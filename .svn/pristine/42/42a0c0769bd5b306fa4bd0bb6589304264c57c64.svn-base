@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JDOrderItemInfoServiceBean">
+    
+    <typeAlias alias="JDOrderItemInfo" type="com.xiu.jd.bean.order.JDOrderItemInfo"/>
+    
+    <insert id="insertBatch" parameterClass="JDOrderItemInfo">
+              <![CDATA[
+           insert into JD_ORDERITEM_INFO (
+	            jdOrderId,
+				skuId,
+				outerSkuId,
+				skuName,
+				jdPrice,
+				wareId,
+			    itemTotal
+           )values(
+               #jdOrderId#,
+	           #skuId#,
+	           #outerSkuId#,
+	           #skuName#,
+	           #jdPrice#,
+	           #wareId#,
+	           #itemTotal#
+	   
+	           
+           )
+        ]]>
+
+   </insert>
+   
+    
+        <insert id="insert" parameterClass="JDOrderItemInfo">
+              <![CDATA[
+           insert into JD_ORDERITEM_INFO (
+	            jdOrderId,
+				skuId,
+				outerSkuId,
+				skuName,
+				jdPrice,
+				wareId,
+			    itemTotal
+           )values(
+               #jdOrderId#,
+	           #skuId#,
+	           #outerSkuId#,
+	           #skuName#,
+	           #jdPrice#,
+	           #wareId#,
+	           #itemTotal#
+	   
+	           
+           )
+        ]]>
+
+   </insert>
+   
+        
+ <!-- 分页查询订单中订单项和订购人信息  -->
+ <select id="getPageResule" parameterClass="java.util.Map" resultClass="JDOrderItemInfo">
+       <![CDATA[ 
+     select n.fullname    fullName,
+       n.mobile      mobile,
+       n.telephone   telePhone,
+       n.fulladdress fullAddress,
+       n.jdorderid   jdOrderId,
+       n.localorderid localOrderId,
+       n.ordercode  orderCode,  
+       n.placetime   placeTime,
+       n.isprocess  isProcess,  
+       n.processtime processTime,
+       n.faildescri faildescri,
+       n.packageFailDesci packageFailDesci
+  from (
+        
+        select  t.fullname    fullname,
+                t.mobile      mobile,
+                t.telephone   telephone,
+                t.fulladdress fulladdress,
+                t.jdorderid   jdorderid,
+                t.localorderid localorderid,
+                t.ordercode ordercode, 
+                t.placetime   placetime,
+                t.isprocess   isprocess,
+                t.processtime processtime,
+                t.faildescri failDescri,
+                t.packageFailDesci packageFailDesci,
+                rownum        as rn
+          from (select c.fullname,
+                        c.mobile,
+                        c.telephone,
+                        c.fulladdress,
+                        o.jdorderid,
+                        o.localorderid,
+                        o.ordercode,
+                        o.placetime,
+                        o.isprocess,
+                        o.processtime,
+                        o.faildescri,
+                        o.packageFailDesci
+                   from  jd_order_track o
+                   left join jd_consigneen_info c
+                     on c.mobile = o.mobile
+                  where c.mobile is not null
+       ]]>
+       <dynamic>
+	     		<isNotEmpty prepend="and" property="jdOrderId"> 
+	             o.jdorderid <![CDATA[=]]>#jdOrderId#
+	            </isNotEmpty>
+
+	     		<isNotEmpty prepend="and" property="isProcess"> 
+	             o.isprocess <![CDATA[=]]>#isProcess#
+	            </isNotEmpty>
+	            
+	          <isNotEmpty prepend="and" property="placeResult"> 
+	             o.placeresult <![CDATA[=]]>#placeResult#
+	            </isNotEmpty>
+	            
+	     		<isNotEmpty prepend="and" property="isSyncPlace"> 
+	             o.issyncplace <![CDATA[=]]>#isSyncPlace#
+	            </isNotEmpty>
+ 
+	            <isNotEmpty prepend="and"  property="telePhone">
+	            c.telephone <![CDATA[=]]>#telePhone#
+	          	</isNotEmpty>
+	          	
+	             <isNotEmpty prepend="and"  property="mobile">
+	              c.mobile <![CDATA[=]]>#mobile#
+	          	</isNotEmpty>
+	          	
+	            <isNotEmpty prepend="and"  property="fullName">
+	                 c.fullname like '%$fullName$%'
+	                 
+	          	 </isNotEmpty>
+	          	 
+	              <isNotEmpty prepend="and"  property="fullAddress">
+	               c.fulladdress like '%$fullAddress$%'
+	          	 </isNotEmpty>
+	          	
+	          	 <isNotEmpty prepend="and" property="startTime"> 
+		           to_date(o.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+			  	 <isNotEmpty prepend="and" property="endTime"> 
+		           to_date(o.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+		         
+			  	 
+			  	  <isNotEmpty prepend="and" property="startTimeProcess"> 
+		           to_date(o.processtime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTimeProcess#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty> 
+			  	 <isNotEmpty prepend="and" property="endTimeProcess"> 
+		           to_date(o.processtime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTimeProcess#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+	           
+		</dynamic>
+       
+                 
+                order by o.isprocess asc , o.placetime desc) t
+         where rownum <![CDATA[<= ]]>#lastNum#
+        
+        ) n
+ where rn <![CDATA[ >=]]>#firstNum#
+     
+</select>
+
+ <!-- 查询订单中的所有订购项getListResult -->
+ 
+ <select id="getListResult" parameterClass="java.util.Map" resultClass="JDOrderItemInfo">
+     
+       <![CDATA[         
+     select 
+        n.jdorderid jdOrderId,
+		n.localorderid localOrderId,
+		n.ordercode orderCode,
+		n.placetime placeTime,
+		n.skuname skuName,
+		n.outerskuid outerSkuId,
+		n.jdprice jdprice,
+		n.itemtotal itemTotal,
+		n.faildescri  failDescri 
+  from (
+        
+        select  t.jdorderid jdorderid,
+				t.localorderid localorderid,
+				t.ordercode ordercode,
+				t.placetime placetime,
+				t.skuname skuname,
+				t.outerskuid outerskuid,
+				t.jdprice jdprice,
+				t.itemtotal itemtotal,
+				t.faildescri  faildescri 
+          from (select  
+                       o.jdorderid,
+                       o.localorderid,
+                       o.ordercode,
+                       o.placetime,
+                       k.skuname,
+                       k.outerskuid,
+                       k.jdprice,
+                       k.itemtotal,
+                       o.faildescri
+
+                   from jd_consigneen_info c
+                   left join jd_order_track o
+                     on c.mobile = o.mobile
+                     
+                  left join jd_orderitem_info k
+                   on o.jdorderid=k.jdorderid
+                  where c.mobile is not null
+       ]]>
+       <dynamic>
+	     		<isNotEmpty prepend="and" property="jdOrderId"> 
+	             o.jdorderid <![CDATA[=]]>#jdOrderId#
+	            </isNotEmpty>
+
+	     		<isNotEmpty prepend="and" property="isProcess"> 
+	             o.isprocess <![CDATA[=]]>#isProcess#
+	            </isNotEmpty>
+	            
+	          <isNotEmpty prepend="and" property="placeResult"> 
+	             o.placeresult <![CDATA[=]]>#placeResult#
+	            </isNotEmpty>
+	            
+	     		<isNotEmpty prepend="and" property="isSyncPlace"> 
+	             o.issyncplace <![CDATA[=]]>#isSyncPlace#
+	            </isNotEmpty>
+ 
+	            <isNotEmpty prepend="and"  property="telePhone">
+	            c.telephone <![CDATA[=]]>#telePhone#
+	          	</isNotEmpty>
+	          	
+	             <isNotEmpty prepend="and"  property="mobile">
+	              c.mobile <![CDATA[=]]>#mobile#
+	          	</isNotEmpty>
+	          	
+	            <isNotEmpty prepend="and"  property="fullName">
+	                 c.fullname like '%$fullName$%'
+	                 
+	          	 </isNotEmpty>
+	          	 
+	              <isNotEmpty prepend="and"  property="fullAddress">
+	               c.fulladdress like '%$fullAddress$%'
+	          	 </isNotEmpty>
+	          	
+	          	 <isNotEmpty prepend="and" property="startTime"> 
+		           to_date(o.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+			  	 <isNotEmpty prepend="and" property="endTime"> 
+		           to_date(o.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+		         
+			  	 
+			  	  <isNotEmpty prepend="and" property="startTimeProcess"> 
+		           to_date(o.processtime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTimeProcess#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty> 
+			  	 <isNotEmpty prepend="and" property="endTimeProcess"> 
+		           to_date(o.processtime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTimeProcess#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+	           
+		</dynamic>
+ 
+                order by o.isprocess asc , o.placetime desc) t
+
+        ) n
+     
+     
+     
+ </select>
+ 
+ 
+ 
+  <!-- 查询订单中的所有订购项(分页) -->
+ 
+ <select id="getListResultPage" parameterClass="java.util.Map" resultClass="JDOrderItemInfo">
+     
+       <![CDATA[         
+     select 
+        n.jdorderid jdOrderId,
+		n.localorderid localOrderId,
+		n.ordercode orderCode,
+		n.placetime placeTime,
+		n.skuname skuName,
+		n.outerskuid outerSkuId,
+		n.jdprice jdprice,
+		n.itemtotal itemTotal,
+		n.faildescri  failDescri 
+  from (
+        
+        select  t.jdorderid jdorderid,
+				t.localorderid localorderid,
+				t.ordercode ordercode,
+				t.placetime placetime,
+				t.skuname skuname,
+				t.outerskuid outerskuid,
+				t.jdprice jdprice,
+				t.itemtotal itemtotal,
+				t.faildescri  faildescri,
+				rownum as rn
+          from (select  
+                       o.jdorderid,
+                       o.localorderid,
+                       o.ordercode,
+                       o.placetime,
+                       k.skuname,
+                       k.outerskuid,
+                       k.jdprice,
+                       k.itemtotal,
+                       o.faildescri
+
+                   from jd_consigneen_info c
+                   left join jd_order_track o
+                     on c.mobile = o.mobile
+                     
+                  left join jd_orderitem_info k
+                   on o.jdorderid=k.jdorderid
+                  where c.mobile is not null
+       ]]>
+       <dynamic>
+	     		<isNotEmpty prepend="and" property="jdOrderId"> 
+	             o.jdorderid <![CDATA[=]]>#jdOrderId#
+	            </isNotEmpty>
+
+	     		<isNotEmpty prepend="and" property="isProcess"> 
+	             o.isprocess <![CDATA[=]]>#isProcess#
+	            </isNotEmpty>
+	            
+	          <isNotEmpty prepend="and" property="placeResult"> 
+	             o.placeresult <![CDATA[=]]>#placeResult#
+	            </isNotEmpty>
+	            
+	     		<isNotEmpty prepend="and" property="isSyncPlace"> 
+	             o.issyncplace <![CDATA[=]]>#isSyncPlace#
+	            </isNotEmpty>
+ 
+	            <isNotEmpty prepend="and"  property="telePhone">
+	            c.telephone <![CDATA[=]]>#telePhone#
+	          	</isNotEmpty>
+	          	
+	             <isNotEmpty prepend="and"  property="mobile">
+	              c.mobile <![CDATA[=]]>#mobile#
+	          	</isNotEmpty>
+	          	
+	            <isNotEmpty prepend="and"  property="fullName">
+	                 c.fullname like '%$fullName$%'
+	                 
+	          	 </isNotEmpty>
+	          	 
+	              <isNotEmpty prepend="and"  property="fullAddress">
+	               c.fulladdress like '%$fullAddress$%'
+	          	 </isNotEmpty>
+	          	
+	          	 <isNotEmpty prepend="and" property="startTime"> 
+		           to_date(o.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+			  	 <isNotEmpty prepend="and" property="endTime"> 
+		           to_date(o.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+		         
+			  	 
+			  	  <isNotEmpty prepend="and" property="startTimeProcess"> 
+		           to_date(o.processtime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTimeProcess#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty> 
+			  	 <isNotEmpty prepend="and" property="endTimeProcess"> 
+		           to_date(o.processtime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTimeProcess#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+	           
+		</dynamic>
+ 
+                order by o.isprocess asc , o.placetime desc) t where rownum   <![CDATA[ <= ]]>#lastNum#
+
+        ) n where rn <![CDATA[ >=]]>#firstNum#
+     
+     
+     
+ </select>
+ 
+ 
+ 
+  <!-- 查询订单中的所有订购项getListResult -->
+ 
+ <select id="getListResultCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+    <![CDATA[         
+           select  
+                    count(*)
+
+                   from jd_consigneen_info c
+                   left join jd_order_track o
+                     on c.mobile = o.mobile
+                     
+                  left join jd_orderitem_info k
+                   on o.jdorderid=k.jdorderid
+                  where c.mobile is not null
+       ]]>
+       <dynamic>
+	     		<isNotEmpty prepend="and" property="jdOrderId"> 
+	             o.jdorderid <![CDATA[=]]>#jdOrderId#
+	            </isNotEmpty>
+
+	     		<isNotEmpty prepend="and" property="isProcess"> 
+	             o.isprocess <![CDATA[=]]>#isProcess#
+	            </isNotEmpty>
+	            
+	          <isNotEmpty prepend="and" property="placeResult"> 
+	             o.placeresult <![CDATA[=]]>#placeResult#
+	            </isNotEmpty>
+	            
+	     		<isNotEmpty prepend="and" property="isSyncPlace"> 
+	             o.issyncplace <![CDATA[=]]>#isSyncPlace#
+	            </isNotEmpty>
+ 
+	            <isNotEmpty prepend="and"  property="telePhone">
+	            c.telephone <![CDATA[=]]>#telePhone#
+	          	</isNotEmpty>
+	          	
+	             <isNotEmpty prepend="and"  property="mobile">
+	              c.mobile <![CDATA[=]]>#mobile#
+	          	</isNotEmpty>
+	          	
+	            <isNotEmpty prepend="and"  property="fullName">
+	                 c.fullname like '%$fullName$%'
+	                 
+	          	 </isNotEmpty>
+	          	 
+	              <isNotEmpty prepend="and"  property="fullAddress">
+	               c.fulladdress like '%$fullAddress$%'
+	          	 </isNotEmpty>
+	          	
+	          	 <isNotEmpty prepend="and" property="startTime"> 
+		           to_date(o.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+			  	 <isNotEmpty prepend="and" property="endTime"> 
+		           to_date(o.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+		         
+			  	 
+			  	  <isNotEmpty prepend="and" property="startTimeProcess"> 
+		           to_date(o.processtime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTimeProcess#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty> 
+			  	 <isNotEmpty prepend="and" property="endTimeProcess"> 
+		           to_date(o.processtime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTimeProcess#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+	           
+		</dynamic>
+ 
+           
+     
+     
+ </select>
+ 
+ 
+ 
+ 
+ <update id="updateOrdersProcessStatu" parameterClass="java.util.Map">
+		update jd_order_track t
+		   set t.isprocess = #processStatu#,
+		       t.processtime= to_char(sysdate,'yyyy-mm-dd hh24:mi:ss')
+		 where 1=1  
+
+      <iterate prepend="and t.jdorderid in" open="(" close=")" conjunction="," property="orderIds">
+	      <![CDATA[#orderIds[]#]]>
+	 </iterate>
+ </update>
+
+ <select id="getCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+	    <![CDATA[ 
+	          select   
+	            count(o.jdorderid)
+              from 
+               jd_consigneen_info c
+               left join jd_order_track o
+                 on c.mobile = o.mobile
+              where c.mobile is not null
+	    ]]>
+	      <dynamic>
+	     		<isNotEmpty prepend="and" property="jdOrderId"> 
+	             o.jdorderid <![CDATA[=]]>#jdOrderId#
+	            </isNotEmpty>
+	            
+	     		<isNotEmpty prepend="and" property="isProcess"> 
+	             o.isprocess <![CDATA[=]]>#isProcess#
+	            </isNotEmpty>
+	            
+	     		<isNotEmpty prepend="and" property="placeResult"> 
+	             o.placeresult <![CDATA[=]]>#placeResult#
+	            </isNotEmpty>
+	            
+	     		<isNotEmpty prepend="and" property="isSyncPlace"> 
+	             o.issyncplace <![CDATA[=]]>#isSyncPlace#
+	            </isNotEmpty>
+	     		
+	            <isNotEmpty prepend="and"  property="telePhone">
+	            c.telephone <![CDATA[=]]>#telePhone#
+	          	</isNotEmpty>
+	          	
+	             <isNotEmpty prepend="and"  property="mobile">
+	              c.mobile <![CDATA[=]]>#mobile#
+	          	</isNotEmpty>
+	          	
+	             <isNotEmpty prepend="and"  property="fullName">
+	                 c.fullname like '%$fullName$%'
+	                 
+	          	 </isNotEmpty>
+	          	 
+	              <isNotEmpty prepend="and"  property="fullAddress">
+	               c.fulladdress like '%$fullAddress$%'
+	          	 </isNotEmpty>
+	          	
+	          	 <isNotEmpty prepend="and" property="startTime"> 
+		           to_date(o.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+			  	 <isNotEmpty prepend="and" property="endTime"> 
+		           to_date(o.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+		         
+			  	 
+			  	   <isNotEmpty prepend="and" property="startTimeProcess"> 
+		           to_date(o.processtime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTimeProcess#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty> 
+			  	 <isNotEmpty prepend="and" property="endTimeProcess"> 
+		           to_date(o.processtime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTimeProcess#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+		</dynamic>
+	</select>
+	
+ 
+   <!--根据订单id查询订单中所订购的商品SKU信息    -->
+   <select id="getOrderItemInfoByOrderId" parameterClass="java.lang.String" resultClass="JDOrderItemInfo">
+       select 
+	       t.skuname skuName,
+	       t.outerskuid outerSkuId,
+	       t.skuId skuId,
+	       t.itemtotal itemTotal
+       from 
+         jd_orderitem_info t 
+       where 
+         t.jdorderid=#orderId#
+       
+   </select>
+   
+   <select id="getTotalCount" resultClass="java.lang.Long">
+       
+       select count(*) from jd_orderitem_info t
+       
+   </select>
+ 
+</sqlMap>

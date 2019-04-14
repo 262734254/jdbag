@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="OnLineBlackProductServiceBean">
+    <typeAlias alias="OnLineBlackProductBean" type="com.xiu.jd.bean.ware.OnLineBlackProductBean"/>
+      
+    <insert id="insertBlackProductBean" parameterClass="OnLineBlackProductBean">
+         <selectKey resultClass="long" keyProperty="id" > 
+          select SEQ_JD_ONLINE_BLACK_PRODUCT.nextval as id from dual
+        </selectKey>
+         insert into  jd_online_black_product
+         (
+           id,
+           xiuCode,
+           isButtJoint,
+           confirmStatus,
+           confirmDate,
+           createDate,
+           importUserName,
+           isDelete,
+           userName,
+           confirmUserName
+          )values(
+           #id#,
+           #xiuCode#,
+           #isButtJoint#,
+           #confirmStatus#,
+           sysdate,
+           sysdate,
+           #importUserName#,
+           #isDelete#,
+           #userName#,
+           #confirmUserName#
+          )
+     </insert>
+     
+    <!-- 分页查询黑名单商品信息 -->
+    <select id="getPageResule" parameterClass="java.util.Map" resultClass="OnLineBlackProductBean">
+   select 
+        z.id,
+        z.xiucode,
+        z.isbuttjoint,
+        z.confirmstatus,
+        z.confirmdate,
+        z.createdate,
+        z.confirmUserName,
+        z.title,
+        z.onlinestatus
+      from (     
+        select k.* ,rownum as rn  from (
+          select 
+	          n.id,
+	          n.xiucode,
+	          n.isbuttjoint,
+	          n.confirmstatus,
+	          to_char(n.confirmdate,'yyyy-MM-dd hh24:mi:ss') confirmdate,
+	          to_char(n.createdate,'yyyy-MM-dd hh24:mi:ss') createdate,
+	          n.confirmUserName,
+	          p.title,
+	          p.onlinestatus 
+          from 
+		  ( select m.* from (
+		                     select 
+		                      t.id,
+		                      t.xiucode,
+		                      t.isbuttjoint,
+		                      t.confirmstatus,
+		                      t.confirmdate,
+		                      t.createdate,
+		                      t.confirmusername
+		                 from jd_online_black_product t
+		                where 1=1 
+		                
+		                <dynamic>
+		               
+		                     <isNotEmpty prepend="and" property="isDelete"> 
+		                        t.isdelete =#isDelete#
+		                    </isNotEmpty>
+		                 
+				             <isNotEmpty prepend="and" property="confirmStartDate">
+								t.confirmdate <![CDATA[>=]]>to_date(#confirmStartDate#,'yyyy-mm-dd hh24:mi:ss')
+							</isNotEmpty>
+							
+							<isNotEmpty prepend="and" property="confirmEndDate">
+								t.confirmdate <![CDATA[<=]]>to_date(#confirmEndDate#,'yyyy-mm-dd hh24:mi:ss')
+							</isNotEmpty>
+							
+							   <isNotEmpty prepend="and" property="createStartDate">
+								t.createdate <![CDATA[>=]]>to_date(#createStartDate#,'yyyy-mm-dd hh24:mi:ss')
+							</isNotEmpty>
+							
+							<isNotEmpty prepend="and" property="createEndDate">
+								 t.createdate <![CDATA[<=]]>to_date(#createEndDate#,'yyyy-mm-dd hh24:mi:ss')
+							</isNotEmpty>
+		                     
+		                    <isNotEmpty prepend=" and " property="xiuCodes">
+						            <iterate prepend=" t.xiucode in " open="(" close=")" conjunction="," property="xiuCodes">
+				                      <![CDATA[#xiuCodes[]#]]>
+				                    </iterate>
+						     </isNotEmpty>
+		                    
+		                <isNotEmpty prepend="and" property="confirmUserName">
+	                        t.confirmusername like '%$confirmUserName$%'
+	                     </isNotEmpty>
+		                     
+                       <isNotEmpty prepend="and" property="isButtJoint"> 
+		                    t.isButtJoint <![CDATA[=]]>#isButtJoint#
+		               </isNotEmpty>
+		               
+                       <isNotEmpty prepend="and" property="confirmStatus"> 
+		                    t.confirmStatus<![CDATA[=]]>#confirmStatus#
+		               </isNotEmpty>
+                       
+                   </dynamic>
+		               
+		               )m  
+		   ) n
+   left join jd_product_info p
+ on n.xiucode=p.xiucode
+ where 1=1 
+  <dynamic>
+   <isNotEmpty prepend="and" property="title">
+	 p.title like '%$title$%'
+   </isNotEmpty>
+ 
+    <isNotEmpty prepend="and" property="onLineStatus"> 
+     p.onLineStatus<![CDATA[=]]>#onLineStatus#
+    </isNotEmpty>
+ </dynamic>
+ order by n.id desc
+ 
+  ) k where rownum<![CDATA[<=]]>#lastNum#
+ ) z where rn <![CDATA[>=]]>#firstNum# 
+  </select>
+     
+     <select id="getCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+           select 
+                count(1)
+          from 
+		  ( select m.* from (
+		                     select 
+		                      t.xiucode
+		                 from jd_online_black_product t
+		                where 1=1 
+		                
+		                <dynamic>
+		               
+		                     <isNotEmpty prepend="and" property="isDelete"> 
+		                        t.isdelete =#isDelete#
+		                    </isNotEmpty>
+		                 
+				             <isNotEmpty prepend="and" property="confirmStartDate">
+								t.confirmdate <![CDATA[>=]]>to_date(#confirmStartDate#,'yyyy-mm-dd hh24:mi:ss')
+							</isNotEmpty>
+							
+							<isNotEmpty prepend="and" property="confirmEndDate">
+								t.confirmdate <![CDATA[<=]]>to_date(#confirmEndDate#,'yyyy-mm-dd hh24:mi:ss')
+							</isNotEmpty>
+							
+							   <isNotEmpty prepend="and" property="createStartDate">
+								t.createdate <![CDATA[>=]]>to_date(#createStartDate#,'yyyy-mm-dd hh24:mi:ss')
+							</isNotEmpty>
+							
+							<isNotEmpty prepend="and" property="createEndDate">
+								 t.createdate <![CDATA[<=]]>to_date(#createEndDate#,'yyyy-mm-dd hh24:mi:ss')
+							</isNotEmpty>
+		                     
+		                    <isNotEmpty prepend=" and " property="xiuCodes">
+						            <iterate prepend=" t.xiucode in " open="(" close=")" conjunction="," property="xiuCodes">
+				                      <![CDATA[#xiuCodes[]#]]>
+				                    </iterate>
+						     </isNotEmpty>
+		                    
+		               <isNotEmpty prepend="and" property="confirmUserName">
+	                        t.confirmusername like '%$confirmUserName$%'
+	                     </isNotEmpty>
+		                     
+                       <isNotEmpty prepend="and" property="isButtJoint"> 
+		                    t.isButtJoint <![CDATA[=]]>#isButtJoint#
+		               </isNotEmpty>
+		               
+                       <isNotEmpty prepend="and" property="confirmStatus"> 
+		                    t.confirmStatus<![CDATA[=]]>#confirmStatus#
+		               </isNotEmpty>
+                       
+                   </dynamic>
+		              
+				               )m 
+				   ) n
+		   left join jd_product_info p
+		 on n.xiucode=p.xiucode
+		 where 1=1
+	  <dynamic>
+	   <isNotEmpty prepend="and" property="title">
+		 p.title like '%$title$%'
+	   </isNotEmpty>
+	 
+	    <isNotEmpty prepend="and" property="onLineStatus"> 
+	     p.onLineStatus<![CDATA[=]]>#onLineStatus#
+	    </isNotEmpty>
+	 </dynamic>
+     </select>
+    
+  <update id="updateOnLineBlackProductBean" parameterClass="java.util.Map">
+      update jd_online_black_product t
+       <dynamic prepend="set">
+			 <isNotEmpty prepend="," property="confirmStatus" removeFirstPrepend="true">
+			      t.confirmstatus=#confirmStatus#
+			 </isNotEmpty>
+			 
+			  <isNotEmpty prepend="," property="confirmDate" removeFirstPrepend="true">
+			       t.confirmdate=sysdate
+			 </isNotEmpty>
+			
+			  <isNotEmpty prepend="," property="isDelete" removeFirstPrepend="true">
+			      t.isdelete=#isDelete#
+			 </isNotEmpty>
+			 
+			    <isNotEmpty prepend="," property="createDate" removeFirstPrepend="true">
+			       t.createdate=sysdate
+			 </isNotEmpty>
+			 
+			 <isNotEmpty prepend="," property="importUserName" removeFirstPrepend="true">
+			       t.importUserName=#importUserName#
+			 </isNotEmpty>
+			 
+			 <isNotEmpty prepend="," property="isButtJoint"  removeFirstPrepend="true"> 
+		        t.isButtJoint=#isButtJoint#
+		     </isNotEmpty>
+	
+		    
+			   <isNotEmpty prepend="," property="userName" removeFirstPrepend="true">
+			      t.userName=#userName#
+			 </isNotEmpty>
+			 
+			  <isNotEmpty prepend="," property="confirmUserName" removeFirstPrepend="true">
+			       t.confirmusername=#confirmUserName#
+			 </isNotEmpty>
+			   
+       
+          
+      </dynamic>
+      where 1=1
+       <dynamic>
+             <isNotEmpty prepend=" and " property="ids">
+            <iterate prepend=" t.id in " open="(" close=")" conjunction="," property="ids">
+                    <![CDATA[#ids[]#]]>
+                  </iterate>
+		</isNotEmpty>
+		 <isNotEmpty prepend=" and " property="xiuCode">
+		      t.xiucode=#xiuCode#
+		  </isNotEmpty>
+             
+       </dynamic>
+      
+  </update>
+  
+  
+  <select id="getQueryResultList" parameterClass="java.util.Map" resultClass="OnLineBlackProductBean">
+      select
+       m.id,
+       m.xiucode,
+       m.isbuttjoint,
+       m.confirmdate,
+       m.createdate
+  from (select 
+                t.id,
+                t.xiucode,
+                t.isbuttjoint,
+                to_char(t.confirmdate,'yyyy-MM-dd hh24:mi:ss') confirmdate,
+	            to_char(t.createdate,'yyyy-MM-dd hh24:mi:ss') createdate,
+                rownum rn
+           from jd_online_black_product t
+          where 1=1
+         
+            <isNotEmpty prepend="and" property="isDelete"> 
+		                        t.isdelete =#isDelete#
+		      </isNotEmpty>
+		                 
+			 
+       and rownum <![CDATA[<=]]>#lastNum#) m
+ where m.rn <![CDATA[>=]]>#firstNum# 
+  </select>
+  
+  <select id="getQueryResultCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+      select 
+               count(1)
+           from jd_online_black_product t
+          where 1=1
+         
+            <isNotEmpty prepend="and" property="isDelete"> 
+		       t.isdelete =#isDelete#
+		     </isNotEmpty>
+		                 
+      
+   </select>
+  
+    <select id="isOnLineBlack" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+        select count(1) from jd_online_black_product t where 
+         t.isdelete=1
+        and t.xiucode=#value#
+        and  (t.confirmstatus=1 or   t.confirmstatus=2) 
+    </select>
+    
+    <select id="xiuCodeIsExits" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+         select count(1) from jd_online_black_product t where 
+         t.isdelete=1
+         and t.xiucode=#value#
+    </select>
+    
+    <update id="update" parameterClass="OnLineBlackProductBean">
+        update jd_online_black_product t 
+        <dynamic prepend="set">
+			 <isNotEmpty prepend="," property="confirmStatus" removeFirstPrepend="true">
+			      t.confirmstatus=#confirmStatus#
+			 </isNotEmpty>
+			 
+			   <isNotEmpty prepend="," property="isButtJoint" removeFirstPrepend="true">
+			      t.isbuttjoint=#isButtJoint#
+			 </isNotEmpty>
+			 
+			 
+		  </dynamic>   
+         where 1=1 and  t.confirmstatus!=2
+       <dynamic>
+             <isNotEmpty prepend=" and " property="id">
+               t.id =#id#
+		     </isNotEmpty>
+
+       </dynamic>
+    </update>
+    
+    
+    <update id="updateAllConfrimStatus"  parameterClass="java.util.Map" >
+         update jd_online_black_product t 
+        <dynamic prepend="set">
+			 <isNotEmpty prepend="," property="confirmStatus" removeFirstPrepend="true">
+			      t.confirmstatus=#confirmStatus#
+			 </isNotEmpty>
+			  <isNotEmpty prepend="," property="isButtJoint" removeFirstPrepend="true">
+			      t.isbuttjoint=#isButtJoint#
+			 </isNotEmpty>
+			 
+			 
+		  </dynamic>   
+         where 1=1 and  t.confirmstatus=2
+       <dynamic>
+            <isNotEmpty prepend="and" property="isDelete"> 
+			      t.isdelete=#isDelete#
+			 </isNotEmpty>
+       </dynamic>
+        
+        
+    </update>
+</sqlMap>

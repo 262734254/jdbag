@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JDAttributeValueDaoBean">
+    
+    <typeAlias alias="JDAttributeValue" type="com.xiu.jd.bean.ware.JDAttributeValue"/>
+     <typeAlias alias="XiuJdAttValue" type="com.xiu.jd.bean.ware.XiuJdAttValue"/>
+    
+    <select id="getListResult" parameterClass="java.util.Map" resultClass="JDAttributeValue">
+    	select distinct t.vid vid,
+    		   t.aid aid,
+    		   t.name name,
+    		   t.status status,
+    		   t.index_id indexId,
+    		   t.features features,
+    		   m.jd_vid identify 
+    	    from jd_attributevalue t
+    		left join jd_attribute w on t.aid = w.aid 
+    		left join (select a.* from jd_xiu_attvalue a 
+               left join xiu_goods.x_data_prd_attr p  on to_char(p.attr_id) = a.xiu_attr_id and to_char(p.val_id) = a.xiu_vid 
+                where a.xiu_childcode = #xiuCategoryId#  and p.product_sn=#xiucode#) m on t.vid = m.jd_vid
+    		where w.aid = #aid# 
+    </select>
+    
+    <select id="getCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+    	select count(t.vid) from jd_attributevalue t 
+        	right join jd_xiu_attvalue a on t.vid = a.jd_vid 
+        	where  t.aid=#aid# and t.vid=#vid#
+    </select>
+    
+    <select id="findJdAttributeValue" parameterClass="java.util.Map" resultClass="JDAttributeValue">
+    	select t.vid vid,
+    		   t.aid aid,
+    		   t.name name,
+    		   t.status status,
+    		   t.index_id indexId,
+    		   t.features features 
+    	    from jd_attributevalue t
+    		left join jd_attribute w on t.aid = w.aid 
+    		where w.cid = #cid# and w.name=#attrName# and t.name=#attrValue# and rownum=1
+    </select>
+    
+    <delete id="deleteAll">
+        delete from JD_ATTRIBUTEVALUE
+        
+    </delete>
+      
+    <update id="updateAttributeValueByXiuChildCode" parameterClass="XiuJdAttValue">
+        update 
+          jd_xiu_attvalue t
+       set 
+         t.jd_cid=#jdCid#,
+         t.jd_category_name=#jdCategoryName#
+       where t.xiu_childcode=#xiuChildcode#
+        
+    </update>
+    
+    <select id="queryAttrValueList" parameterClass="java.util.Map" resultClass="java.lang.String">
+    	select t.name from jd_attributevalue t 
+    		left join jd_attribute w on t.aid = w.aid 
+    		where w.cid=#cid# and w.name=#attrName# and w.is_sale_prop=1
+    </select>
+    
+    <select id="queryAidandVid" parameterClass="java.util.Map" resultClass="java.lang.String">
+    	select t.aid||':'||t.vid from jd_attributevalue t 
+    		left join jd_attribute w on t.aid = w.aid 
+    		where w.cid=#cid# and t.name=#attrName# and w.is_sale_prop=1
+    </select>
+    <!--  -->
+    <select id="isExistAttrValue" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+    	select count(1) from jd_attributevalue t where t.aid=#jdAttrAid# and t.vid=#jdAttrVid#
+    	
+    	<dynamic>
+    	   <isNotEmpty property="cid" prepend="and">
+    	       cid=#cid#
+    	   </isNotEmpty>
+    	    
+    	</dynamic>
+    </select>
+    
+    <insert id="insertBatch" parameterClass="JDAttributeValue">
+    	 <![CDATA[
+           insert into jd_attributeValue (
+	            vid,
+				aid,
+				cid,
+				name,
+				status,
+				index_id,
+				features
+           )values(
+            	#vid#,
+				#aid#,
+				#cid#,
+				#name#,
+				#status#,
+				#indexId#,
+				#features#
+           )
+        ]]>
+    </insert>
+    
+     <insert id="insert" parameterClass="JDAttributeValue">
+    	 <![CDATA[
+           insert into jd_attributeValue (
+	            vid,
+				aid,
+				cid,
+				name,
+				status,
+				index_id,
+				features
+           )values(
+            	#vid#,
+				#aid#,
+				#cid#,
+				#name#,
+				#status#,
+				#indexId#,
+				#features#
+           )
+        ]]>
+    </insert>
+</sqlMap>

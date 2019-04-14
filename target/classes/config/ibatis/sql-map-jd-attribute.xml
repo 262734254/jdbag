@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JDAttributeDaoBean">
+    
+    <typeAlias alias="JDAttribute" type="com.xiu.jd.bean.ware.JDAttribute"/>
+    
+    
+    
+    <select id="getListResult" parameterClass="java.util.Map" resultClass="JDAttribute" >
+    
+      
+    	select distinct t.aid aid,
+    		   t.name name,
+    		   t.cid cid,
+    		   t.is_key_prop keyProp,
+    		   t.is_sale_prop saleProp,
+    		   t.index_id indexId,
+    		   t.status status,
+    		   t.att_type attType,
+    		   t.input_type inputType,
+    		   t.is_req req,
+    		   t.is_fet fet,
+    		   t.is_nav nav  
+    		from jd_attribute t 
+    		left join jd_xiu_category w on w.jd_cid = t.cid 
+    		left join jd_product_info p on substr(p.categoryid,1,4) = substr(w.xiu_cid,1,4)
+    		where t.is_sale_prop = 0 and t.name != '品牌' and w.xiu_cid=#xiuCategoryId# and p.xiucode= #xiucode# order by t.index_id asc
+    </select>
+    
+    <delete id="deleteAll">
+        
+        delete from JD_ATTRIBUTE
+    </delete>
+    
+    <select id="isExistAttr" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+    	select count(1) from jd_attribute t where t.cid = #jdCid# and t.aid = #jdAttrAid#
+    </select>
+    
+    <insert id="insertBatch" parameterClass="JDAttribute">
+    	<![CDATA[
+           insert into jd_attribute (
+	            aid,
+       			NAME,
+       			cid,
+       			is_key_prop,
+       			is_sale_prop,
+       			index_id,
+       			status,
+       			att_type,
+       			input_type,
+       			is_req,
+       			is_fet,
+       			is_nav
+           )values(
+                #aid#,
+                #name#,
+				#cid#,
+				#keyProp#,
+				#saleProp#,
+				#indexId#,
+				#status#,
+				#attType#,
+				#inputType#,
+				#req#,
+				#fet#,
+				#nav#
+           )
+        ]]>
+    </insert>
+    
+</sqlMap>

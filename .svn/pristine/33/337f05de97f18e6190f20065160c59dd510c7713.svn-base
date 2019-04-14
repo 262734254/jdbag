@@ -1,0 +1,1148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JDWareDaoBean">
+    
+    <typeAlias alias="JDProduct" type="com.xiu.jd.bean.ware.JDProduct"/>
+
+	<select id="getJdProductByWareId" parameterClass="String" resultClass="JDProduct">
+		<![CDATA[
+		SELECT 
+			XIU_ITEM_ID 	xiuItemId,
+			XIU_ATTR_VALUES xiuAttrValues,
+			XIU_ATTR_VALUES_ZH  xiuAttrValuesZh,
+			  jd_Ware_Id	jdWareId,
+			  XIU_BRAND_CODE	xiuBrandCode,
+			  JD_BRAND_ID 	jdBrandId,
+			  xiucode		xiucode,
+	          title			title,
+	          high			high,
+	          weight		weight,
+	          lenght		lenght,
+	          costprice		costprice,
+	          marketprice	marketprice,
+	          jdprice		jdprice,
+	          notes			notes,
+	          mainimagepath	mainimagepath,
+	          stocknum		stocknum,
+	          operatename	operatename,
+	          num			num,
+	          brandcode		brandcode,
+	          categoryid	categoryid
+	          FROM xiu_jd_bag.jd_product_info WHERE jd_Ware_Id=#jdWareId#
+		]]>
+	</select>
+    
+    <insert id="insert" parameterClass="JDProduct">
+        <![CDATA[
+          insert into xiu_jd_bag.jd_product_info 
+        (
+              xiucode,
+	          title,
+	          high,
+	          weight,
+	          lenght,
+	          attributes,
+	          wide,
+	          costprice,
+	          marketprice,
+	          jdprice,
+	          mainimagepath,
+	          stocknum,
+	          operatename,
+	          num,
+	          brandcode,
+	          categoryid,
+	          cid,
+	          createDate,
+	          lastupdate,
+	          jd_ware_id,
+	          xiu_item_id,
+	          xiu_brand_code,
+	          status,
+	          onLineStatus,
+	          shopcategory,
+	          supplierCode,
+	          notes,
+	          adContent,
+	          itemNum
+          )
+        values(
+              #xiucode#,
+              #title#,
+	          #high#,
+	          #weight#,
+	          #lenght#,
+	          #attributes#,
+	          #wide#,
+	          #costprice#,
+	          #marketprice#,
+	          #jdprice#,
+	          #mainimagepath#,
+	          #stocknum#,
+	          #operatename#,
+	          #num#,
+	          #brandcode#,
+	          #categoryid#,
+	          #cid#,
+	          #createDate#,
+	          #lastupdate#,
+	          #jd_ware_id#,
+	          #xiu_item_id#,
+			  #xiu_brand_code#,
+			  #status#,
+			  #onLineStatus#,
+			  #shopCategory#,
+			  #supplierCode#,
+			  #notes#,
+			  #adContent#,
+			  #itemNum#
+        )
+        ]]>
+   
+    </insert>
+     <!-- 批量保存商品 -->
+        <insert id="insertBatch" parameterClass="JDProduct">
+              <![CDATA[
+         insert into xiu_jd_bag.jd_product_info 
+        (
+              xiucode,
+	          title,
+	          high,
+	          weight,
+	          lenght,
+	          attributes,
+	          wide,
+	          costprice,
+	          marketprice,
+	          jdprice,
+	          mainimagepath,
+	          stocknum,
+	          operatename,
+	          num,
+	          brandcode,
+	          categoryid,
+	          cid,
+	          createDate,
+	          lastupdate,
+	          jd_ware_id,
+	          xiu_item_id,
+	          xiu_brand_code,
+	          status,
+	          onLineStatus,
+	          shopcategory,
+	          supplierCode,
+	          notes
+          )
+        values(
+              #xiucode#,
+              #title#,
+	          #high#,
+	          #weight#,
+	          #lenght#,
+	          #attributes#,
+	          #wide#,
+	          #costprice#,
+	          #marketprice#,
+	          #jdprice#,
+	          #mainimagepath#,
+	          #stocknum#,
+	          #operatename#,
+	          #num#,
+	          #brandcode#,
+	          #categoryid#,
+	          #cid#,
+	          #createDate#,
+	          #lastupdate#,
+	          #jd_ware_id#,
+	          #xiu_item_id#,
+			  #xiu_brand_code#,
+			  #status#,
+			  #onLineStatus#,
+			  #shopCategory#,
+			  #supplierCode#,
+			  #notes#
+        )
+        ]]>
+        
+    </insert>
+    
+    
+    <!-- 批量保存商品 -->
+        <insert id="insertXiuBatch" parameterClass="JDProduct">
+              <![CDATA[
+         insert into xiu_jd.jd_product_info 
+        (
+              xiucode,
+	          title,
+	          high,
+	          weight,
+	          lenght,
+	          attributes,
+	          wide,
+	          costprice,
+	          marketprice,
+	          jdprice,
+	          mainimagepath,
+	          stocknum,
+	          operatename,
+	          num,
+	          brandcode,
+	          categoryid,
+	          cid,
+	          createDate,
+	          lastupdate,
+	          jd_ware_id,
+	          xiu_item_id,
+	          xiu_brand_code,
+	          status,
+	          onLineStatus,
+	          shopcategory,
+	          supplierCode,
+	          notes
+          )
+        values(
+              #xiucode#,
+              #title#,
+	          #high#,
+	          #weight#,
+	          #lenght#,
+	          #attributes#,
+	          #wide#,
+	          #costprice#,
+	          #marketprice#,
+	          #jdprice#,
+	          #mainimagepath#,
+	          #stocknum#,
+	          #operatename#,
+	          #num#,
+	          #brandcode#,
+	          #categoryid#,
+	          #cid#,
+	          #createDate#,
+	          #lastupdate#,
+	          #jd_ware_id#,
+	          #xiu_item_id#,
+			  #xiu_brand_code#,
+			  #status#,
+			  #onLineStatus#,
+			  #shopCategory#,
+			  #supplierCode#,
+			  #notes#
+        )
+        ]]>
+        
+    </insert>
+    
+    <!-- 批量保存商品 -->
+        <insert id="insertEbayBatch" parameterClass="JDProduct">
+              <![CDATA[
+         insert into xiu_ebay_jd.jd_product_info 
+        (
+              xiucode,
+	          title,
+	          high,
+	          weight,
+	          lenght,
+	          attributes,
+	          wide,
+	          costprice,
+	          marketprice,
+	          jdprice,
+	          mainimagepath,
+	          stocknum,
+	          operatename,
+	          num,
+	          brandcode,
+	          categoryid,
+	          cid,
+	          createDate,
+	          lastupdate,
+	          jd_ware_id,
+	          xiu_item_id,
+	          xiu_brand_code,
+	          status,
+	          onLineStatus,
+	          shopcategory,
+	          supplierCode,
+	          notes
+          )
+        values(
+              #xiucode#,
+              #title#,
+	          #high#,
+	          #weight#,
+	          #lenght#,
+	          #attributes#,
+	          #wide#,
+	          #costprice#,
+	          #marketprice#,
+	          #jdprice#,
+	          #mainimagepath#,
+	          #stocknum#,
+	          #operatename#,
+	          #num#,
+	          #brandcode#,
+	          #categoryid#,
+	          #cid#,
+	          #createDate#,
+	          #lastupdate#,
+	          #jd_ware_id#,
+	          #xiu_item_id#,
+			  #xiu_brand_code#,
+			  #status#,
+			  #onLineStatus#,
+			  #shopCategory#,
+			  #supplierCode#,
+			  #notes#
+        )
+        ]]>
+        
+    </insert>
+    
+      <resultMap id="sql_model_mapping_resultMap" class="com.xiu.jd.bean.ware.ProductAttributeInfoModel" >
+		<result column="ID" property="id" jdbcType="DECIMAL" />
+		<result column="PRODUCT_ID" property="productId" jdbcType="DECIMAL" />
+		<result column="PRODUCT_SN" property="productSn" jdbcType="VARCHAR" />
+		<result column="ATTR_ID" property="attrId" jdbcType="DECIMAL" />
+		<result column="ATTR_NAME" property="attrName" jdbcType="VARCHAR" />
+		<result column="VAL_ID" property="valId" jdbcType="DECIMAL" />
+		<result column="VAL_DESC" property="valDesc" jdbcType="VARCHAR" />
+		<result column="DELETE_FLAG" property="deleteFlag" jdbcType="DECIMAL" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="DATE" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="DATE" />
+	</resultMap>
+	
+      <delete id="deleteWareInfoByXiuCodes" parameterClass="java.util.List">
+          delete from xiu_jd_bag.jd_product_info t where t.xiucode in
+           <iterate conjunction="," open="(" close=")" >
+	   			#value[]# 
+	   		</iterate>
+      </delete>
+      
+      <resultMap id="JDProduct_wardId_xiuCode" class="com.xiu.jd.bean.ware.JDProduct" >
+          <result column="wardId" property="jd_ware_id" jdbcType="VARCHAR" />
+          <result column="xiucode" property="xiucode" jdbcType="VARCHAR" />
+      </resultMap>
+      
+      <!-- 根据走秀码查询对应的京东ID -->
+      <select id="queryWardIdsByXiuCodes" parameterClass="java.util.Map" resultMap="JDProduct_wardId_xiuCode">
+          
+          select 
+            t.jd_ware_id  wardId,
+            t.xiucode  xiucode
+            
+          from xiu_jd_bag.jd_product_info t 
+          <iterate prepend="where  t.xiucode in " conjunction="," open="(" close=")" property="xiuCodes">
+	   			#xiuCodes[]# 
+	   		</iterate>
+      </select>
+      
+       <resultMap id="JDProduct_xiuCode_wardId" class="com.xiu.jd.bean.ware.JDProduct" >
+          <result column="jdWareId" property="jdWareId" jdbcType="VARCHAR" />
+          <result column="xiucode" property="xiucode" jdbcType="VARCHAR" />
+           <result column="title" property="title" jdbcType="VARCHAR" />
+      </resultMap>
+      
+      <!-- 根据京东商品ID查询对应的走秀码    -->
+      
+       <select id="queryXiuCodesByWardIds" parameterClass="java.util.Map" resultMap="JDProduct_xiuCode_wardId">
+          
+          select 
+            t.jd_ware_id  jdWareId,
+            t.xiucode  xiucode,
+            t.title   title
+          
+          from xiu_jd_bag.jd_product_info t 
+          <iterate prepend="where  t.jd_ware_id in " conjunction="," open="(" close=")" property="jdWardIds">
+	   			#jdWardIds[]# 
+	   		</iterate>
+          
+          
+      </select>
+      
+      <delete id="deleteAllProduct">
+          
+          delete from xiu_jd_bag.jd_product_info
+      </delete>
+    
+    <!--  从商品中心查询商品的属性信息-->
+   <select id="select_product_attribute_list" resultMap="sql_model_mapping_resultMap" parameterClass="java.util.List" >
+           select 
+	    	ID, 
+	    	PRODUCT_ID,
+	    	PRODUCT_SN, 
+	    	ATTR_ID, 
+	    	ATTR_NAME, 
+	    	VAL_ID, 
+	    	VAL_DESC, 
+	    	DELETE_FLAG,
+	      	CREATE_TIME, 
+	      	UPDATE_TIME
+	    from xiu_goods.X_DATA_PRD_ATTR
+	    where 1=1 and
+			PRODUCT_SN in
+	   		<iterate conjunction="," open="(" close=")" >
+	   			#value[]# 
+	   		</iterate>
+	   		and DISPLAY = '1'
+            and DELETE_FLAG='0'
+        
+        
+    </select>
+    
+   <!--  更新商品销售状态 1:在售,2:下架  -->
+   <update id="updateProductOnline" parameterClass="java.util.Map">
+       update xiu_jd_bag.jd_product_info t
+       <dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="onlineStatus" removeFirstPrepend="true"> 
+		 			 t.onlinestatus=#onlineStatus#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="stockNum" removeFirstPrepend="true"> 
+		 			 t.stocknum=#stockNum#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="shopCategory" removeFirstPrepend="true"> 
+		 			 t.shopcategory=#shopCategory#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="supplierCode" removeFirstPrepend="true"> 
+		 			 t.supplierCode=#supplierCode#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="costprice" removeFirstPrepend="true"> 
+		 			t.costprice=#costprice#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="lockUser" removeFirstPrepend="true"> 
+		 			t.lockuser=#lockUser#
+		 		</isNotEmpty>
+		 	</dynamic> 
+        where t.jd_ware_id=#JdwareId#
+   </update>
+   
+   
+      <update id="updateProductOnlineBatch" parameterClass="JDProduct">
+       update xiu_jd_bag.jd_product_info t
+       <dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="onLineStatus" removeFirstPrepend="true"> 
+		 			 t.onlinestatus=#onLineStatus#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="stocknum" removeFirstPrepend="true"> 
+		 			 t.stocknum=#stocknum#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="shopCategory" removeFirstPrepend="true"> 
+		 			 t.shopcategory=#shopCategory#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="supplierCode" removeFirstPrepend="true"> 
+		 			 t.supplierCode=#supplierCode#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="costprice" removeFirstPrepend="true"> 
+		 			t.costprice=#costprice#
+		 		</isNotEmpty>
+		 	</dynamic> 
+        where t.jd_ware_id=#jdWareId#
+   </update>
+        
+    <!-- 修改商品时对商品进行加锁 -->
+    <update id="addLock" parameterClass="java.util.Map">
+        update xiu_jd_bag.jd_product_info t set t.lockuser=#lockuser# where t.xiucode=#xiucode# and t.lockuser is null
+        
+    </update>
+    <!-- 修改商品时完成时对商品进行解锁-->
+    <update id="unlock" parameterClass="java.lang.String">
+        update xiu_jd_bag.jd_product_info t set t.lockuser='' where t.xiucode=#xiucode#
+    </update>
+    
+    <delete id="deleteAll" >
+        delete from xiu_jd_bag.jd_category t
+        
+    </delete>
+    
+    <delete id="deleteNationProductByWareId" parameterClass="java.lang.String">
+        delete from xiu_jd_bag.jd_product_info t  where t.jd_ware_id=#wareId#
+        
+    </delete>
+     
+    <!-- 走秀码是否在本地数据库已经存在 -->
+    <select id="xiuCodeIsExistsNation" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+        
+         select count(*) from xiu_jd_bag.jd_product_info t where t.xiucode =#xiucode#
+        
+    </select>
+
+    
+     <!-- 走秀码是否在本地数据库已经存在 -->
+    <select id="wareIdIsExistsNation" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+        
+        select count(*) from xiu_jd_bag.jd_product_info t where t.jd_ware_id=#wareId#
+        
+    </select>
+    
+    <!-- 京东品牌属性是否存在 -->
+    <select id="jdBrandIsExist" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+      
+         select count(*) from xiu_jd_bag.jd_attribute t 
+       			left join xiu_jd_bag.jd_product_info w on t.cid = w.cid 
+    		  where t.name='品牌' and w.xiucode=#xiucode#
+    </select>
+
+      <!-- 分页查询实体 -->
+     <select id="getPageResule" parameterClass="java.util.Map" >
+          
+		select 
+		n.title title,
+		n.stocknum stocknum, 
+		n.operatename operatename
+		  from (select m.*, rownum rn
+		          from (
+		                
+		                select t.*,
+		                        row_number() over(partition by t.xiucode order by t.createdate desc) as rown
+		                 from xiu_jd_bag.jd_product_info t
+		                ) m
+		         where m.rown = 1
+		           and rownum  <![CDATA[ <=]]> #lastNum#) n
+		 where rn <![CDATA[>= ]]> #firstNum# 
+		 order by n.createdate desc
+
+     </select>
+     
+     <select id="queryResult" parameterClass="java.util.Map" resultClass="JDProduct">
+    <![CDATA[	
+         select 
+	       n.title         title,
+	       n.high          high,
+	       n.weight        weight,
+	       n.lenght        lenght,
+	       n.costprice     costprice,
+	       n.marketprice   marketprice,
+	       n.jdprice       jdprice,
+	       n.notes         notes,
+	       n.mainimagepath mainimagepath,
+	       n.stocknum      stocknum,
+	       n.attributes    attributes,
+	       n.createdate    createdate,
+	       n.xiucode       xiucode,
+	       n.lastupdate    lastupdate,
+	       n.operatename   operatename,
+	       n.num           num,
+	       n.brandcode     brandcode,
+	       n.categoryid    categoryid,
+	       n.status        status,
+	       n.wide          wide,
+	       n.cid           cid,
+	       n.lockuser      lockuser,
+	       n.jdWareId      jdWareId,
+	       n.shopCategory  shopCategory,
+	       n.jdBrandName   jdBrandName,
+	       n.jdBrandAid    jdBrandAid,
+	       n.jdBrandVid    jdBrandVid,
+		   n.itemnum       itemNum,
+	       n.adcontent     adcontent
+
+    from (
+        
+        select
+        
+         t.title         title,
+          t.high          high,
+          t.weight        weight,
+          t.lenght        lenght,
+          t.costprice     costprice,
+          t.marketprice   marketprice,
+          t.jdprice       jdprice,
+          t.notes         notes,
+          t.mainimagepath mainimagepath,
+          t.stocknum      stocknum,
+          t.attributes    attributes,
+          t.createdate    createdate,
+          t.xiucode       xiucode,
+          t.lastupdate    lastupdate,
+          t.operatename   operatename,
+          t.num           num,
+          t.brandcode     brandcode,
+          t.categoryid    categoryid,
+          t.status        status,
+          t.wide          wide,
+          t.cid           cid,
+          t.lockuser      lockuser,
+          t.jd_ware_id    jdWareId,
+          t.itemnum       itemNum,
+          t.adcontent     adcontent,
+          t.shopCategory  shopCategory,
+          m.jd_vame       jdBrandName,
+          jd.aid          jdBrandAid,
+          jd.vid          jdBrandVid
+          from xiu_jd_bag.jd_product_info t
+        
+          left join xiu_jd_bag.jd_xiu_brand m
+            on t.brandcode = m.xiu_brand_code
+           and t.cid = m.jd_Cid
+          left join xiu_jd_bag.jd_attributevalue jd
+            on m.jd_vid = jd.vid
+        
+         where 1 = 1
+      ]]>        
+             <dynamic>
+	     		<isNotEmpty prepend="and" property="xiucode"> 
+	           t.xiucode <![CDATA[=]]>#xiucode#
+	            </isNotEmpty>
+	            <isNotEmpty prepend="and" property="num"> 
+	           t.num <![CDATA[=]]>#num#
+	            </isNotEmpty>
+            </dynamic>
+           
+           
+           <![CDATA[	
+        
+         order by t.createdate desc) n
+ where n.jdBrandAid = (
+                       
+                       select a.aid
+                         from xiu_jd_bag.jd_attribute a
+                        where a.cid = (
+                                        select e.cid as cid
+                                         from xiu_jd_bag.jd_product_info e where 1=1
+          ]]>
+            
+                                        <dynamic>
+								     		<isNotEmpty prepend="and" property="xiucode"> 
+								              e.xiucode <![CDATA[=]]>#xiucode#
+								            </isNotEmpty>
+                                         </dynamic>
+                <![CDATA[
+                                        )
+                          and a.name = '品牌'
+                       
+                       )
+   and rownum = 1
+     ]]>
+     
+     </select>
+     
+     
+          <select id="queryXiuResult" parameterClass="java.util.Map" resultClass="JDProduct">
+    <![CDATA[	
+         select 
+	       n.title         title,
+	       n.high          high,
+	       n.weight        weight,
+	       n.lenght        lenght,
+	       n.costprice     costprice,
+	       n.marketprice   marketprice,
+	       n.jdprice       jdprice,
+	       n.notes         notes,
+	       n.mainimagepath mainimagepath,
+	       n.stocknum      stocknum,
+	       n.attributes    attributes,
+	       n.createdate    createdate,
+	       n.xiucode       xiucode,
+	       n.lastupdate    lastupdate,
+	       n.operatename   operatename,
+	       n.num           num,
+	       n.brandcode     brandcode,
+	       n.categoryid    categoryid,
+	       n.status        status,
+	       n.wide          wide,
+	       n.cid           cid,
+	       n.lockuser      lockuser,
+	       n.jdWareId      jdWareId,
+	       n.shopCategory  shopCategory,
+	       n.jdBrandName   jdBrandName,
+	       n.jdBrandAid    jdBrandAid,
+	       n.jdBrandVid    jdBrandVid,
+		   n.itemnum       itemNum,
+	       n.adcontent     adcontent
+
+    from (
+        
+        select
+        
+         t.title         title,
+          t.high          high,
+          t.weight        weight,
+          t.lenght        lenght,
+          t.costprice     costprice,
+          t.marketprice   marketprice,
+          t.jdprice       jdprice,
+          t.notes         notes,
+          t.mainimagepath mainimagepath,
+          t.stocknum      stocknum,
+          t.attributes    attributes,
+          t.createdate    createdate,
+          t.xiucode       xiucode,
+          t.lastupdate    lastupdate,
+          t.operatename   operatename,
+          t.num           num,
+          t.brandcode     brandcode,
+          t.categoryid    categoryid,
+          t.status        status,
+          t.wide          wide,
+          t.cid           cid,
+          t.lockuser      lockuser,
+          t.jd_ware_id    jdWareId,
+          t.itemnum       itemNum,
+          t.adcontent     adcontent,
+          t.shopCategory  shopCategory,
+          m.jd_vame       jdBrandName,
+          jd.aid          jdBrandAid,
+          jd.vid          jdBrandVid
+          from xiu_jd.jd_product_info t
+        
+          left join xiu_jd.jd_xiu_brand m
+            on t.brandcode = m.xiu_brand_code
+           and t.cid = m.jd_Cid
+          left join xiu_jd.jd_attributevalue jd
+            on m.jd_vid = jd.vid
+        
+         where 1 = 1
+      ]]>        
+             <dynamic>
+	     		<isNotEmpty prepend="and" property="xiucode"> 
+	           t.xiucode <![CDATA[=]]>#xiucode#
+	            </isNotEmpty>
+	            <isNotEmpty prepend="and" property="num"> 
+	           t.num <![CDATA[=]]>#num#
+	            </isNotEmpty>
+            </dynamic>
+           
+           
+           <![CDATA[	
+        
+         order by t.createdate desc) n
+ where n.jdBrandAid = (
+                       
+                       select a.aid
+                         from xiu_jd.jd_attribute a
+                        where a.cid = (
+                                        select e.cid as cid
+                                         from xiu_jd.jd_product_info e where 1=1
+          ]]>
+            
+                                        <dynamic>
+								     		<isNotEmpty prepend="and" property="xiucode"> 
+								              e.xiucode <![CDATA[=]]>#xiucode#
+								            </isNotEmpty>
+                                         </dynamic>
+                <![CDATA[
+                                        )
+                          and a.name = '品牌'
+                       
+                       )
+   and rownum = 1
+     ]]>
+     
+     </select>
+     
+          <select id="queryEbayResult" parameterClass="java.util.Map" resultClass="JDProduct">
+    <![CDATA[	
+         select 
+	       n.title         title,
+	       n.high          high,
+	       n.weight        weight,
+	       n.lenght        lenght,
+	       n.costprice     costprice,
+	       n.marketprice   marketprice,
+	       n.jdprice       jdprice,
+	       n.notes         notes,
+	       n.mainimagepath mainimagepath,
+	       n.stocknum      stocknum,
+	       n.attributes    attributes,
+	       n.createdate    createdate,
+	       n.xiucode       xiucode,
+	       n.lastupdate    lastupdate,
+	       n.operatename   operatename,
+	       n.num           num,
+	       n.brandcode     brandcode,
+	       n.categoryid    categoryid,
+	       n.status        status,
+	       n.wide          wide,
+	       n.cid           cid,
+	       n.lockuser      lockuser,
+	       n.jdWareId      jdWareId,
+	       n.shopCategory  shopCategory,
+	       n.jdBrandName   jdBrandName,
+	       n.jdBrandAid    jdBrandAid,
+	       n.jdBrandVid    jdBrandVid,
+		   n.itemnum       itemNum,
+	       n.adcontent     adcontent
+
+    from (
+        
+        select
+        
+         t.title         title,
+          t.high          high,
+          t.weight        weight,
+          t.lenght        lenght,
+          t.costprice     costprice,
+          t.marketprice   marketprice,
+          t.jdprice       jdprice,
+          t.notes         notes,
+          t.mainimagepath mainimagepath,
+          t.stocknum      stocknum,
+          t.attributes    attributes,
+          t.createdate    createdate,
+          t.xiucode       xiucode,
+          t.lastupdate    lastupdate,
+          t.operatename   operatename,
+          t.num           num,
+          t.brandcode     brandcode,
+          t.categoryid    categoryid,
+          t.status        status,
+          t.wide          wide,
+          t.cid           cid,
+          t.lockuser      lockuser,
+          t.jd_ware_id    jdWareId,
+          t.itemnum       itemNum,
+          t.adcontent     adcontent,
+          t.shopCategory  shopCategory,
+          m.jd_vame       jdBrandName,
+          jd.aid          jdBrandAid,
+          jd.vid          jdBrandVid
+          from xiu_ebay_jd.jd_product_info t
+        
+          left join xiu_ebay_jd.jd_xiu_brand m
+            on t.brandcode = m.xiu_brand_code
+           and t.cid = m.jd_Cid
+          left join xiu_ebay_jd.jd_attributevalue jd
+            on m.jd_vid = jd.vid
+        
+         where 1 = 1
+      ]]>        
+             <dynamic>
+	     		<isNotEmpty prepend="and" property="xiucode"> 
+	           t.xiucode <![CDATA[=]]>#xiucode#
+	            </isNotEmpty>
+	            <isNotEmpty prepend="and" property="num"> 
+	           t.num <![CDATA[=]]>#num#
+	            </isNotEmpty>
+            </dynamic>
+           
+           
+           <![CDATA[	
+        
+         order by t.createdate desc) n
+ where n.jdBrandAid = (
+                       
+                       select a.aid
+                         from xiu_ebay_jd.jd_attribute a
+                        where a.cid = (
+                                        select e.cid as cid
+                                         from xiu_ebay_jd.jd_product_info e where 1=1
+          ]]>
+            
+                                        <dynamic>
+								     		<isNotEmpty prepend="and" property="xiucode"> 
+								              e.xiucode <![CDATA[=]]>#xiucode#
+								            </isNotEmpty>
+                                         </dynamic>
+                <![CDATA[
+                                        )
+                          and a.name = '品牌'
+                       
+                       )
+   and rownum = 1
+     ]]>
+     
+     </select>
+   
+
+ <!-- 查询商品信息 -->
+  <select id="queryWareInfoAndLockWareObjects" parameterClass="java.util.Map" resultClass="JDProduct">
+  <![CDATA[
+     	select t.title title,
+		       t.high high,
+		       t.weight weight,
+		       t.lenght lenght,
+		       t.costprice costprice,
+		       t.marketprice marketprice,
+		       t.jdprice jdprice,
+		       t.notes notes,
+		       t.mainimagepath mainimagepath,
+		       t.stocknum stocknum,
+		       t.attributes attributes,
+		       t.createdate createdate,
+		       t.xiucode xiucode,
+		       t.lastupdate lastupdate,
+		       t.operatename operatename,
+		       t.num num,
+		       t.brandcode brandcode,
+		       t.categoryid categoryid,
+		       t.status status,
+		       t.wide wide,
+		       w.jd_cid cid,
+		       t.lockuser lockuser,
+		       t.jd_ware_id jdWareId,
+		       t.shopCategory shopCategory,
+		       m.jd_vame jdBrandName,
+		       jd.aid jdBrandAid,
+		       jd.vid jdBrandVid 
+		    from jd_product_info t 
+     		left join xiu_jd_bag.jd_xiu_category w on substr(t.categoryid,1,4) = w.xiu_cid 
+     		left join xiu_jd_bag.jd_xiu_brand m on t.brandcode = m.xiu_brand_code and t.cid = m.jd_Cid
+     		left join xiu_jd_bag.jd_attributevalue jd on m.jd_vid = jd.vid 
+     		where 1=1 
+     		]]>
+     		<dynamic>
+	     		<isNotEmpty prepend="and" property="xiucode"> 
+	           t.xiucode <![CDATA[=]]>#xiucode#
+	            </isNotEmpty>
+	            <isNotEmpty prepend="and" property="num"> 
+	           t.num <![CDATA[=]]>#num#
+	            </isNotEmpty>
+            </dynamic>
+            and rownum = 1
+     		order by t.createdate desc
+  </select>
+     
+     
+  <select id="findResultString" parameterClass="java.util.Map" resultClass="java.lang.String">
+     	select jd_cid from xiu_jd_bag.jd_xiu_category t where t.xiu_cid = #xiuCid#
+     </select>
+     
+     <update id="updateJdProductPrice" parameterClass="java.util.Map">
+         
+         update xiu_jd_bag.jd_product_info t set t.jdprice=#jdprice# where t.xiucode=#xiucode#
+     </update>
+     <select id="getEntityById" parameterClass="java.lang.String"  resultClass="JDProduct">
+	       <![CDATA[
+	          select 
+	              t.jdprice jdprice,
+	              t.marketprice marketprice
+	          from xiu_jd_bag.jd_product_info t 
+	          where t.xiucode=#entityId#
+	        ]]>
+	  </select>
+	  <update id="update" parameterClass="JDProduct">
+	  		update xiu_jd_bag.jd_product_info t 
+	  		<dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="status" removeFirstPrepend="true"> 
+		 			t.status = #status#
+		 		</isNotEmpty>
+		 		
+		 	   <isNotEmpty prepend="," property="lockuser" removeFirstPrepend="true"> 
+		 			t.lockuser = #lockuser#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="jdWareId" removeFirstPrepend="true"> 
+		 			t.jd_ware_id=#jdWareId#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="onLineStatus" removeFirstPrepend="true"> 
+		 			t.onlinestatus=#onLineStatus#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="adContent" removeFirstPrepend="true"> 
+		 			t.adContent=#adContent#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="marketprice" removeFirstPrepend="true"> 
+		 			t.marketprice=#marketprice#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="itemNum" removeFirstPrepend="true"> 
+		 			t.itemNum=#itemNum#
+		 		</isNotEmpty>	
+		 		<isNotEmpty prepend="," property="shopCategory" removeFirstPrepend="true"> 
+		 			t.shopCategory=#shopCategory#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="stocknum" removeFirstPrepend="true"> 
+		 			t.stocknum=#stocknum#
+		 		</isNotEmpty>
+		 		
+		 	</dynamic> 
+	  		where t.xiucode = #xiucode#
+	  </update>
+	  
+	   <update id="updateEbay" parameterClass="JDProduct">
+	  		update xiu_ebay_jd.jd_product_info t 
+	  		<dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="status" removeFirstPrepend="true"> 
+		 			t.status = #status#
+		 		</isNotEmpty>
+		 		
+		 	   <isNotEmpty prepend="," property="lockuser" removeFirstPrepend="true"> 
+		 			t.lockuser = #lockuser#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="jdWareId" removeFirstPrepend="true"> 
+		 			t.jd_ware_id=#jdWareId#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="onLineStatus" removeFirstPrepend="true"> 
+		 			t.onlinestatus=#onLineStatus#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="adContent" removeFirstPrepend="true"> 
+		 			t.adContent=#adContent#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="marketprice" removeFirstPrepend="true"> 
+		 			t.marketprice=#marketprice#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="itemNum" removeFirstPrepend="true"> 
+		 			t.itemNum=#itemNum#
+		 		</isNotEmpty>	
+		 		<isNotEmpty prepend="," property="shopCategory" removeFirstPrepend="true"> 
+		 			t.shopCategory=#shopCategory#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="stocknum" removeFirstPrepend="true"> 
+		 			t.stocknum=#stocknum#
+		 		</isNotEmpty>
+		 		
+		 	</dynamic> 
+	  		where t.xiucode = #xiucode#
+	  </update>
+	  
+	  
+	   <update id="updateXiu" parameterClass="JDProduct">
+	  		update xiu_jd.jd_product_info t 
+	  		<dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="status" removeFirstPrepend="true"> 
+		 			t.status = #status#
+		 		</isNotEmpty>
+		 		
+		 	   <isNotEmpty prepend="," property="lockuser" removeFirstPrepend="true"> 
+		 			t.lockuser = #lockuser#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="jdWareId" removeFirstPrepend="true"> 
+		 			t.jd_ware_id=#jdWareId#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="onLineStatus" removeFirstPrepend="true"> 
+		 			t.onlinestatus=#onLineStatus#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="adContent" removeFirstPrepend="true"> 
+		 			t.adContent=#adContent#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="marketprice" removeFirstPrepend="true"> 
+		 			t.marketprice=#marketprice#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="itemNum" removeFirstPrepend="true"> 
+		 			t.itemNum=#itemNum#
+		 		</isNotEmpty>	
+		 		<isNotEmpty prepend="," property="shopCategory" removeFirstPrepend="true"> 
+		 			t.shopCategory=#shopCategory#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="stocknum" removeFirstPrepend="true"> 
+		 			t.stocknum=#stocknum#
+		 		</isNotEmpty>
+		 		
+		 	</dynamic> 
+	  		where t.xiucode = #xiucode#
+	  </update>
+	  
+	 <select id="getXiuJdLogistics" parameterClass="String"  
+	 	resultClass="com.xiu.jd.bean.ware.XiuJdLogistics">
+	       <![CDATA[
+	          select 
+	          	deliverCode deliverCode,
+	          	deliverName deliverName,
+	          	jd_deliver_id jdDeliverId
+	          from  xiu_jd.jd_xiu_logistics 
+	          where deliverCode=#deliverCode#
+	        ]]>
+	  </select>
+	  
+	  <select id="findJDCategoryId" parameterClass="String" resultClass="java.lang.String">
+	  	select t.jd_cid  from xiu_jd_bag.jd_xiu_category t where t.xiu_cid= #xiuCategoryID# and rownum =1
+	  </select>
+	  
+	  <update id="updateProduct" parameterClass="JDProduct">
+	  		update xiu_jd_bag.jd_product_info t 
+	  		<dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="title" removeFirstPrepend="true"> 
+		 			t.title = #title#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="notes" removeFirstPrepend="true"> 
+		 			t.notes=#notes#
+		 		</isNotEmpty>
+		 	   <isNotEmpty prepend="," property="adContent" removeFirstPrepend="true"> 
+		 			t.adContent=#adContent#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="itemNum" removeFirstPrepend="true"> 
+		 			t.itemNum=#itemNum#
+		 		</isNotEmpty>			 				 		
+		 		<isNotEmpty prepend="," property="jdprice" removeFirstPrepend="true"> 
+		 			t.jdprice=#jdprice#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="marketprice" removeFirstPrepend="true"> 
+		 			t.marketprice=#marketprice#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="shopCategory" removeFirstPrepend="true"> 
+		 			t.shopCategory=#shopCategory#
+		 		</isNotEmpty>	 
+		 
+		 	</dynamic> 
+		 	where t.jd_ware_id = #jdWareId#
+	  </update>
+	  
+	  <select id="getJdProductMainPic" parameterClass="String" resultClass="java.lang.String">
+	  	select t.mainimagepath from xiu_jd_bag.jd_product_info t where t.jd_ware_id = #jdWareId# and rownum =1 
+	  </select>
+	  
+	  <update id="updateJdProductBatch" parameterClass="JDProduct">
+	  		update xiu_jd_bag.jd_product_info t 
+	  		<dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="onLineStatus" removeFirstPrepend="true"> 
+		 			t.onlinestatus=#onLineStatus#
+		 		</isNotEmpty>
+		 	</dynamic> 
+		 	where t.jd_ware_id = #jdWareId#
+	  </update>
+	  
+	 <select id="getProductByXiuCode" parameterClass="java.lang.String" resultClass="JDProduct">
+	        select 
+	              t.cid            cid,
+		          c.jd_fullname    mainimagepath,
+		          t.categoryid     categoryid,
+		          b.xiu_brand_code xiu_brand_code,
+		          b.xiu_brand_name jdBrandName,
+		          t.brandcode brandcode
+		     from xiu_jd_bag.jd_product_info t
+		     left join xiu_jd_bag.jd_xiu_category c
+		       on t.cid = c.jd_cid
+		     left join xiu_jd_bag.jd_xiu_brand b
+		       on t.brandcode = b.xiu_brand_code
+		    where t.xiucode = #xiuCode#
+	      and rownum = 1
+	 </select>
+	 
+	 <select id="getXiuProductByXiuCode" parameterClass="java.lang.String" resultClass="JDProduct">
+	        select 
+	              t.cid            cid,
+		          c.jd_fullname    mainimagepath,
+		          t.categoryid     categoryid,
+		          b.xiu_brand_code xiu_brand_code,
+		          b.xiu_brand_name jdBrandName,
+		          t.brandcode brandcode
+		     from xiu_jd.jd_product_info t
+		     left join xiu_jd.jd_xiu_category c
+		       on t.cid = c.jd_cid
+		     left join xiu_jd.jd_xiu_brand b
+		       on t.brandcode = b.xiu_brand_code
+		    where t.xiucode = #xiuCode#
+	      and rownum = 1
+	 </select>
+	 
+	  <select id="getEbayProductByXiuCode" parameterClass="java.lang.String" resultClass="JDProduct">
+	        select 
+	              t.cid            cid,
+		          c.jd_fullname    mainimagepath,
+		          t.categoryid     categoryid,
+		          b.xiu_brand_code xiu_brand_code,
+		          b.xiu_brand_name jdBrandName,
+		          t.brandcode brandcode
+		     from xiu_ebay_jd.jd_product_info t
+		     left join xiu_ebay_jd.jd_xiu_category c
+		       on t.cid = c.jd_cid
+		     left join xiu_ebay_jd.jd_xiu_brand b
+		       on t.brandcode = b.xiu_brand_code
+		    where t.xiucode = #xiuCode#
+	      and rownum = 1
+	 </select>
+	  <select id="getProductTotalStockNumByWareId" parameterClass="java.lang.String" resultClass="java.lang.String">
+	       select sum(t.stocknum) from xiu_jd_bag.jd_product_sku_info t where t.jdwarejd=#wareId#
+	   </select>
+	   
+	  
+	  	  <select id="getProductTotalStockNum" parameterClass="java.lang.String" resultClass="java.lang.String">
+	       select sum(t.stocknum) from xiu_jd_bag.jd_product_sku_info t where t.xiucode=#xiuCode# and  t.jdwarejd is  null
+	   </select>
+	
+</sqlMap>

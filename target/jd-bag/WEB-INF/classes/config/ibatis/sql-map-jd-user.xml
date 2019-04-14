@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JDConsigneenInfoServiceBean">
+    
+    <typeAlias alias="JDConsigneenInfo" type="com.xiu.jd.bean.user.JDConsigneenInfo"/>
+
+	<typeAlias alias="jdToken" type="com.xiu.jd.bean.jdtoken.JdToken"/>
+	
+	<typeAlias alias="jdEmail" type="com.xiu.jd.bean.email.JdEmail"/>
+    
+    
+    <insert id="insert" parameterClass="JDConsigneenInfo">
+              <![CDATA[
+           insert into jd_consigneen_info (
+	            id,
+				fullName,
+				mobile,
+				telePhone,
+				fullAddress
+           )values(
+               SEQ_JD_CONSIGNEEN.nextval,
+	           #fullName#,
+	           #mobile#,
+	           #telePhone#,
+	           #fullAddress#
+	           
+           )
+        ]]>
+       <selectKey resultClass="long" keyProperty="id" > 
+          select  SEQ_JD_CONSIGNEEN.currval as id from dual
+       </selectKey>
+   </insert>
+   
+    <select id="isExistsUserMobileNation" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+        select count(*) from jd_consigneen_info t where t.mobile=#mobile#
+        
+    </select>
+    <!-- 更新订单收货人地址详情 -->
+    <update id="update" parameterClass="JDConsigneenInfo">
+       update jd_consigneen_info t set t.fulladdress = #fullAddress# where t.mobile=#mobile#
+
+    </update>
+    
+      <select id="getJdTokenInfo" resultClass="jdToken">
+		    select t.username userName,
+		       t.password password,
+		       t.appkey appKey,
+		       t.appsecret appSecret,
+		       t.token token,
+		       t.expiresin expiresin,
+		       to_char(t.create_date,'YYYY-MM-DD hh24:mm:ss') createDate,
+		       t.type type from xiu_jd.jd_token t
+    </select>
+    <select id="getEmail" parameterClass="java.lang.Integer" resultClass="jdEmail" >
+         select email_address emailAddress,type,time_set timeSet from jd_Email where 1=1
+                     and 
+		 			type=#type#
+		 
+    </select>
+    
+      <!-- 更新订单收货人地址详情 -->
+    <update id="updateOderEmailAddress" parameterClass="java.util.Map">
+       update jd_Email set email_address=#emailAddress# where type=1
+    </update>
+    
+     <update id="updateTokenEmailAddress" parameterClass="java.util.Map">
+       update jd_Email 
+       <dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="emailAddress" removeFirstPrepend="true"> 
+		 			  email_address=#emailAddress#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="timeSet" removeFirstPrepend="true"> 
+		 			 time_set=#timeSet#
+		 		</isNotEmpty>
+		</dynamic> 
+       where type=2
+    </update>
+</sqlMap>

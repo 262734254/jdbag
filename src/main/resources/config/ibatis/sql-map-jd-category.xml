@@ -1,0 +1,807 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JDCategoryDaoBean">
+	<typeAlias alias="JDCategory" type="com.xiu.jd.bean.ware.JDCategory"/>
+	<typeAlias alias="JDAttribute" type="com.xiu.jd.bean.ware.JDAttribute"/>
+	<typeAlias alias="JDAttributeValue" type="com.xiu.jd.bean.ware.JDAttributeValue"/>
+	
+	<!-- 添加京东类目至本地 -->
+    <insert id="insertJDCategory" parameterClass="JDCategory">
+        <![CDATA[
+           insert into jd_category (
+	            ID,NAME,status,fid,lev,index_id
+           )values(
+               	#id#,
+               	#name#,
+			   	#status#,
+			   	#fid#,
+			  	#lev#,
+				#indexId#
+           )
+        ]]>
+    </insert>
+    
+    <delete id="deleteAll">
+        
+       delete from  JD_CATEGORY
+    </delete>
+    
+    <!-- 根据id获取本地类目 -->
+	<select id="getJDCategory" resultClass="JDCategory"
+		parameterClass="int">
+    	<![CDATA[
+    	SELECT 
+    		ID 			id,
+    		NAME 		name,
+    		status 		status,
+    		fid 		fid,
+    		lev 		lev,
+    		index_id 	indexId
+		 FROM jd_category WHERE ID= #id#
+     	]]>
+	</select>
+	
+	<!-- 根据id获取本地类目 -->
+	<select id="getEntityById" resultClass="JDCategory"
+		parameterClass="int">
+    	<![CDATA[
+    	SELECT 
+    		ID 			id,
+    		NAME 		name,
+    		status 		status,
+    		fid 		fid,
+    		lev 		lev,
+    		index_id 	indexId
+		 FROM jd_category WHERE ID= #id#
+     	]]>
+	</select>
+	
+	<!-- 批量删除映射的属性 -->
+	<delete id="batchDeleteAttri" parameterClass="java.util.Map">
+	    
+	      delete from jd_xiu_attvalue t where 1=1
+
+	      <iterate prepend="and t.id in" open="(" close=")" conjunction="," property="ids">
+		      <![CDATA[#ids[]#]]>
+		 </iterate>
+	 
+	</delete>
+	
+	
+	<!-- 批量删除映射的品牌 -->
+	<delete id="batchDeleteBrand" parameterClass="java.util.Map">
+	    
+	      delete from jd_xiu_brand t where 1=1
+
+	      <iterate prepend="and t.id in" open="(" close=")" conjunction="," property="ids">
+		      <![CDATA[#ids[]#]]>
+		 </iterate>
+	 
+	</delete>
+	
+	<update id="updateBrandByJdCid" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand">
+	    
+        update jd_xiu_brand t set t.jd_category_name = #jdCategoryName# where t.jd_cid = #jdCid#
+
+	</update> 
+	
+	<!-- 根据父id获取下级类目 -->
+	<select id="queryJDCategoryByFid" resultClass="JDCategory" parameterClass="int">
+    	<![CDATA[
+    	SELECT 
+    		ID 			id,
+    		NAME 		name,
+    		status 		status,
+    		fid 		fid,
+    		lev 		lev,
+    		index_id 	indexId
+		 FROM jd_category WHERE fid=#fid# order by nlssort(NAME,'NLS_SORT=SCHINESE_PINYIN_M')
+     	]]>
+	</select>
+	
+	<!-- 按树形查询类目信息 -->
+	<select id="queryJDCategory" resultClass="JDCategory" parameterClass="int">
+    	<![CDATA[
+    	SELECT 
+    		ID 			id,
+    		NAME 		name,
+    		status 		status,
+    		fid 		fid,
+    		lev 		lev,
+    		index_id 	indexId
+		 FROM jd_category 
+		 START WITH fid = 0
+		    CONNECT BY PRIOR ID = fid
+     	]]>
+	</select>
+	
+	<!-- 查询类目最大深度层次 -->
+	<select id="queryJDCategoryMaxLev" resultClass="int" >
+    	<![CDATA[
+    		SELECT MAX(lev) FROM jd_category
+    	 	]]>
+	</select>
+	
+	<!-- 插入京东类目属性至本地 -->
+     <insert id="insertJDAttribute" parameterClass="JDAttribute">
+        <![CDATA[
+           insert into jd_attribute (
+	            aid,
+       			NAME,
+       			cid,
+       			is_key_prop,
+       			is_sale_prop,
+       			index_id,
+       			status,
+       			att_type,
+       			input_type,
+       			is_req,
+       			is_fet,
+       			is_nav
+           )values(
+                #aid#,
+                #name#,
+				#cid#,
+				#keyProp#,
+				#saleProp#,
+				#indexId#,
+				#status#,
+				#attType#,
+				#inputType#,
+				#req#,
+				#fet#,
+				#nav#
+           )
+        ]]>
+    </insert>
+    
+    <!-- 查询类目属性 -->
+     <select id="getJDAttribute" resultClass="JDAttribute" parameterClass="long">
+    	<![CDATA[
+    	SELECT 
+    			aid 			aid,
+       			NAME 			name,
+       			cid 			cid,
+       			is_key_prop 	keyProp,
+       			is_sale_prop 	saleProp,
+       			index_id 		indexId,
+       			status 			status,
+       			att_type 		attType,
+       			input_type 		inputType,
+       			is_req 			req,
+       			is_fet 			fet,
+       			is_nav 			nav
+		       FROM jd_attribute WHERE aid= #aid#
+     	]]>
+    </select>
+    
+    <!-- 查询类目id查询类目属性 -->
+     <select id="queryJDAttributeByCid" resultClass="JDAttribute" parameterClass="String">
+    	<![CDATA[
+    	SELECT 
+    			aid 			aid,
+       			NAME 			name,
+       			cid 			cid,
+       			is_key_prop 	keyProp,
+       			is_sale_prop 	saleProp,
+       			index_id 		indexId,
+       			status 			status,
+       			att_type 		attType,
+       			input_type 		inputType,
+       			is_req 			req,
+       			is_fet 			fet,
+       			is_nav 			nav
+		       FROM jd_attribute WHERE cid= #cid# and is_sale_prop=0  order by nlssort(Name,'NLS_SORT=SCHINESE_PINYIN_M') 
+     	]]>
+    </select>
+    
+    <!-- 根据类目属性值id获取类目属性值-->
+    <select id="getJDAttributeValue" resultClass="JDAttributeValue"
+		parameterClass="long">
+    	<![CDATA[
+    	SELECT 
+    		 	vid			vid,
+				aid			aid,
+				name		name,
+				status		status,
+				index_id	indexId,
+				features	features
+		 FROM jd_attributeValue WHERE vid= #vid# and rownum =1
+     	]]>
+	</select>
+	
+	 <!-- 根据类目属性id查询类目属性值-->
+	<select id="queryJDAttrValueByAid" resultClass="JDAttributeValue"
+		parameterClass="long">
+    	<![CDATA[
+    	SELECT 
+    		 	vid			vid,
+				aid			aid,
+				name		name,
+				status		status,
+				index_id	indexId,
+				features	features
+		 FROM jd_attributeValue WHERE aid= #aid# order by nlssort(name,'NLS_SORT=SCHINESE_PINYIN_M') 
+     	]]>
+	</select>
+	
+	<!-- 添加京东类目属性值至本地-->
+     <insert id="insertJDAttributeValue" parameterClass="JDAttributeValue">
+        <![CDATA[
+           insert into jd_attributeValue (
+	            vid,
+				aid,
+				cid,
+				name,
+				status,
+				index_id,
+				features
+           )values(
+            	#vid#,
+				#aid#,
+				#cid#,
+				#name#,
+				#status#,
+				#indexId#,
+				#features#
+           )
+        ]]>
+    </insert>
+    
+    <!-- 查询走秀类目-->
+    <select id="queryXiuCategory" resultClass="com.xiu.jd.bean.ware.XiuCategory"
+		parameterClass="com.xiu.jd.bean.ware.XiuCategory">
+    	<![CDATA[
+    	 SELECT 
+    	 	$code$_code			code,
+    	 	MAX($code$_name) 	name
+			FROM xiu_xop.x_xop_base_category_v 
+			GROUP BY $code$_code
+     	]]>
+     	<dynamic>
+     		<isNotNull property="parentCode">
+     			HAVING MAX($parentCode$_code)=#paramCode#
+     		</isNotNull>
+     	</dynamic>
+     	order by nlssort(MAX($code$_name),'NLS_SORT=SCHINESE_PINYIN_M')  
+	</select>
+	
+	<!-- 添加走秀-京东类目映射-->
+	 <insert id="insertXiuJdCategory" parameterClass="com.xiu.jd.bean.ware.XiuJdCategory">
+        <![CDATA[
+           insert into jd_xiu_category (
+	            id,jd_cid,jd_name,xiu_cid,xiu_name,jd_fullname
+           )values(
+           		seq_jd_xiu_category.nextval,
+               	#jdCid#,
+               	#jdName#,
+			   	#xiuCid#,
+			   	#xiuName#,
+			   	#jdFullName#
+           )
+        ]]>
+    </insert>
+    
+    <!-- 查询走秀-京东类目映射-->
+    <select id="queryXiuJdCategory" resultClass="com.xiu.jd.bean.ware.XiuJdCategory"
+		parameterClass="com.xiu.jd.bean.ware.XiuJdCategory">
+    	<![CDATA[
+    	 SELECT 
+    	 	id 			id,
+    	 	jd_cid		jdCid,
+    	 	jd_name		jdName,
+    	 	xiu_cid		xiuCid,
+    	 	xiu_name	xiuName,
+    	 	jd_fullname jdFullName
+			FROM jd_xiu_category
+			where 1=1
+			]]>
+			<dynamic>
+				
+				<isNotEmpty property="xiuCid" prepend="and">
+				    xiu_cid=#xiuCid#
+				</isNotEmpty>
+			</dynamic>
+     </select>
+     
+      <!-- 查询走秀-京东类目映射-->
+     <select id="queryXiuJdCategory2" resultClass="com.xiu.jd.bean.ware.XiuJdCategory"
+		parameterClass="com.xiu.jd.bean.ware.XiuJdCategory">
+    	<![CDATA[
+    	 SELECT 
+    	 	id 			id,
+    	 	jd_cid		jdCid,
+    	 	jd_name		jdName,
+    	 	xiu_cid		xiuCid,
+    	 	xiu_name	xiuName,
+    	 	jd_fullname	jdFullName
+			FROM jd_xiu_category
+     	]]>
+     	<dynamic prepend="WHERE">
+     		<isNotEmpty property="jdCid" prepend="AND">
+     			jd_cid=#jdCid#
+     		</isNotEmpty>
+     		<isNotEmpty property="jdName" prepend="AND">
+     			jd_name=#jdName#
+     		</isNotEmpty>
+     		<isNotEmpty property="xiuCid" prepend="AND">
+     			xiu_cid=#xiuCid#
+     		</isNotEmpty>
+     		<isNotEmpty property="xiuName" prepend="AND">
+     			xiu_name=#xiuName#
+     		</isNotEmpty>
+     	</dynamic>
+     	ORDER BY ID ASC
+	</select>
+	
+	 <!-- 查询走秀-京东类目映射数量-->
+	  <select id="queryXiuJdCategoryCount" resultClass="long"
+		parameterClass="com.xiu.jd.bean.ware.XiuJdCategory">
+    	<![CDATA[
+    	 SELECT 
+    	 	COUNT(1)
+			FROM jd_xiu_category
+     	]]>
+     	<dynamic prepend="WHERE">
+     		<isNotEmpty property="jdCid" prepend="AND">
+     			jd_cid=#jdCid#
+     		</isNotEmpty>
+     		<isNotEmpty property="jdName" prepend="AND">
+     			jd_name=#jdName#
+     		</isNotEmpty>
+     		<isNotEmpty property="xiuCid" prepend="AND">
+     			xiu_cid=#xiuCid#
+     		</isNotEmpty>
+     		<isNotEmpty property="xiuName" prepend="AND">
+     			xiu_name=#xiuName#
+     		</isNotEmpty>
+     	</dynamic>
+	</select>
+	
+	 <!-- 删除走秀-京东类目映射-->
+	<delete id="delXiuJdCategory" parameterClass="int">
+		DELETE FROM jd_xiu_category WHERE id=#id#
+	</delete>
+	
+	 <!-- 根据id获取走秀-京东类目映射-->
+	<select id="getXiuJdCategory" parameterClass="int" resultClass="com.xiu.jd.bean.ware.XiuJdCategory">
+		SELECT 
+    	 	id 			id,
+    	 	jd_cid		jdCid,
+    	 	jd_name		jdName,
+    	 	xiu_cid		xiuCid,
+    	 	xiu_name	xiuName,
+    	 	jd_fullname jdFullName
+			FROM jd_xiu_category WHERE id=#id#
+	</select>
+	
+	 <!-- 更新走秀-京东类目映射-->
+	<update id="updateXiuJdCategory" parameterClass="com.xiu.jd.bean.ware.XiuJdCategory">
+		UPDATE jd_xiu_category
+			SET jd_cid=#jdCid#,
+    	 	jd_name=#jdName#,
+    	 	xiu_cid=#xiuCid#,
+    	 	xiu_name=#xiuName#,
+    	 	jd_fullname=#jdFullName#
+    	 	WHERE id=#id#
+	</update>
+	
+	 <!-- 查询走秀属性值对应中的类目-->
+	<select id="queryXiuCategoryForValueRef" resultClass="com.xiu.jd.vo.DictVo">
+		<![CDATA[
+			SELECT distinct a.class_code id,a.class_name name FROM
+				(select p.* from xiu_xop.x_xop_base_category_v p) a,
+				(select t.categoryid from jd_product_info t GROUP BY t.categoryid) b
+				WHERE a.child_code = b.categoryid
+		]]>
+	</select>
+	
+	<!-- 查询走秀属性值对应中的属性-->
+	<select id="queryXiuAttrForValueRef" parameterClass="java.lang.String" resultClass="com.xiu.jd.vo.DictVo">
+		<![CDATA[
+		SELECT A.attr_id id,max(A.attr_name) name
+		  FROM XIU_GOODS.X_CATGROUP_ATTR_XOP_VIEW A
+		 WHERE A.CATGROUP_CODE = #cid# GROUP BY A.attr_id 
+		 order by nlssort(max(A.attr_name), 'NLS_SORT=SCHINESE_PINYIN_M')
+		]]>
+	</select>
+	
+	<!-- 查询走秀属性值-->
+	<select id="queryXiuAttrValueForValueRef" parameterClass="java.lang.String" resultClass="com.xiu.jd.vo.DictVo">
+		<![CDATA[
+		SELECT A.attrval_id id,max(A.value) name
+  		FROM XIU_GOODS.X_CATGROUP_ATTR_XOP_VIEW A WHERE A.attr_id=#aid#
+  		GROUP BY A.attrval_id 
+  		order by nlssort(max(A.value), 'NLS_SORT=SCHINESE_PINYIN_M')
+		]]>
+	</select>
+	
+	<!-- 添加走秀-京东属性值映射-->
+	<insert id="insertXiuJdAttValue" parameterClass="com.xiu.jd.bean.ware.XiuJdAttValue">
+        <![CDATA[
+           insert into jd_xiu_attValue (
+	            id,jd_vid,jd_name,xiu_vid,xiu_name,xiu_attr_id,xiu_childcode,jd_cid,jd_category_name
+           )values(
+           		seq_jd_xiu_attValue.nextval,
+               	#jdVid#,
+               	#jdName#,
+			   	#xiuVid#,
+			   	#xiuName#,
+			   	#xiuAttrId#,
+			   	#xiuChildcode#, 
+			   	#jdCid#,
+			   	#jdCategoryName#
+           )
+        ]]>
+    </insert>
+    
+    <!-- 查询走秀-京东属性值映射-->
+    <select id="queryXiuJdAttValue" resultClass="com.xiu.jd.bean.ware.XiuJdAttValue"
+		parameterClass="com.xiu.jd.bean.ware.XiuJdAttValue">
+    	<![CDATA[
+    	 SELECT 
+    	 	id 			id,
+    	 	jd_vid		jdVid,
+    	 	jd_name		jdName,
+    	 	xiu_vid		xiuVid,
+    	 	xiu_name	xiuName,
+    	 	xiu_attr_id xiuAttrId,
+    	 	xiu_childcode	xiuChildcode,
+    	 	jd_cid jdCid,
+    	 	jd_category_name jdCategoryName
+    	 	
+			FROM jd_xiu_attValue
+			]]>
+		<dynamic prepend="WHERE">
+     		
+		    <isNotEmpty property="jdVid" prepend="AND">
+     			jd_vid=#jdVid#
+     		</isNotEmpty>
+     		
+     		<isNotEmpty property="jdCid" prepend="AND">
+     			jd_cid=#jdCid#
+     		</isNotEmpty>
+     		
+     		<isNotEmpty property="jdName" prepend="AND">
+     			jd_name like '%$jdName$%' 
+     		</isNotEmpty>
+     		<isNotEmpty property="xiuVid" prepend="AND">
+     			xiu_vid=#xiuVid#
+     		</isNotEmpty>
+     		<isNotEmpty property="xiuName" prepend="AND">
+     			xiu_name like '%$xiuName$%' 
+     		</isNotEmpty>
+     		
+     		<isNotEmpty property="xiuChildcode" prepend="AND">
+     			xiu_childcode=#xiuChildcode#
+     		</isNotEmpty>
+     		
+     		<isNotEmpty property="jdCategoryName" prepend="AND">
+     			jd_category_name like '%$jdCategoryName$%'
+     		</isNotEmpty>
+     	</dynamic>
+     	
+		 order by id desc
+     </select>
+     <!-- 查询走秀-京东属性值映射数量-->
+	  <select id="queryXiuJdAttValueCount" resultClass="long"
+		parameterClass="com.xiu.jd.bean.ware.XiuJdAttValue">
+    	<![CDATA[
+    	 SELECT 
+    	 	COUNT(1)
+			FROM jd_xiu_attValue
+     	]]>
+     	<dynamic prepend="WHERE">
+     		<isNotEmpty property="jdVid" prepend="AND">
+     			jd_vid=#jdVid#
+     		</isNotEmpty>
+     		
+     		<isNotEmpty property="jdCid" prepend="AND">
+     			jd_cid=#jdCid#
+     		</isNotEmpty>
+     		
+     		<isNotEmpty property="jdName" prepend="AND">
+     			jd_name like '%$jdName$%' 
+     		</isNotEmpty>
+     		<isNotEmpty property="xiuVid" prepend="AND">
+     			xiu_vid=#xiuVid#
+     		</isNotEmpty>
+     		<isNotEmpty property="xiuName" prepend="AND">
+     			xiu_name like '%$xiuName$%' 
+     		</isNotEmpty>
+     		
+     		<isNotEmpty property="xiuChildcode" prepend="AND">
+     			xiu_childcode=#xiuChildcode#
+     		</isNotEmpty>
+     		
+     		<isNotEmpty property="jdCategoryName" prepend="AND">
+     			jd_category_name like '%$jdCategoryName$%'
+     		</isNotEmpty>
+     	</dynamic>
+	</select>
+	<select id="queryXiuJdAttValue2" parameterClass="java.util.Map" resultClass="com.xiu.jd.bean.ware.XiuJdAttValue">
+		<![CDATA[
+    	   SELECT distinct 
+    	 	t.id 			id,
+    	 	t.jd_vid		jdVid,
+    	 	t.jd_name		jdName,
+    	 	t.xiu_vid		xiuVid,
+    	 	t.xiu_name	xiuName,
+    	 	t.xiu_attr_id xiuAttrId,
+    	 	t.xiu_childcode	xiuChildcode
+			FROM jd_xiu_attValue t
+      		where 1=1 
+			]]>
+		<dynamic>
+     		<isNotEmpty property="cid" prepend="AND">
+     			t.xiu_childcode = #cid#
+     		</isNotEmpty>
+     		<isNotEmpty property="xiuVid" prepend="AND">
+     			t.xiu_vid=#xiuVid#
+     		</isNotEmpty>
+     	</dynamic>
+			
+	</select>
+	<!-- 删除走秀-京东属性值映射-->
+	<delete id="delXiuJdAttValue" parameterClass="int">
+		DELETE FROM jd_xiu_attValue WHERE id=#id#
+	</delete>
+	<!-- 根据id获取走秀-京东属性值映射-->
+	<select id="getXiuJdAttValue" parameterClass="int" resultClass="com.xiu.jd.bean.ware.XiuJdAttValue">
+		SELECT 
+    	 	id 			id,
+    	 	jd_vid		jdVid,
+    	 	jd_name		jdName,
+    	 	xiu_vid		xiuVid,
+    	 	xiu_name	xiuName,
+    	 	xiu_attr_id xiuAttrId,
+    	 	xiu_childcode	xiuChildcode
+			FROM jd_xiu_attValue WHERE id=#id#
+	</select>
+	<!-- 更新走秀-京东属性值映射-->
+	<update id="updateXiuJdAttValue" parameterClass="com.xiu.jd.bean.ware.XiuJdAttValue">
+		UPDATE jd_xiu_category
+			SET jd_vid=#jdVid#,
+    	 	jd_name=#jdName#,
+    	 	xiu_vid=#xiuVid#,
+    	 	xiu_name=#xiuName#,
+    	 	xiu_attr_id=#xiuAttrId#,
+    	 	xiu_childcode=#xiuChildcode#
+    	 	WHERE id=#id#
+	</update>
+	
+	<select id="queryXiuBrand" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand" resultClass="com.xiu.jd.bean.ware.XiuJdBrand">
+		<![CDATA[
+			SELECT xiu_brand_code xiuBrandCode,
+	    	 	xiu_brand_name xiuBrandName
+				FROM v_xiu_brand
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="xiuBrandCode" prepend="OR">
+				xiu_brand_code=#xiuBrandCode#
+			</isNotEmpty>
+			<isNotEmpty property="xiuBrandName" prepend="OR">
+				lower(xiu_brand_name) like '%$xiuBrandName$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+  <select id="queryXiuBrandCount" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand" resultClass="long">
+		<![CDATA[
+			SELECT count(1) FROM v_xiu_brand
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="xiuBrandCode" prepend="OR">
+				xiu_brand_code=#xiuBrandCode#
+			</isNotEmpty>
+			<isNotEmpty property="xiuBrandName" prepend="OR">
+				lower(xiu_brand_name) like '%$xiuBrandName$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryXiuJdBrand" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand" resultClass="com.xiu.jd.bean.ware.XiuJdBrand">
+		<![CDATA[
+			SELECT     ID id,
+					   jd_cid jdCid ,
+				       jd_vid jdVid,
+				       jd_vame jdVname,
+				       xiu_brand_code xiuBrandCode,
+				       xiu_brand_name xiuBrandName,
+				       jd_category_name jdCategoryName
+				FROM jd_xiu_brand where 1=1 
+		]]>
+		<dynamic>
+			<isEmpty property="jdCid" prepend="AND">
+				jd_cid is not null 
+			</isEmpty>
+			<isNotEmpty property="jdCid" prepend="AND">
+				jd_cid=#jdCid#
+			</isNotEmpty>
+			<isNotEmpty property="jdVid" prepend="AND">
+				jd_vid=#jdVid#
+			</isNotEmpty>
+			
+			<isNotEmpty property="jdCategoryName" prepend="AND">
+				jd_category_name like '%$jdCategoryName$%'
+			</isNotEmpty>
+			
+			<isNotEmpty property="jdVname" prepend="AND">
+				jd_vame = #jdVname#
+			</isNotEmpty>
+			<isNotEmpty property="xiuBrandCode" prepend="AND">
+				xiu_brand_code = #xiuBrandCode#
+			</isNotEmpty>
+			<isNotEmpty property="xiuBrandName" prepend="AND">
+				xiu_brand_name like '%$xiuBrandName$%'
+			</isNotEmpty>
+		</dynamic>
+		order by ID desc
+	</select>
+	<select id="queryXiuJdBrandCount" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand" resultClass="long">
+		<![CDATA[
+			SELECT count(1) FROM jd_xiu_brand  where 1=1  
+		]]>
+		<dynamic>
+			<isEmpty property="jdCid" prepend="AND">
+				jd_cid is not null 
+			</isEmpty>
+			<isNotEmpty property="jdCid" prepend="AND">
+				jd_cid=#jdCid#
+			</isNotEmpty>
+			<isNotEmpty property="jdVid" prepend="AND">
+				jd_vid=#jdVid#
+			</isNotEmpty>
+			
+			<isNotEmpty property="jdCategoryName" prepend="AND">
+				jd_category_name like '%$jdCategoryName$%'
+			</isNotEmpty>
+			
+			<isNotEmpty property="jdVname" prepend="AND">
+				jd_vame = #jdVname#
+			</isNotEmpty>
+			<isNotEmpty property="xiuBrandCode" prepend="AND">
+				xiu_brand_code = #xiuBrandCode#
+			</isNotEmpty>
+			<isNotEmpty property="xiuBrandName" prepend="AND">
+				xiu_brand_name like '%$xiuBrandName$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryXiuBrand2" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand" resultClass="com.xiu.jd.bean.ware.XiuJdBrand">
+		<![CDATA[
+			SELECT     ID id,
+				       jd_vid jdVid,
+				       jd_cid jdCid,
+				       jd_vame jdVname,
+				       xiu_brand_code xiuBrandCode,
+				       xiu_brand_name xiuBrandName
+				FROM xiu_jd_bag.jd_xiu_brand
+				where 1=1 
+		]]>
+		<dynamic>
+			<isNotEmpty property="xiuBrandCode" prepend="AND">
+				xiu_brand_code = #xiuBrandCode# 
+			</isNotEmpty>
+			<isNotEmpty property="jdCid" prepend="AND">
+				jd_cid = #jdCid# 
+			</isNotEmpty>
+		</dynamic>
+	</select>
+		<select id="queryBrand2Xiu" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand" resultClass="com.xiu.jd.bean.ware.XiuJdBrand">
+		<![CDATA[
+			SELECT     ID id,
+				       jd_vid jdVid,
+				       jd_cid jdCid,
+				       jd_vame jdVname,
+				       xiu_brand_code xiuBrandCode,
+				       xiu_brand_name xiuBrandName
+				FROM xiu_jd.jd_xiu_brand
+				where 1=1 
+		]]>
+		<dynamic>
+			<isNotEmpty property="xiuBrandCode" prepend="AND">
+				xiu_brand_code = #xiuBrandCode# 
+			</isNotEmpty>
+			<isNotEmpty property="jdCid" prepend="AND">
+				jd_cid = #jdCid# 
+			</isNotEmpty>
+		</dynamic>
+	</select>
+		<select id="queryEbayBrand2" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand" resultClass="com.xiu.jd.bean.ware.XiuJdBrand">
+		<![CDATA[
+			SELECT     ID id,
+				       jd_vid jdVid,
+				       jd_cid jdCid,
+				       jd_vame jdVname,
+				       xiu_brand_code xiuBrandCode,
+				       xiu_brand_name xiuBrandName
+				FROM xiu_ebay_jd.jd_xiu_brand
+				where 1=1 
+		]]>
+		<dynamic>
+			<isNotEmpty property="xiuBrandCode" prepend="AND">
+				xiu_brand_code = #xiuBrandCode# 
+			</isNotEmpty>
+			<isNotEmpty property="jdCid" prepend="AND">
+				jd_cid = #jdCid# 
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+	
+	<insert id="insertXiuJdBrand" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand">
+		<![CDATA[
+		 INSERT INTO xiu_jd_bag.jd_xiu_brand(id,jd_vid,jd_cid,jd_vame,xiu_brand_code,xiu_brand_name,jd_category_name)
+		 	VALUES(seq_jd_xiu_brand.nextval,#jdVid#,#jdCid#,#jdVname#,#xiuBrandCode#,#xiuBrandName#,#jdCategoryName#)
+		]]>
+	</insert>
+	<insert id="insertJdBrandXiu" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand">
+		<![CDATA[
+		 INSERT INTO xiu_jd.jd_xiu_brand(id,jd_vid,jd_cid,jd_vame,xiu_brand_code,xiu_brand_name,jd_category_name)
+		 	VALUES(seq_jd_xiu_brand.nextval,#jdVid#,#jdCid#,#jdVname#,#xiuBrandCode#,#xiuBrandName#,#jdCategoryName#)
+		]]>
+	</insert>
+	<insert id="insertEbayJdBrand" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand">
+		<![CDATA[
+		 INSERT INTO xiu_ebay_jd.jd_xiu_brand(id,jd_vid,jd_cid,jd_vame,xiu_brand_code,xiu_brand_name,jd_category_name)
+		 	VALUES(seq_jd_xiu_brand.nextval,#jdVid#,#jdCid#,#jdVname#,#xiuBrandCode#,#xiuBrandName#,#jdCategoryName#)
+		]]>
+	</insert>
+	<delete id="deleteXiuJdBrand" parameterClass="int">
+		DELETE FROM jd_xiu_brand WHERE id=#id#
+	</delete>
+	<!-- 查询类目映射信息是否在本地存在 -->
+	<select id="isExistXiuJdCategory" parameterClass="com.xiu.jd.bean.ware.XiuJdCategory" resultClass="java.lang.Integer">
+		<![CDATA[
+    	 SELECT 
+    	 	count(*)
+			FROM jd_xiu_category
+			where 1=1
+			]]>
+			<dynamic>
+				<isNotEmpty property="xiuCid" prepend="and">
+				    xiu_cid=#xiuCid#
+				</isNotEmpty>
+			</dynamic>
+	</select>
+	<!-- 查询属性映射信息是否在本地存在 -->
+	<select id="isExistXiuJdValue" parameterClass="com.xiu.jd.bean.ware.XiuJdAttValue" resultClass="java.lang.Integer">
+		<![CDATA[
+    	 SELECT 
+    	 	count(*)
+			FROM jd_xiu_attvalue t 
+			where 1=1
+			]]>
+			<dynamic>
+				<isNotEmpty property="xiuChildcode" prepend="and">
+				    t.xiu_childcode=#xiuChildcode#
+				</isNotEmpty>
+				<isNotEmpty property="xiuVid" prepend="and">
+					t.xiu_Vid = #xiuVid# 
+				</isNotEmpty>
+				<isNotEmpty property="xiuAttrId" prepend="and">
+					t.xiu_Attr_Id = #xiuAttrId# 
+				</isNotEmpty>
+			</dynamic>
+	</select>
+	
+	<select id="queryXopBrand" parameterClass="com.xiu.jd.bean.ware.XiuJdBrand" resultClass="com.xiu.jd.bean.ware.XiuJdBrand">
+		<![CDATA[
+			 select t.brand_code xiuBrandCode,
+         T.BRAND_NAME_US || ' ' || T.BRAND_NAME_ZHS || ' ' AS xiuBrandName
+    from XIU_XOP.X_XOP_BRAND_XIU_MAP t
+			
+		]]>
+		where 1=1
+		<dynamic >
+			<isNotEmpty property="xiuBrandCode" prepend="and">
+				t.brand_code=#xiuBrandCode#
+			</isNotEmpty>
+			
+		</dynamic>
+	</select>
+</sqlMap>

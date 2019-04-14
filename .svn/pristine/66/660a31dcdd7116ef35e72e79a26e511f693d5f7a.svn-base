@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JdPromoDaoBean">
+    
+    <typeAlias alias="JdPromo" type="com.xiu.jd.bean.ware.JdPromo"/>
+    <typeAlias alias="JdPromoSku" type="com.xiu.jd.bean.ware.JdPromoSku"/>
+    <insert id="insertJdPromo" parameterClass="JdPromo">
+        <![CDATA[
+          insert into jd_promo 
+        (
+            ID,
+            PROMO_ID,
+			NAME,
+			TYPE,
+			BEGIN_TIME,
+			END_TIME
+          )  
+        values(
+           xiu_jd_bag.seq_jd_promo.nextval,
+           #promoId#,
+           #name#,
+           #type#,
+           to_date(#beginTime#,'yyyy-mm-dd hh24:mi:ss'),
+           to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+        )
+        ]]>
+   
+    </insert>
+    
+    
+     <!-- 批量保存商品 -->
+        <insert id="insertJdPromoSku" parameterClass="JDPromoSku">
+              <![CDATA[
+         insert into jd_promo_sku 
+        (
+            WARE_ID,
+			XIUCODE,
+			JDSKUID,
+			SKU_NAME,
+			PROMO_ID,
+			JD_PRICE,
+			PROMO_PRICE,
+			STATUS,
+			FAIL_DESC,
+			SKUSN
+          )          
+        values(
+              #wareId#,
+              #xiuCode#,
+	          #jdSkuId#,
+	          #skuName#,
+	          #promoId#,
+	          #jdPrice#,
+	          #promoPrice#,
+	          #status#,
+	          #failDesc#,
+	          #skuSn#
+        )
+        ]]>        
+    </insert>
+</sqlMap>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JdSellerCategoryDaoBean">
+	<typeAlias alias="JdSellerCategory" type="com.xiu.jd.bean.ware.JdSellerCategory" />
+
+	<insert id="insert" parameterClass="JdSellerCategory">
+		insert into jd_seller_category
+		(cid, parentid, name, ishomeshow, isparent, isopen, orderno, shopid)
+		values
+		(#cid#,
+		#parentId#,
+		#name#,
+		#isHomeShow#,
+		#isParent#,
+		#isOpen#,
+		#orderNo#,
+		#shopId#)
+
+	    </insert>
+
+
+	<insert id="insertBatch" parameterClass="JdSellerCategory">
+		insert into jd_seller_category
+		(cid, parentid, name, ishomeshow, isparent, isopen, orderno, shopid)
+		values
+		(#cid#,
+		#parentId#,
+		#name#,
+		#isHomeShow#,
+		#isParent#,
+		#isOpen#,
+		#orderNo#,
+		#shopId#)
+
+	     </insert>
+
+	<select id="querySellerCategory" resultClass="JdSellerCategory"
+		parameterClass="java.util.Map">
+		<![CDATA[ 
+		select t.cid cid,
+			   t.name name,
+			   t.parentId parentId,
+			   t.isparent isParent 
+	    from jd_seller_category t 
+	    where 1=1 
+	    ]]>
+		<dynamic>
+			<isNotEmpty prepend="and" property="parentId">
+				t.parentId <![CDATA[=]]>#parentId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="isParent">
+				t.isParent <![CDATA[=]]>#isParent#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="querySellerCategoryFid" resultClass="JdSellerCategory"
+		parameterClass="java.lang.Integer">
+		select t.cid cid,
+			   t.name name,
+			   t.parentId parentId,
+			   t.isparent isParent 
+	    from jd_seller_category t 
+	    where t.parentId = #shopCategoryId#
+	</select>
+	<!-- 删除本地京东店内分类表的数据 -->
+	<delete id="deleteAllSellerCategory">
+		delete from jd_seller_category t 
+	</delete>
+</sqlMap>

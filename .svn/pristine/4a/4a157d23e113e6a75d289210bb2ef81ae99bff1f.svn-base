@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JDWareAndSkuInfoDaoBean">
+    
+    <typeAlias alias="JDWareAndSkuInfo" type="com.xiu.jd.bean.ware.JDWareAndSkuInfo"/>
+    <typeAlias alias="JDWareSkuBrand" type="com.xiu.jd.bean.ware.JDWareSkuBrand"/>
+    
+
+      <!-- 分页查询实体 -->
+     <select id="getPageResule" parameterClass="java.util.Map" resultClass="JDWareAndSkuInfo" >
+          <![CDATA[ 
+		select 
+		  n.cid cid,
+		  n.jd_ware_id jdWareId,
+		  n.title title,
+		  n.xiucode xiucode,
+		  n.high high,
+		  n.lenght lenght,
+		  n.weight weight,
+		  n.jdprice jdprice,
+		  n.marketprice marketprice,
+		  n.stocknum stocknum,
+		  n.createdate createdate,
+		  n.num num,
+		  n.status status,
+		  n.onlinestatus onLineStatus,
+		  n.shopCategory shopCategory,
+		  n.brandCode brandCode,
+		  n.categoryid categoryid 
+		  from (select m.*, rownum rn
+	          from (
+	              		select w.* from jd_product_info w 
+	              		where 1=1 
+	   ]]> 
+	   <dynamic>
+     		<isNotEmpty prepend="and" property="cid"> 
+           	w.cid <![CDATA[=]]>#cid#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="xiuCode"> 
+           	w.xiucode <![CDATA[=]]>#xiuCode#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="jdWareId"> 
+           	w.jd_ware_id <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="startTime"> 
+           	w.createdate <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="endTime"> 
+             w.createdate <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="minJdPrice"> 
+           	to_number(w.jdprice) <![CDATA[>=]]>to_number(#minJdPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="maxJdPrice"> 
+             to_number(w.jdprice) <![CDATA[<=]]>to_number(#maxJdPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="minMarketPrice"> 
+           	to_number(w.marketprice) <![CDATA[>=]]>to_number(#minMarketPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="maxMarketPrice"> 
+             to_number(w.marketprice) <![CDATA[<=]]>to_number(#maxMarketPrice#)
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="num"> 
+             w.num<![CDATA[=]]>#num#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="status"> 
+             w.status<![CDATA[=]]>#status#
+            </isNotEmpty >
+             <isNotEmpty prepend="and" property="onLineStatus"> 
+             w.onlinestatus<![CDATA[=]]>#onLineStatus#
+            </isNotEmpty >
+            <isNotEmpty prepend="and" property="shopCategory"> 
+             w.shopCategory like '%$shopCategory$%' 
+            </isNotEmpty >
+            <isNotEmpty prepend="and" property="title"> 
+             w.title like '%$title$%' 
+            </isNotEmpty >
+            <isEqual prepend="and" property="wareStock" compareValue="0">
+            w.stocknum = '0'
+            </isEqual>
+            <isEqual prepend="and" property="wareStock" compareValue="1">
+            w.stocknum != '0'
+            </isEqual>
+             <isNotEmpty  property="xiuCodes">
+                 <iterate prepend="and 	w.xiucode in " open="(" close=")" conjunction="," property="xiuCodes">
+                      <![CDATA[#xiuCodes[]#]]>
+                     
+                 </iterate>
+             </isNotEmpty>
+        
+       </dynamic>
+         <![CDATA[ 
+		 order by 
+		 
+		 ]]>	
+		  <isNotEmpty prepend="" property="stockOrder"> 
+		            <![CDATA[   w.stocknum $stockOrder$ ]]> 
+		  </isNotEmpty>
+		               
+       ,w.createdate desc ) m
+		         where  rownum  <![CDATA[ <=]]> #lastNum#) n
+		 where rn >= #firstNum#
+
+     </select>
+     
+     <select id="getCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+	    <![CDATA[ 
+	    select count(*) from jd_product_info w 
+	    where 1=1
+	    ]]>
+	     <dynamic>
+	     	<isNotEmpty prepend="and" property="cid"> 
+           	w.cid <![CDATA[=]]>#cid#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="xiuCode"> 
+           	w.xiucode <![CDATA[=]]>#xiuCode#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="jdWareId"> 
+           	w.jd_ware_id <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="startTime"> 
+           	w.createdate <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="endTime"> 
+             w.createdate <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="minJdPrice"> 
+           	to_number(w.jdprice) <![CDATA[>=]]>to_number(#minJdPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="maxJdPrice"> 
+             to_number(w.jdprice) <![CDATA[<=]]>to_number(#maxJdPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="minMarketPrice"> 
+           	to_number(w.marketprice) <![CDATA[>=]]>to_number(#minMarketPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="maxMarketPrice"> 
+             to_number(w.marketprice) <![CDATA[<=]]>to_number(#maxMarketPrice#)
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="num"> 
+             w.num<![CDATA[=]]>#num#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="status"> 
+             w.status<![CDATA[=]]>#status#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="onLineStatus"> 
+             w.onlinestatus<![CDATA[=]]>#onLineStatus#
+            </isNotEmpty >
+            <isNotEmpty prepend="and" property="shopCategory"> 
+             w.shopCategory like '%$shopCategory$%' 
+            </isNotEmpty >
+            <isNotEmpty prepend="and" property="title"> 
+             w.title like '%$title$%' 
+            </isNotEmpty >
+            <isEqual prepend="and" property="wareStock" compareValue="0">
+            w.stocknum = '0'
+            </isEqual>
+            <isEqual prepend="and" property="wareStock" compareValue="1">
+            w.stocknum != '0'
+            </isEqual>
+             <isNotEmpty  property="xiuCodes">
+                 <iterate prepend="and 	w.xiucode in " open="(" close=")" conjunction="," property="xiuCodes">
+                      <![CDATA[#xiuCodes[]#]]>
+                     
+                 </iterate>
+             </isNotEmpty>
+	</dynamic>
+	</select>
+	
+	<select id="queryWareSkuBrand" parameterClass="java.util.Map" resultClass="JDWareSkuBrand">
+		 <![CDATA[ 
+	    select t.skusn skuCode,
+	    	   t.jdskuid jdSkuId,
+	    	   w.jd_ware_id jdWareId,
+	    	   t.xiucode xiuCode,
+	    	   w.supplierCode supplierCode,
+	    	   w.costprice costPrice,
+	    	   w.marketprice marketPrice,
+	    	   v.xiu_brand_name xiuBrand,
+	    	   t.stocknum skuStock,
+	    	   w.jdPrice jdPrice,
+	    	   w.title jdWareName,
+	    	   w.onlinestatus onLineStatus,
+	    	   t1.name jdFirCname,
+	           t2.name jdSecCname,
+	           t3.name jdThiCname,
+	           v.super_name xiuSuperName,
+	           v.family_name xiuFamliyName,
+	           v.child_name xiuChildName
+	    from jd_product_sku_info t 
+     	left join jd_product_info w on t.xiucode=w.xiucode 
+     	left join  v_xiu_brand v on w.brandcode = v.xiu_brand_code 
+     	left join jd_category t3 on w.cid = t3.id 
+        left join jd_category t2 on t3.fid = t2.id 
+        left join jd_category t1 on t2.fid = t1.id 
+        left join  xiu_xop.x_xop_base_category_v v on w.categoryid = v.child_code 
+	    where 1=1 and w.xiucode is not null
+	    ]]>
+	     <dynamic>
+	     	<isNotEmpty prepend="and" property="cid"> 
+           	w.cid <![CDATA[=]]>#cid#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="xiuCode"> 
+           	w.xiucode <![CDATA[=]]>#xiuCode#
+            </isNotEmpty>	
+            <isNotEmpty prepend="and" property="jdWareId"> 
+           	w.jd_ware_id <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="startTime"> 
+           	w.createdate <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="endTime"> 
+             w.createdate <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="minJdPrice"> 
+           	to_number(w.jdprice) <![CDATA[>=]]>to_number(#minJdPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="maxJdPrice"> 
+             to_number(w.jdprice) <![CDATA[<=]]>to_number(#maxJdPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="minMarketPrice"> 
+           	to_number(w.marketprice) <![CDATA[>=]]>to_number(#minMarketPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="maxMarketPrice"> 
+             to_number(w.marketprice) <![CDATA[<=]]>to_number(#maxMarketPrice#)
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="num"> 
+             w.num<![CDATA[=]]>#num#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="status"> 
+             w.status<![CDATA[=]]>#status#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="onLineStatus"> 
+             w.onlinestatus<![CDATA[=]]>#onLineStatus#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="shopCategory"> 
+             w.shopCategory like '%$shopCategory$%' 
+            </isNotEmpty >
+            <isNotEmpty prepend="and" property="title"> 
+             w.title like '%$title$%' 
+            </isNotEmpty >
+            <isEqual prepend="and" property="wareStock" compareValue="0">
+            w.stocknum = '0'
+            </isEqual>
+            <isEqual prepend="and" property="wareStock" compareValue="1">
+            w.stocknum != '0'
+            </isEqual>
+            <isNotEmpty  property="xiuCodes">
+                 <iterate prepend="and 	w.xiucode in " open="(" close=")" conjunction="," property="xiuCodes">
+                      <![CDATA[#xiuCodes[]#]]>
+                     
+                 </iterate>
+             </isNotEmpty>
+            </dynamic>
+	</select>
+	
+	
+	
+  <!-- Excel分页导出商品信息 -->
+  <select id="queryWareSkuBrandPage" parameterClass="java.util.Map" resultClass="JDWareSkuBrand">
+		 <![CDATA[
+		 select 
+           k.skuCode skuCode,
+    
+           k.jdSkuId jdSkuId,
+           k.jdWareId jdWareId,
+           k.xiuCode xiuCode,
+           k.supplierCode supplierCode,
+           k.costPrice costPrice,
+           k.marketPrice marketPrice,
+           k.xiuBrand xiuBrand,
+           k.skuStock skuStock,
+           k.jdPrice jdPrice,
+           k.jdWareName jdWareName,
+           k.onLineStatus onLineStatus,
+           k.jdFirCname jdFirCname,
+           k.jdSecCname jdSecCname,
+           k.jdThiCname jdThiCname,
+           k.xiuSuperName xiuSuperName,
+           k.xiuFamliyName xiuFamliyName,
+	       k.xiuChildName xiuChildName,
+           k.createdate   createDate
+
+			 from (
+			select m.*,  rownum as rn from (
+					 
+				    select t.skusn skuCode,
+				    	   t.jdskuid jdSkuId,
+				    	   w.jd_ware_id jdWareId,
+				    	   t.xiucode xiuCode,
+				    	   w.supplierCode supplierCode,
+				    	   w.costprice costPrice,
+				    	   w.marketprice marketPrice,
+				    	   v.xiu_brand_name xiuBrand,
+				    	   t.stocknum skuStock,
+				    	   w.jdPrice jdPrice,
+				    	   w.title jdWareName,
+				    	   w.onlinestatus onLineStatus,
+				    	   t1.name jdFirCname,
+				           t2.name jdSecCname,
+				           t3.name jdThiCname,
+				           v.super_name xiuSuperName,
+				           v.family_name xiuFamliyName,
+				           v.child_name xiuChildName,
+				           to_char(w.createdate,'YYYY-MM-DD hh:mm:ss') createdate
+				    from jd_product_sku_info t 
+			     	left join jd_product_info w on t.xiucode=w.xiucode 
+			     	left join v_xiu_brand v on w.brandcode = v.xiu_brand_code 
+			     	left join jd_category t3 on w.cid = t3.id 
+			        left join jd_category t2 on t3.fid = t2.id 
+			        left join jd_category t1 on t2.fid = t1.id 
+			        left join  xiu_xop.x_xop_base_category_v v on w.categoryid = v.child_code 
+				    where 1=1 and w.xiucode is not null
+	    ]]>
+	     <dynamic>
+	     	<isNotEmpty prepend="and" property="cid"> 
+           	w.cid <![CDATA[=]]>#cid#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="xiuCode"> 
+           	w.xiucode <![CDATA[=]]>#xiuCode#
+            </isNotEmpty>	
+            <isNotEmpty prepend="and" property="jdWareId"> 
+           	w.jd_ware_id <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="startTime"> 
+           	w.createdate <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="endTime"> 
+             w.createdate <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="minJdPrice"> 
+           	to_number(w.jdprice) <![CDATA[>=]]>to_number(#minJdPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="maxJdPrice"> 
+             to_number(w.jdprice) <![CDATA[<=]]>to_number(#maxJdPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="minMarketPrice"> 
+           	to_number(w.marketprice) <![CDATA[>=]]>to_number(#minMarketPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="maxMarketPrice"> 
+             to_number(w.marketprice) <![CDATA[<=]]>to_number(#maxMarketPrice#)
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="num"> 
+             w.num<![CDATA[=]]>#num#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="status"> 
+             w.status<![CDATA[=]]>#status#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="onLineStatus"> 
+             w.onlinestatus<![CDATA[=]]>#onLineStatus#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="shopCategory"> 
+             w.shopCategory like '%$shopCategory$%' 
+            </isNotEmpty >
+            <isNotEmpty prepend="and" property="title"> 
+             w.title like '%$title$%' 
+            </isNotEmpty >
+            <isEqual prepend="and" property="wareStock" compareValue="0">
+            w.stocknum = '0'
+            </isEqual>
+            <isEqual prepend="and" property="wareStock" compareValue="1">
+            w.stocknum != '0'
+            </isEqual>
+            <isNotEmpty  property="xiuCodes">
+                 <iterate prepend="and 	w.xiucode in " open="(" close=")" conjunction="," property="xiuCodes">
+                      <![CDATA[#xiuCodes[]#]]>
+                     
+                 </iterate>
+             </isNotEmpty>
+            </dynamic>
+            
+	       ) m  where rownum  <![CDATA[<= ]]>#lastNum#
+      
+      ) k where <![CDATA[rn>= ]]>#firstNum#
+	</select>
+	
+	
+	<select id="queryWareSkuBrandCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+		 <![CDATA[ 
+	    select 
+	         count(*)
+	    
+	    from jd_product_sku_info t 
+     	left join jd_product_info w on t.xiucode=w.xiucode 
+     	left join v_xiu_brand v on w.brandcode = v.xiu_brand_code 
+     	left join jd_category t3 on w.cid = t3.id 
+        left join jd_category t2 on t3.fid = t2.id 
+        left join jd_category t1 on t2.fid = t1.id 
+        left join  xiu_xop.x_xop_base_category_v v on w.categoryid = v.child_code 
+	    where 1=1 and w.xiucode is not null
+	    ]]>
+	     <dynamic>
+	     	<isNotEmpty prepend="and" property="cid"> 
+           	w.cid <![CDATA[=]]>#cid#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="xiuCode"> 
+           	w.xiucode <![CDATA[=]]>#xiuCode#
+            </isNotEmpty>	
+            <isNotEmpty prepend="and" property="jdWareId"> 
+           	w.jd_ware_id <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="startTime"> 
+           	w.createdate <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="endTime"> 
+             w.createdate <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="minJdPrice"> 
+           	to_number(w.jdprice) <![CDATA[>=]]>to_number(#minJdPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="maxJdPrice"> 
+             to_number(w.jdprice) <![CDATA[<=]]>to_number(#maxJdPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="minMarketPrice"> 
+           	to_number(w.marketprice) <![CDATA[>=]]>to_number(#minMarketPrice#)
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="maxMarketPrice"> 
+             to_number(w.marketprice) <![CDATA[<=]]>to_number(#maxMarketPrice#)
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="num"> 
+             w.num<![CDATA[=]]>#num#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="status"> 
+             w.status<![CDATA[=]]>#status#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="onLineStatus"> 
+             w.onlinestatus<![CDATA[=]]>#onLineStatus#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="shopCategory"> 
+             w.shopCategory like '%$shopCategory$%' 
+            </isNotEmpty >
+            <isNotEmpty prepend="and" property="title"> 
+             w.title like '%$title$%' 
+            </isNotEmpty >
+            <isEqual prepend="and" property="wareStock" compareValue="0">
+            w.stocknum = '0'
+            </isEqual>
+            <isEqual prepend="and" property="wareStock" compareValue="1">
+            w.stocknum != '0'
+            </isEqual>
+            <isNotEmpty  property="xiuCodes">
+                 <iterate prepend="and 	w.xiucode in " open="(" close=")" conjunction="," property="xiuCodes">
+                      <![CDATA[#xiuCodes[]#]]>
+                     
+                 </iterate>
+             </isNotEmpty>
+            </dynamic>
+	</select>
+</sqlMap>

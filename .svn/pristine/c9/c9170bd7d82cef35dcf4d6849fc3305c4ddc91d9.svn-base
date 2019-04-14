@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JDConsigneenInfoServiceBean">
+    
+    <typeAlias alias="JDConsigneenInfo" type="com.xiu.jd.bean.user.JDConsigneenInfo"/>
+
+	
+    
+    <insert id="insert" parameterClass="JDConsigneenInfo">
+              <![CDATA[
+           insert into jd_consigneen_info (
+	            id,
+				fullName,
+				mobile,
+				telePhone,
+				fullAddress
+           )values(
+               SEQ_JD_CONSIGNEEN.nextval,
+	           #fullName#,
+	           #mobile#,
+	           #telePhone#,
+	           #fullAddress#
+	           
+           )
+        ]]>
+       <selectKey resultClass="long" keyProperty="id" > 
+          select  SEQ_JD_CONSIGNEEN.currval as id from dual
+       </selectKey>
+   </insert>
+   
+    <select id="isExistsUserMobileNation" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+        select count(*) from jd_consigneen_info t where t.mobile=#mobile#
+        
+    </select>
+    <!-- 更新订单收货人地址详情 -->
+    <update id="update" parameterClass="JDConsigneenInfo">
+       update jd_consigneen_info t set t.fulladdress = #fullAddress# where t.mobile=#mobile#
+
+    </update>
+</sqlMap>

@@ -1,0 +1,42 @@
+package com.xiu.jd.service.ware.impl;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import com.xiu.jd.bean.ware.JdPromo;
+import com.xiu.jd.bean.ware.JdPromoSku;
+import com.xiu.jd.dao.ware.JdPromoDao;
+import com.xiu.jd.service.ware.JdPromoService;
+
+@Service("jdPromoServiceBean")
+public class JdPromoServiceBean implements JdPromoService {
+	private Logger log = LoggerFactory.getLogger("JdPromoServiceBean");
+
+	@Resource(name="JdPromoDaoBean")
+	private JdPromoDao jdPromoDaoBean;
+
+	@Override
+	public boolean createPromo(JdPromo jdPromo,JdPromoSku jdPromoSku) {
+		// TODO Auto-generated method stub
+		Boolean bool=true;
+		try {
+			jdPromoDaoBean.insertPromo(jdPromo);
+		} catch (Exception e) {
+			log.error("新增单品促销信息失败"+jdPromo);
+			bool=false;
+			e.printStackTrace();
+		}
+		try {
+			jdPromoDaoBean.insertPromoSku(jdPromoSku);
+		} catch (Exception e) {
+			log.error("新增单品促销sku失败"+jdPromoSku);
+			bool=false;
+			e.printStackTrace();
+		}
+		return bool;
+	}
+
+}

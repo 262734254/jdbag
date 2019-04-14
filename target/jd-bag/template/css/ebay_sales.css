@@ -1,0 +1,43 @@
+@charset "utf-8";
+/* CSS Document */
+
+.xs-sort-bar .sort-box dd i,
+.xs-toolbar .showmode b,
+.xs-toolbar .l_page,.xs-toolbar
+.r_page,.xs-itemsbox 
+.showprice,.xs-itemsbox .delprice,.xs-catalog .bd dt b,
+.xs-saleitemslist .price,
+.xs-pagebar a.pre-page,.xs-pagebar a
+.next-page,.xs-catalog-search{background:url(/images/xsearchico20120615.png?__=20120803) no-repeat 999em 999em;}
+
+.xs-sort-bar .sort-box dd b,.xs-sort-bar .sort-box dd a{background:url(/images/xsearch20120615.png?__=20120803) no-repeat 999em 999em;}
+.down{background-position:0 -55px;}
+.facet-line .down:hover{background-position:0 -75px;}.brand-btn-box .more-opt{top:4px;}
+.brand-item-box{height:0;overflow-x:hidden;overflow-y:hidden;overflow:hidden;_height:0;_zoom:1;}
+.brand-item-box ul{padding:0 5px;*zoom:1;overflow:hidden;}
+.brand-item-box li{float:left;width:110px;height:20px;line-height:20px;overflow:hidden;padding:5px 10px 7px 0;*zoom:1;}.brand-item-box li span{color:#999;}.brand-item-box li a{padding:0 8px;width:94px;height:20px;line-height:20px;float:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}.brand-item-box li a:hover,.brand-item-box li a:hover span{background-color:#939192;color:#fff;}.normal-item-box{position:relative;*zoom:1;padding:5px 35px 0 0;}
+.normal-item-box ul{*zoom:1;overflow:hidden;}
+.normal-item-box .all-btn{text-align:center;display:block;position:absolute;top:5px;left:5px;width:40px;height:20px;line-height:20px;}.normal-item-box li{float:left;height:20px;line-height:20px;padding:0 10px 10px 0;*zoom:1;}.normal-item-box li a{padding:0 8px;height:20px;line-height:20px;float:left;display:block;*zoom:1;white-space:nowrap;}.normal-item-box li a:hover,.normal-item-box .all-btn:hover,
+.normal-item-box .active{background-color:#939192;color:#fff;}
+.normal-item-box li a:hover span{color:#fff;}
+.facet-item-box{overflow:hidden;zoom:1;min-height:30px;height:30px;}
+.facet-item-box ul{overflow:hidden;}
+.normal-item-box li span{color:#999;}
+.normal-item-box .hide{display:none;}
+.xs-filterbox{margin-top:10px;}
+.xs-sort-bar{height:26px;}
+.xs-sort-bar .sort-box{line-height:26px;line-height:28px \9;height:26px;float:left;overflow:hidden;zoom:1;}
+.xs-sort-bar .sort-box dt{float:left;width:58px;}
+.xs-sort-bar .sort-box dt label{padding-left:11px;}
+.xs-sort-bar .sort-box dd{float:left;margin-right:3px;}
+.xs-sort-bar .sort-box dd a{float:left;padding:0 20px 0 15px;height:26px;overflow:hidden;position:relative;zoom:1;background-position:right -26px;font-size:14px;}.xs-sort-bar 
+.sort-box dd a.w2{width:50px;}
+.xs-sort-bar .sort-box dd a.nonearr{padding-left:16px;padding-right:16px;}.xs-sort-bar
+
+.sort-box dd a.w4{width:60px;}.xs-sort-bar .sort-box dd b{display:block;top:0;left:0;height:26px;width:5px;line-height:0;background-position:0 -26px;position:absolute;}
+.xs-sort-bar .sort-box dd i{display:block;top:50%;margin-top:-3px;_margin-top:-4px;right:8px;line-height:0;position:absolute;width:7px;height:8px;background-position:0 -240px;}
+.xs-sort-bar .sort-box dd i.down{background-position:0 -260px;}.xs-sort-bar .sort-box a:hover,.xs-sort-bar .sort-box a.active{background-position:right 0;text-decoration:none;color:#fff;font-weight:bold;}.xs-sort-bar .sort-box a:hover b,.xs-sort-bar .sort-box a.active b{background-position:0 0;}
+.xs-sort-bar .sort-box a:hover i,.xs-sort-bar .sort-box a.active i{background-position:0 -280px;}
+.xs-sort-bar .sort-box a:hover i.down,.xs-sort-bar .sort-box a.active i.down{background-position:0 -300px;}
+
+ .active{background-color:#939192;color:#fff;}

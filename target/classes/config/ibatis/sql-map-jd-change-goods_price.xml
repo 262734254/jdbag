@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JdChangeGoodsPriceServiceBean">
+<typeAlias alias="JdChangedGoodsPrice" type="com.xiu.jd.bean.ware.JdChangedGoodsPrice"/>
+	
+	<!-- 添加京东类目至本地 -->
+    <insert id="insert" parameterClass="JdChangedGoodsPrice">
+         <selectKey resultClass="long" keyProperty="recordid" > 
+          select seq_jd_changed_goods_price.nextval as recordid from dual
+        </selectKey>
+        <![CDATA[
+           insert into jd_changed_goods_price (
+                recordid,
+	            xiucode,
+	            xiuprice,
+	            xiuactivityprice,
+	            updatestatus,
+	            wareid,
+	            createdate
+           )values(
+                seq_jd_changed_goods_price.currval,
+               	#xiucode#,
+               	#xiuprice#,
+               	#xiuactivityprice#,
+               	#updatestatus#,
+               	#wareid#,
+			   	sysdate
+           )
+        ]]>
+         
+    </insert>
+      
+    
+      <!-- 分页查询需要同步商品价格到京东的商品 -->
+     <select id="getPageResule" parameterClass="java.util.Map" resultClass="JdChangedGoodsPrice">
+         <![CDATA[   
+			select 
+			        n.recordid recordid,
+					n.xiucode xiucode, 
+					n.xiuprice xiuprice,
+					n.xiuactivityprice xiuactivityprice,
+					n.updatestatus updatestatus,
+					n.wareid wareid,
+					n.createdate createdate
+			  from (select k.*, rownum as rn
+			          from (select t.*,
+			                       row_number() over(partition by t.xiucode order by t.createdate desc) as rown
+			                  from jd_changed_goods_price t where 1=1
+		     ]]>
+		  
+		            <dynamic>
+		                <isNotEmpty prepend="and" property="updatestatus"> 
+		                    t.updatestatus <![CDATA[=]]>#updatestatus#
+		              </isNotEmpty>
+		            </dynamic>
+			               
+			 <![CDATA[                  
+			                 ) k where 1 =1
+		   ]]>
+		          
+		        <dynamic>
+		     		<isNotEmpty prepend="and" property="rown"> 
+		                rown = 1 
+		            </isNotEmpty>
+	            </dynamic>
+		           and rownum <![CDATA[<= ]]> #lastNum#
+		         order by k.createdate desc) n
+			     where 1=1
+			  <dynamic>
+		     		<isNotEmpty prepend="and" property="xiucode"> 
+		              n.xiucode <![CDATA[=]]>#xiucode#
+		            </isNotEmpty>
+		            
+		     		<isNotEmpty prepend="and" property="updatestatus"> 
+		             n.updatestatus <![CDATA[=]]>#updatestatus#
+		            </isNotEmpty>
+		            <isNotEmpty prepend="and" property="startTime"> 
+			           to_date(n.createdate,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+			         </isNotEmpty>
+				  	 <isNotEmpty prepend="and" property="endTime"> 
+			           to_date(n.createdate,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+			         </isNotEmpty>
+		      </dynamic>
+		 
+		and rn <![CDATA[ >= ]]>#firstNum#
+
+     </select>
+    
+
+      <select id="getCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+          select count(*)
+          from (select  t.*,
+                       row_number() over(partition by t.xiucode order by t.createdate desc) as rown
+                  from jd_changed_goods_price t
+                 where t.updatestatus = 0) k
+         where 1 = 1
+         <dynamic>
+		     		<isNotEmpty prepend="and" property="rown"> 
+		                rown = 1 
+		            </isNotEmpty>
+		            
+		     		<isNotEmpty prepend="and" property="xiucode"> 
+	                    k.xiucode <![CDATA[=]]>#xiucode#
+	                </isNotEmpty>
+	            
+	     		   <isNotEmpty prepend="and" property="updatestatus"> 
+	                 k.updatestatus <![CDATA[=]]>#updatestatus#
+	                </isNotEmpty>
+	               <isNotEmpty prepend="and" property="startTime"> 
+		             to_date(k.createdate,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+		            </isNotEmpty>
+			  	   <isNotEmpty prepend="and" property="endTime"> 
+		             to_date(k.createdate,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+		          </isNotEmpty>
+	    </dynamic>
+       </select>
+       
+      <update id="update" parameterClass="JdChangedGoodsPrice">
+           update jd_changed_goods_price t
+           
+              <dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="xiucode" removeFirstPrepend="true"> 
+		 			 t.xiucode=#xiucode#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="xiuprice" removeFirstPrepend="true"> 
+		 			 t.xiuprice=#xiuprice#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="jdprice" removeFirstPrepend="true"> 
+		 			 t.jdprice=#jdprice#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="updatestatus" removeFirstPrepend="true"> 
+		 			 t.updatestatus=#updatestatus#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="wareid" removeFirstPrepend="true"> 
+		 			 t.wareid=#wareid#
+		 		</isNotEmpty>
+		 		
+		 	  </dynamic>
+            where t.recordid=#recordid#
+          
+          
+      </update>
+</sqlMap>

@@ -1,0 +1,62 @@
+package com.xiu.jd.service.ware;
+
+import java.util.List;
+import java.util.Map;
+
+import com.xiu.jd.bean.ware.JDSku;
+
+public interface JdSkuService<T> {
+
+	  /**
+     * 判断商品SKU码在本地数据库中是否已经存在
+     * @param outerId
+     * @return
+     */
+	public boolean xiuSnIsExistsNation(String outerId);
+    /**
+     * 更新商品sku库存 (到本地数据库 jd_product_sku_info表)
+     * @param parames
+     * @return
+     */
+	public int updateJdProductSkuStock(Map<String, Object> parames);
+	
+	public int deleteNationProductSkuByWareId(String wareId);
+	public void deleteAll();
+	
+	public int update(JDSku jdSku);
+	
+	public void insert(T entity);
+	/**
+	 * 批量添加sku
+	 * @param jdSkus
+	 * @param batchSize 批处理大小
+	 */
+	public void insertBatch(List<JDSku> jdSkus, int batchSize);
+
+	/**查询SKU中图片未上传到京东**/
+	public  List<JDSku> isUpLoadToJd();
+	
+	/**更新SKU图片的状态**/
+	public void updateStatus(JDSku jdSku);
+	
+	/**查询图片创建日期**/
+	public String findPicDate(JDSku jdSku);
+	/**查询SKU属性**/
+	public String findLocalSkuAttr(String outerId);
+	
+	/**
+	 * 批量更新
+	 * @param jdSkus 
+	 * @param batchSize 批处理大小
+	 */
+	public void updateBatch(List<JDSku> jdSkus, int batchSize);
+	/**根据京东商品ID查询商品sku**/
+	public List<JDSku> findSku(String jdWareId);
+	
+	public String pushSkuPic(List<JDSku> skus,String mianPic);
+	/**查找销售属性名**/
+	public String findSaleAttrName(String jdSaleAttr);
+	/**查找商品sku**/
+	public List<JDSku> querySkuInfo(Map<String, Object> skuParames);
+
+}

@@ -1,0 +1,14 @@
+package com.xiu.jd.dao.ware;
+
+import com.xiu.jd.bean.ware.JdPromo;
+import com.xiu.jd.bean.ware.JdPromoSku;
+import com.xiu.jd.dao.BaseDao;
+
+public interface JdPromoDao<T> extends BaseDao<T> {
+	
+	public void insertPromo(JdPromo jdPromo);
+	
+	public void insertPromoSku(JdPromoSku jdPromoSku);
+	
+
+}

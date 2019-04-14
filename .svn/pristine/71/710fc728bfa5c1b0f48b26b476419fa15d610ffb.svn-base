@@ -1,0 +1,313 @@
+package com.xiu.jd.web.action;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.context.annotation.Scope;
+
+import com.jd.open.api.sdk.JdClient;
+import com.jd.open.api.sdk.request.promotion.SellerPromotionAddRequest;
+import com.jd.open.api.sdk.request.promotion.SellerPromotionCommitRequest;
+import com.jd.open.api.sdk.request.promotion.SellerPromotionSkuAddRequest;
+import com.jd.open.api.sdk.response.promotion.SellerPromotionAddResponse;
+import com.jd.open.api.sdk.response.promotion.SellerPromotionCommitResponse;
+import com.jd.open.api.sdk.response.promotion.SellerPromotionSkuAddResponse;
+import com.xiu.jd.bean.ware.JdPromo;
+import com.xiu.jd.bean.ware.JdPromoSku;
+import com.xiu.jd.service.ware.JdPromoService;
+import com.xiu.jd.utils.BaseUtils;
+import com.xiu.jd.utils.FileUtils;
+import com.xiu.jd.utils.ImportExcelUtil;
+
+@SuppressWarnings("serial")
+@Scope("prototype")
+public class JdPromoAction extends BaseAction {
+private static final Logger logger=Logger.getLogger(JdPromoAction.class);
+    
+	 
+    private File uploadFile;//得到上传的文件    
+	 
+    private String uploadFileContentType;//得到文件的类型  
+    
+    private String uploadFileFileName;//得到文件的名称
+    
+	@Resource(name = "jdPromoServiceBean")
+	private JdPromoService jdPromoServiceBean;
+
+    
+    public String importPromo(){
+    	JdClient client=BaseUtils.getJdClient();
+    	String redirectUrl = request.getContextPath() + "/jdGoods/importPromoUI.action";
+		if(uploadFile!= null){
+			// 取得文件后缀名
+			String ext = FileUtils.getFileExt(uploadFileFileName);
+			if (!"xls".equals(ext) && !"xlsx".equals(ext)) {
+				request.setAttribute("message", "上传文件必须为Excle文件");
+				request.setAttribute("redirectUrl", redirectUrl);
+				return "message";
+			}
+	   
+			try {
+				Object wb = ImportExcelUtil.getWorkbook(uploadFile, uploadFileFileName);
+				Object sheet = null;
+				String sku="";
+				if(wb instanceof HSSFWorkbook){
+					sheet = ((HSSFWorkbook) wb).getSheetAt(0);
+				}
+				if(wb instanceof XSSFWorkbook){
+					sheet = ((XSSFWorkbook) wb).getSheetAt(0);
+				}
+				Object row = null;
+				int rowCount = 0;
+				if(sheet instanceof HSSFSheet){
+					row = ((HSSFSheet) sheet).getRow(0);
+					rowCount = ((HSSFSheet) sheet).getLastRowNum();
+				}
+				if(sheet instanceof XSSFSheet){
+					row = ((XSSFSheet) sheet).getRow(0);
+					rowCount = ((XSSFSheet) sheet).getLastRowNum();
+				}
+				Object cellSkuInfo = ImportExcelUtil.getCell(row, 3);
+				if(cellSkuInfo != null){
+					sku = ImportExcelUtil.getCellValueStr(cellSkuInfo);
+				}
+				List<JdPromo> jdPromoList = null;
+				List<JdPromoSku> JdPromoSku = null;
+				for(int i=1;i<=rowCount;i++){
+					JdPromo jdPromo = new JdPromo();
+					JdPromoSku jdPromoSku =new JdPromoSku();
+					String name=getSkuMapInfo(sheet,row,i,0);
+					boolean bool=false;
+					if(name==null || "".equals(name.trim())){
+						continue;
+					}
+					jdPromo.setName(name);
+					String beginTime =getSkuMapInfo(sheet,row,i,1);
+					if(beginTime==null||"".equals(beginTime.trim())){
+						continue;
+					}
+					jdPromo.setBeginTime(beginTime);
+					String endTime=getSkuMapInfo(sheet,row,i,2);
+					if(endTime==null || "".equals(endTime.trim())){
+						continue;
+					}
+					jdPromo.setEndTime(endTime);
+					jdPromo.setType(1);
+					
+					
+					
+					String xiuCode=getSkuMapInfo(sheet,row,i,3);
+					String xiuSku=getSkuMapInfo(sheet,row,i,4);
+					String wareId=getSkuMapInfo(sheet,row,i,5);
+					String jdWareSkuId=getSkuMapInfo(sheet,row,i,6);
+					String jdPrice=getSkuMapInfo(sheet,row,i,7);
+					String promoPrice=getSkuMapInfo(sheet,row,i,8);					
+					jdPromoSku.setXiuCode(xiuCode);
+					jdPromoSku.setSkuSn(xiuSku);
+					jdPromoSku.setWareId(wareId);
+					jdPromoSku.setJdPrice(jdPrice);
+					jdPromoSku.setPromoPrice(promoPrice);
+					jdPromoSku.setJdSkuId(jdWareSkuId);
+					
+					
+					SellerPromotionAddRequest addPromoequest=new SellerPromotionAddRequest();
+					addPromoequest.setName(jdPromo.getName());
+					addPromoequest.setType( 1 );
+					addPromoequest.setBeginTime( jdPromo.getBeginTime() );
+					addPromoequest.setEndTime( jdPromo.getEndTime() );					
+					SellerPromotionAddResponse response=null;
+					try {
+						logger.info("==创建单品促销开始==");
+						response=client.execute(addPromoequest);						
+						Long promoId =response.getPromoId();
+						jdPromo.setPromoId(Long.toString(promoId));
+						jdPromoSku.setPromoId(Long.toString(promoId));
+						
+						SellerPromotionSkuAddRequest skuAddRequest=new SellerPromotionSkuAddRequest();
+						skuAddRequest.setPromoId( promoId );
+						skuAddRequest.setSkuIds( jdPromoSku.getJdSkuId() );
+						skuAddRequest.setJdPrices( jdPromoSku.getJdPrice() );
+						skuAddRequest.setPromoPrices( jdPromoSku.getPromoPrice() );
+						SellerPromotionSkuAddResponse skuResponse=null;
+						if (promoId!=null) {
+							try {
+								logger.info("==创建单品促销添加sku开始=="+jdPromo+" "+jdPromoSku);
+								skuResponse = client.execute(skuAddRequest);
+								List<Long> ids = skuResponse.getIds();
+								SellerPromotionCommitRequest requestCommit = new SellerPromotionCommitRequest();
+								requestCommit.setPromoId(promoId);
+								SellerPromotionCommitResponse responseCommit = null;
+								try {
+									if (ids!=null) {
+										logger.info("==提交单品促销开始=="
+												+ jdPromo.toString() + " "
+												+ jdPromoSku.toString());
+										responseCommit = client
+												.execute(requestCommit);
+										bool = responseCommit.getSuccess();
+										if (bool) {
+											jdPromoSku.setStatus(1);//添加促销成功
+										} else {
+											jdPromoSku.setStatus(2);//添加促销失败
+											jdPromoSku.setFailDesc("单品促销提交失败:"+responseCommit.getZhDesc());
+										}
+									}else{
+										jdPromoSku.setStatus(2);
+										jdPromoSku.setFailDesc("单品添加sku失败："+skuResponse.getZhDesc());
+									}
+
+								} catch (Exception e) {
+									jdPromoSku.setFailDesc("单品促销提交失败:"+responseCommit.getZhDesc());
+									jdPromoSku.setStatus(2);
+									logger.error("单品促销提交失败：" + jdPromo.getPromoId() + " "
+											+ jdPromoSku.getJdSkuId() + "返回错误代码"
+											+ responseCommit.getCode()
+											+ " 错误描述："
+											+ responseCommit.getZhDesc());
+									e.printStackTrace();
+								}
+							} catch (Exception e) {
+								jdPromoSku.setStatus(2);
+								jdPromoSku.setFailDesc("单品添加sku失败："+skuResponse.getZhDesc());
+								logger.error("单品添加sku促销失败：" + jdPromo.getPromoId() + " "
+										+ jdPromoSku.getJdSkuId() + "返回错误代码"
+										+ skuResponse.getCode() + " 错误描述："
+										+ skuResponse.getZhDesc());
+								e.printStackTrace();
+								
+							}
+						}
+						
+						jdPromoServiceBean.createPromo(jdPromo, jdPromoSku);
+						
+					} catch (Exception e) {
+						jdPromoSku.setFailDesc("创建单品促销失败:"+response.getZhDesc());
+						jdPromoSku.setStatus(2);
+						logger.error("创建单品促销失败："+jdPromo+" "+jdPromoSku+"返回错误代码"+response.getCode()+" 错误描述："+response.getZhDesc()
+								);
+						e.printStackTrace();
+					} 
+				}	
+				request.setAttribute("message", "文件已经上传");
+			} catch (Exception e) {
+				request.setAttribute("message", "文件上传异常");
+				e.printStackTrace();
+			}
+		}
+		request.setAttribute("redirectUrl", redirectUrl);
+		return "message";
+    }
+    
+    /**
+	 * 获取excel单元格的信息
+	 * @param sheet
+	 * @param row
+	 * @param rowIndex
+	 * @param index
+	 * @return
+	 */
+	private String getSkuMapInfo(Object sheet,Object row,int rowIndex, int index) {
+		String skuInfo = "";
+		if (sheet instanceof HSSFSheet) {
+			row = ((HSSFSheet) sheet).getRow(rowIndex);
+		}
+		if (sheet instanceof XSSFSheet) {
+			row = ((XSSFSheet) sheet).getRow(rowIndex);
+		}
+		Object cellSku = ImportExcelUtil.getCell(row, index);
+		if(cellSku != null){
+			skuInfo = ImportExcelUtil.getCellValue3(cellSku);
+		}
+		return skuInfo;
+	}
+    
+
+	
+	
+	
+	/**
+	 * 商品库存模板下载动作
+	 * @return
+	 *//*
+	public String xiuCodeTemplateDown()throws Exception{
+	   logger.info("单品促销模板下载动作");
+		try{
+		String fileName = "xiuCode_template";
+		response.setContentType("aplication/msexcel"); // 设置文件类型
+		response.setHeader("Content-disposition", "attachment; filename="+fileName+".xls");
+
+		HSSFWorkbook workbook =new HSSFWorkbook();// 创建工作薄
+	
+		//// 创建工作表
+		HSSFSheet sheet=workbook.createSheet("sheet");
+		//获取工作表中的第一行
+		HSSFRow row=sheet.createRow(0);
+        //设置第一行的表头
+		List<String> title=getTitleValue();
+		for(int i=0;i<title.size();i++){
+			
+			HSSFCell  cell=row.createCell(i);
+			cell.setCellValue(title.get(i));
+		}
+		workbook.write(response.getOutputStream());
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+		return null;
+	}*/
+    public String importPromoUI(){
+		logger.info("显示 导入单品促销商品页面");
+		return "success";
+	}
+
+	public File getUploadFile() {
+		return uploadFile;
+	}
+
+	public void setUploadFile(File uploadFile) {
+		this.uploadFile = uploadFile;
+	}
+
+	public String getUploadFileContentType() {
+		return uploadFileContentType;
+	}
+
+	public void setUploadFileContentType(String uploadFileContentType) {
+		this.uploadFileContentType = uploadFileContentType;
+	}
+
+	public String getUploadFileFileName() {
+		return uploadFileFileName;
+	}
+
+	public void setUploadFileFileName(String uploadFileFileName) {
+		this.uploadFileFileName = uploadFileFileName;
+	}
+	
+    
+    
+    
+    
+
+}

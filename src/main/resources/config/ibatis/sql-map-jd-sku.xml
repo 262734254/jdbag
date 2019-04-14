@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JdSkuDaoBean">
+    
+    <typeAlias alias="JDSku" type="com.xiu.jd.bean.ware.JDSku"/>
+
+    
+    <insert id="insert" parameterClass="JDSku">
+        <![CDATA[
+           insert into jd_product_sku_info (
+	           skusn,
+	           xiucode,
+	           stocknum,
+	           colorname,
+	           sizevalue,
+	           attributes,
+	           ismain,
+	           skuImagePath,
+	           num,
+	           jdWareJd
+           )values(
+               #skusn#,
+	           #xiucode#,
+	           #stocknum#,
+	           #colorname#,
+	           #sizevalue#,
+	           #attributes#,
+	           #ismain#,
+	           #skuImagePath#,
+	           #num#,
+	           #jdWareJd#
+           )
+        ]]>
+        
+    </insert>
+    
+	 <insert id="insertBatch" parameterClass="JDSku">
+		  <![CDATA[
+           insert into jd_product_sku_info (
+	           skusn,
+	           xiucode,
+	           stocknum,
+	           colorname,
+	           sizevalue,
+	           attributes,
+	           ismain,
+	           skuImagePath,
+	           num,
+	           jdWareJd,
+	           jdskuid
+           )values(
+               #skusn#,
+	           #xiucode#,
+	           #stocknum#,
+	           #colorname#,
+	           #sizevalue#,
+	           #attributes#,
+	           #ismain#,
+	           #skuImagePath#,
+	           #num#,
+	           #jdWareJd#,
+	           #jdSkuId#
+           )
+        ]]>
+	    
+	</insert>
+	<select id="getListResult" parameterClass="java.util.Map" resultClass="JDSku">
+		select * from xiu_jd_bag.jd_product_sku_info t where t.xiucode = #xiucode# and t.stocknum >0 order by t.attributes desc,t.skusn asc
+	</select>
+	
+	<select id="getXiuListResult" parameterClass="java.util.Map" resultClass="JDSku">
+		select * from xiu_jd.jd_product_sku_info t where t.xiucode = #xiucode# and t.stocknum >0 order by t.attributes desc,t.skusn asc
+	</select>
+	
+	<select id="getEbayListResult" parameterClass="java.util.Map" resultClass="JDSku">
+		select * from xiu_ebay_jd.jd_product_sku_info t where t.xiucode = #xiucode# and t.stocknum >0 order by t.attributes desc,t.skusn asc
+	</select>
+	
+	<delete id="deleteAll">
+	    delete from xiu_jd_bag.jd_product_sku_info
+	</delete>
+	
+	<delete id="deleteNationProductSkuByWareId" parameterClass="java.lang.String">
+	     delete from jd_product_sku_info t where  t.jdWareJd=#wareId#
+	    
+	</delete>
+	
+	 <!-- 走秀码是否在本地数据库已经存在 -->
+    <select id="xiuSnIsExistsNation" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+        
+         select count(*) from xiu_jd_bag.jd_product_sku_info t where t.skusn =#skusn#
+        
+    </select>
+	
+    <update id="updateJdProductSkuStock" parameterClass="java.util.Map">
+        update xiu_jd_bag.jd_product_sku_info t set t.stocknum=#stocknum# where t.skusn=#skusn#
+        
+    </update>
+    <!-- 删除sku信息通过走秀码 -->
+    <delete id="deleteWareSKUByXiuCodes" parameterClass="java.util.List">
+        delete from xiu_jd_bag.jd_product_sku_info t where t.xiucode in
+        
+        <iterate conjunction="," open="(" close=")" >
+	   			#value[]# 
+	   		</iterate>
+        
+    </delete>
+    
+      <!-- 删除sku信息通过走秀码和京东ID -->
+    <delete id="deleteWareSKUByXiuCodesAndWardId" parameterClass="java.util.Map">
+        delete from xiu_jd_bag.jd_product_sku_info t where 1=1  and t.xiucode in
+        
+        <iterate conjunction="," open="(" close=")" property="xiuCodes">
+	   			#xiuCodes[]# 
+	   	</iterate>
+	   	
+        <isNotEmpty prepend="and " property="jdWareJd">
+            t.jdWareJd=#jdWareJd#
+        </isNotEmpty>
+        
+        <isNotEmpty prepend="and " property="skuSN">
+            t.skusn=#skuSN#
+        </isNotEmpty>
+        
+        <isNotEmpty prepend="and " property="jdskuId">
+            t.jdskuid=#jdskuId#
+        </isNotEmpty>
+        
+    </delete>
+    
+	 <select id="findResultString" parameterClass="java.util.Map" resultClass="java.lang.String">
+     	select distinct t.aid || ':' || t.vid  attr from xiu_jd_bag.jd_attributevalue t 
+     		left join xiu_jd_bag.jd_attribute w on t.aid = w.aid 
+     		where w.cid=#jdCid# and  t.cid=#jdCid# and t.name=#attrValue# and w.IS_SALE_PROP=1 and rownum =1
+     </select>
+     
+     	 <select id="findXiuResultString" parameterClass="java.util.Map" resultClass="java.lang.String">
+     	select distinct t.aid || ':' || t.vid  attr from xiu_jd.jd_attributevalue t 
+     		left join xiu_jd.jd_attribute w on t.aid = w.aid 
+     		where w.cid=#jdCid# and  t.cid=#jdCid# and t.name=#attrValue# and w.IS_SALE_PROP=1 and rownum =1
+     </select>
+     
+     	 <select id="findEbayResultString" parameterClass="java.util.Map" resultClass="java.lang.String">
+     	select distinct t.aid || ':' || t.vid  attr from xiu_ebay_jd.jd_attributevalue t 
+     		left join xiu_ebay_jd.jd_attribute w on t.aid = w.aid 
+     		where w.cid=#jdCid# and  t.cid=#jdCid# and t.name=#attrValue# and w.IS_SALE_PROP=1 and rownum =1
+     </select>
+	
+	 <update id="updateBatch" parameterClass="JDSku">
+	 	update xiu_jd_bag.jd_product_sku_info t
+	 	<dynamic prepend="set">
+	 		<isNotEmpty prepend="," property="attributes" removeFirstPrepend="true"> 
+	 			t.attributes = #attributes#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="colorname" removeFirstPrepend="true"> 
+	 			t.colorname=#colorname#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="sizevalue" removeFirstPrepend="true"> 
+	 			t.sizevalue=#sizevalue#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="status" removeFirstPrepend="true"> 
+	 			t.status=#status#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="jdWareJd" removeFirstPrepend="true"> 
+	 			t.jdWareJd=#jdWareJd#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="jdSkuId" removeFirstPrepend="true"> 
+	 			t.jdskuid=#jdSkuId#
+	 		</isNotEmpty>
+	 	
+	 	</dynamic> 
+	 	 where t.skusn=#skusn#
+	 </update>
+	 
+	  <update id="updateXiuBatch" parameterClass="JDSku">
+	 	update xiu_jd.jd_product_sku_info t
+	 	<dynamic prepend="set">
+	 		<isNotEmpty prepend="," property="attributes" removeFirstPrepend="true"> 
+	 			t.attributes = #attributes#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="colorname" removeFirstPrepend="true"> 
+	 			t.colorname=#colorname#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="sizevalue" removeFirstPrepend="true"> 
+	 			t.sizevalue=#sizevalue#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="status" removeFirstPrepend="true"> 
+	 			t.status=#status#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="jdWareJd" removeFirstPrepend="true"> 
+	 			t.jdWareJd=#jdWareJd#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="jdSkuId" removeFirstPrepend="true"> 
+	 			t.jdskuid=#jdSkuId#
+	 		</isNotEmpty>
+	 	
+	 	</dynamic> 
+	 	 where t.skusn=#skusn#
+	 </update>
+	 
+	 
+	 
+	  <update id="updateEbayBatch" parameterClass="JDSku">
+	 	update xiu_ebay_jd.jd_product_sku_info t
+	 	<dynamic prepend="set">
+	 		<isNotEmpty prepend="," property="attributes" removeFirstPrepend="true"> 
+	 			t.attributes = #attributes#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="colorname" removeFirstPrepend="true"> 
+	 			t.colorname=#colorname#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="sizevalue" removeFirstPrepend="true"> 
+	 			t.sizevalue=#sizevalue#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="status" removeFirstPrepend="true"> 
+	 			t.status=#status#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="jdWareJd" removeFirstPrepend="true"> 
+	 			t.jdWareJd=#jdWareJd#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="jdSkuId" removeFirstPrepend="true"> 
+	 			t.jdskuid=#jdSkuId#
+	 		</isNotEmpty>
+	 	
+	 	</dynamic> 
+	 	 where t.skusn=#skusn#
+	 </update>
+	 
+	 
+	 
+	 
+	 <update id="update" parameterClass="JDSku">
+	 	update xiu_jd_bag.jd_product_sku_info t
+	 	<dynamic prepend="set">
+	 		<isNotEmpty prepend="," property="attributes" removeFirstPrepend="true"> 
+	 			t.attributes = #attributes#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="colorname" removeFirstPrepend="true"> 
+	 			t.colorname=#colorname#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="sizevalue" removeFirstPrepend="true"> 
+	 			t.sizevalue=#sizevalue#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="status" removeFirstPrepend="true"> 
+	 			t.status=#status#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="jdWareJd" removeFirstPrepend="true"> 
+	 			t.jdWareJd=#jdWareJd#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="jdSkuId" removeFirstPrepend="true"> 
+	 			t.jdskuid=#jdSkuId#
+	 		</isNotEmpty>
+	 		<isNotEmpty prepend="," property="stocknum" removeFirstPrepend="true"> 
+	 			t.stocknum=#stocknum#
+	 		</isNotEmpty>
+	 	
+	 	</dynamic> 
+	 	 where t.skusn=#skusn#
+	 </update>
+	 
+	 
+	 
+	 
+	 <select id="findLocalSkuAttr" parameterClass="java.lang.String" resultClass="java.lang.String">
+	     
+	     select t.attributes from xiu_jd_bag.jd_product_sku_info t where t.skusn=#outerId# and rownum=1
+	 </select>
+	 
+	 <select id="isUpLoadToJd"  resultClass="JDSku">
+	  <![CDATA[ 
+		select t.attributes attributes,
+			   t.skuimagepath skuImagePath,
+			   w.jd_ware_id wareId,
+			   t.xiucode xiucode,
+			   t.skusn skusn 
+			from xiu_jd_bag.jd_product_sku_info t
+			left join xiu_jd_bag.jd_product_info w on w.xiucode = t.xiucode
+			where w.status =1 and t.status=0 or t.status =2
+		 ]]>
+	 </select>
+	 
+	 <update id="updateStatus" parameterClass="JDSku">
+	 	update xiu_jd_bag.jd_product_sku_info t set t.status = #status# where t.skusn=#skusn#
+	 </update>
+	 
+	 <select id="findPicDate" parameterClass="JDSku" resultClass="java.lang.String">
+	 	select  to_char(t.product_create,'yyyyMMdd') from xiu_goods.x_data_prd_info t 
+	 		where t.product_sn = #xiucode#
+	 </select>
+	 
+	 <select id="findSkuColor" parameterClass="java.util.Map" resultClass="java.lang.String">
+	 	select distinct w.jdcolor from (select   t.JDFIRSTCNAME||t.jdsecondCName|| t.jdthreecname names,t.* from xiu_jd_bag.jd_xiu_color t where t.xiucolor=#xiuColor#
+	 	
+	 	) w 
+       			 join (select t1.name||t2.name|| t3.name names from jd_category t1 
+		                   left join jd_category t2 on t1.id = t2.fid 
+		                   left join jd_category t3 on t2.id = t3.fid 
+                   		where  t3.id=#jdCid#)  m on w.names = m.names where rownum=1
+	 </select>
+	 
+	  <select id="findSkuSize" parameterClass="java.util.Map" resultClass="java.lang.String">
+	 	select distinct w.jdsize from (select  t.JDFIRSTCNAME||t.jdsecondCName|| t.jdthreecname names,t.* from xiu_jd_bag.jd_xiu_size t where t.xiusize=#xiuSize#
+	 	
+	 	) w 
+       			 join (select t1.name||t2.name || t3.name names from jd_category t1 
+		                   left join jd_category t2 on t1.id = t2.fid 
+		                   left join jd_category t3 on t2.id = t3.fid 
+                   		where  t3.id=#jdCid# ) m on w.names = m.names where rownum=1
+	 </select>
+	 
+	<!--  <select id="findSku" parameterClass="java.lang.String" resultClass="JDSku">
+	 		select t.attributes attributes,
+			   t.skuimagepath skuImagePath,
+			   w.jd_ware_id wareId,
+			   t.xiucode xiucode,
+			   t.skusn skusn 
+			from jd_product_sku_info t
+			left join jd_product_info w on w.xiucode = t.xiucode
+			where w.jd_ware_id=#jdWareId#
+	 </select> -->
+	 
+	  <select id="findSku" parameterClass="java.util.Map" resultClass="JDSku">
+	  select *
+        from (select k.*, rownum rn
+                from (select t.attributes   attributes,
+                             t.skuimagepath skuImagePath,
+                             w.jd_ware_id   wareId,
+                             t.xiucode      xiucode,
+                             t.skusn        skusn
+                        from xiu_jd_bag.jd_product_sku_info t
+                        left join xiu_jd_bag.jd_product_info w
+                          on w.xiucode = t.xiucode
+                       where 1=1
+				         <dynamic>
+				     	 	<isNotEmpty prepend="and" property="jdWareId">
+				     	 		w.jd_ware_id =#jdWareId#
+				     	 	</isNotEmpty>
+				     	 	
+				     	 </dynamic>                         
+                        ) k
+               where rownum <![CDATA[<]]>#end# )
+       where rn <![CDATA[>=]]> #start#
+	 </select> 
+	 
+	 
+	 <select id="findSkuCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+       select count(1)
+             from xiu_jd_bag.jd_product_sku_info t
+             left join xiu_jd_bag.jd_product_info w
+               on w.xiucode = t.xiucode
+            where 1=1
+      <dynamic>
+     	 <isNotEmpty prepend="and" property="jdWareId">
+     	 		w.jd_ware_id =#jdWareId#
+     	 </isNotEmpty>				     	 	
+      </dynamic>                         
+                     
+	 </select> 
+	 
+	 <!-- 根据属性Aid查找销售属性名称 -->
+	 <select id="findSaleAttrName" parameterClass="java.lang.String" resultClass="java.lang.String">
+     	select t.name from xiu_jd_bag.jd_attribute t where t.aid=#jdAttrName# and t.is_sale_prop =1
+     </select>
+     <!-- 查找商品sku -->
+     <select id="querySkuInfo" parameterClass="java.util.Map" resultClass="JDSku">
+     	select 
+     		t.skusn skusn,
+     		t.xiucode xiucode,
+     		t.stocknum stocknum,
+     		t.jdWareJd jdWareJd,
+     		t.jdSkuId jdSkuId
+     	 from xiu_jd_bag.jd_product_sku_info t 
+     	 where 1=1 
+     	 <dynamic>
+     	 	<isNotEmpty prepend="and" property="skuCode">
+     	 		t.skusn = #skuCode#
+     	 	</isNotEmpty>
+     	 </dynamic>
+     </select>
+        
+     <!-- 查找商品sku -->
+     <select id="querySkuInfoByWareId" parameterClass="java.util.Map" resultClass="JDSku">
+     	 select k.skusn skusn,
+     	 k.xiucode xiucode,
+     	 k.attributes attributes,
+     	 t.jd_ware_id jdWareJd
+                   from xiu_jd_bag.jd_product_info t
+         left join xiu_jd_bag.jd_product_sku_info k on t.xiucode=k.xiucode
+     	      where 1=1  and      	
+     	 		t.jd_ware_id=#jdWareId#  
+     	 		
+     	 			 
+     	 
+     </select>
+</sqlMap>

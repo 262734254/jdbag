@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="XOPBaseCategoryDaoBean">
+    
+    <typeAlias alias="XOPBaseCategory" type="com.xiu.jd.bean.ware.XOPBaseCategory"/>
+    
+    <select id="queryResult" parameterClass="java.util.Map" resultClass="XOPBaseCategory">
+    	select t.super_code superCode,
+    		   t.super_name superName,
+    		   t.family_code familyCode,
+    		   t.family_name familyName,
+    		   t.class_code classCode,
+    		   t.class_name className,
+    		   t.child_code childCode,
+    		   t.child_name childName,
+    		   t.base_category baseCategory 
+    		 from xiu_xop.x_xop_base_category_v t 
+    		 left join jd_product_info p on t.child_code = p.categoryid 
+    		 where p.xiucode = #xiucode# and rownum = 1
+    </select>
+</sqlMap>

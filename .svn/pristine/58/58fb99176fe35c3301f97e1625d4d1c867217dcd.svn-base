@@ -1,0 +1,9 @@
+package com.xiu.jd.service.ware;
+
+import com.xiu.jd.bean.ware.JdPromo;
+import com.xiu.jd.bean.ware.JdPromoSku;
+
+public interface JdPromoService {
+	public boolean createPromo(JdPromo jdPromo,JdPromoSku jdPromoSku);
+
+}

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+	<bean id="orderJob" class="com.xiu.jd.schedule.OrderPushToOscJob" singleton="false"></bean>
+	
+	<bean id="categoryJob" class="com.xiu.jd.schedule.CategoryJob"></bean>
+	
+	<bean id="orderPushPackageToJdJob" class="com.xiu.jd.schedule.OrderPushPackageToJdJob"></bean>
+	
+	<bean id="orderPackagePushFail" class="com.xiu.jd.schedule.OrderPackagePushFail"></bean>
+	
+	<bean id="onLineProductBlackSchedule" class="com.xiu.jd.schedule.ware.OnLineProductBlackSchedule"></bean>
+	
+
+	
+	<!-- 上下架黑名单 -->
+   <bean id="onLineProductBlackScheduleJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="onLineProductBlackSchedule" />
+		</property>
+		<property name="targetMethod">
+			<value>scanBlackProduct</value>
+		</property>
+	</bean>
+	<bean id="onLineProductBlackScheduleTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="onLineProductBlackScheduleJob" />
+		</property>
+		<property name="cronExpression">
+			<value>0 0 * * * ?</value>
+		</property>
+	</bean>
+	
+	
+
+	<bean id="syncOrderInfoToLocalJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="orderJob" />
+		</property>
+		<property name="targetMethod">
+			<value>syncOrderInfoToLocal</value>
+		</property>
+	</bean>
+	<bean id="syncOrderInfoToLocalTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="syncOrderInfoToLocalJob" />
+		</property>
+		<property name="cronExpression">
+			<value>0 0/6 * * * ?</value>
+		</property>
+	</bean>
+	
+	
+	<bean id="sycnCategoryInfoJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="categoryJob" />
+		</property>
+		<property name="targetMethod">
+			<value>sycnCategoryInfo</value>
+		</property>
+	</bean>
+	<bean id="sycnCategoryInfoTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="sycnCategoryInfoJob" />
+		</property>
+		<property name="cronExpression">
+			<value>0 0/35 4 * * ?</value>
+		</property>
+	</bean>
+	
+	
+	<bean id="sycnOrderPushPackageToJdJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="orderPushPackageToJdJob" />
+		</property>
+		<property name="targetMethod">
+			<value>pushPackageToJd</value>
+		</property>
+	</bean>
+	
+	<bean id="sycnOrderPushPackageToJdJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="sycnOrderPushPackageToJdJob" />
+		</property>
+		<property name="cronExpression">
+			<value>0 0/20 * * * ?</value>
+		</property>
+	</bean>
+	
+	
+
+	
+	
+	
+	<!-- 推送失败(订单被锁定)的订单包裹 -->
+	<bean id="synOrderPackageFailJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="orderPackagePushFail" />
+		</property>
+		<property name="targetMethod">
+			<value>getLockedJdOrder</value>
+		</property>
+	</bean>
+	<bean id="synOrderPackageFailTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="synOrderPackageFailJob" />
+		</property>
+		<property name="cronExpression">
+		    <!-- 0 0/5 * * * ? -->
+			<value>0 0 * * * ?</value>
+		</property>
+	</bean>
+	
+	<bean lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				
+				<!--将京东订单入到走秀TM系统 
+				 <ref local="syncOrderInfoToLocalTrigger" /> -->
+				 <!-- 将走秀订单包裹推送到京东 
+				 <ref local="sycnOrderPushPackageToJdJobTrigger"/>-->
+				 <!-- 推送失败(订单被锁定)的订单包裹
+				 <ref local="synOrderPackageFailTrigger"/> -->
+				 
+				 <!-- 京东分类 <ref local="sycnCategoryInfoTrigger" />-->
+				 
+				 
+				  <!-- 上下架黑名单-->
+				  <ref local=" onLineProductBlackScheduleTrigger"/>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

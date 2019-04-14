@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JdPromoDaoBean">
+    
+    <typeAlias alias="JdPromo" type="com.xiu.jd.bean.ware.JdPromo"/>
+    <typeAlias alias="JdPromoSku" type="com.xiu.jd.bean.ware.JdPromoSku"/>
+    
+    <typeAlias alias="JdOrderMode" type="com.xiu.jd.bean.ware.JdOrderMode"/>
+    <typeAlias alias="jdPromoSkuRec" type="com.xiu.jd.bean.ware.JdPromoSkuRec"/>
+    
+    <insert id="insertJdPromo" parameterClass="JdPromo">
+        <![CDATA[
+          insert into jd_promo 
+        (
+            id,
+            promo_id,
+			name,
+			type,
+			begin_time,
+			end_time,
+			bound,
+			favor_mode
+          )  
+        values(
+           xiu_jd_bag.seq_jd_promo.nextval,
+           #promoId#,
+           #name#,
+           #type#,
+           to_date(#beginTime#,'yyyy-mm-dd hh24:mi:ss'),
+           to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss'),
+           #bound#,
+           #favorMode#
+        )
+        ]]>
+   
+    </insert>
+    
+    
+     <!-- 批量保存商品 -->
+        <insert id="insertJdPromoSku" parameterClass="JDPromoSku">
+              <![CDATA[
+         insert into jd_promo_sku 
+        (
+            WARE_ID,
+			XIUCODE,
+			JDSKUID,
+			SKU_NAME,
+			PROMO_ID,
+			JD_PRICE,
+			PROMO_PRICE,
+			STATUS,
+			FAIL_DESC,
+			SKUSN
+          )          
+        values(
+              #wareId#,
+              #xiuCode#,
+	          #jdSkuId#,
+	          #skuName#,
+	          #promoId#,
+	          #jdPrice#,
+	          #promoPrice#,
+	          #status#,
+	          #failDesc#,
+	          #skuSn#
+        )
+        ]]>        
+    </insert>
+    
+    
+    <insert id="insertJdOrderMode" parameterClass="JdOrderMode">
+        <![CDATA[
+          insert into jd_ordermode 
+        (
+              promo_id    ,
+			  favor_mode  ,
+			  quota       ,
+			  rate        ,
+			  plus        ,
+			  jd_minus    ,
+			  link        ,
+			  jd_desc   
+			  
+          )  
+        values(
+          
+          #promoId#,
+          #favorMode#,
+		  #quota# ,
+		  #rate# ,
+		  #plus# ,
+		  #jdMinus#,
+		  #link# ,
+		  #jdDesc#   
+        )
+        ]]>
+   
+    </insert>
+    
+    <select id="getPageResule" resultClass="JdPromo"  parameterClass="java.util.Map">
+    
+	 select *
+    from (select n.*, rownum rn
+            from (select                  
+                   t.promo_id    promoId,
+                   t.name        name,
+                   t.type        type,
+                   to_char(t.begin_time, 'yyyy-mm-dd hh24:mi:ss')   beginTime,
+                   to_char(t.end_time, 'yyyy-mm-dd hh24:mi:ss')    endTime,
+                   t.bound       bound,
+                   t.member      member,
+                   t.slogan      slogan,
+                   t.favor_mode  favorMode,
+                   to_char(t.create_time, 'yyyy-mm-dd hh24:mi:ss') createTime
+                    from jd_promo t
+                    left join jd_promo_sku k
+                      on t.promo_id = k.promo_id                  
+                   where 1=1
+			         <dynamic >
+				 		<isNotEmpty prepend="and" property="promoId" > 
+				 			t.promo_id = #promoId#
+				 		</isNotEmpty>
+				 		<isNotEmpty prepend="and" property="name" > 
+				 			t.name=#name#
+				 		</isNotEmpty>
+				 		<isNotEmpty prepend="and" property="beginTime" > 
+				 			t.begin_time<![CDATA[>=]]>to_date(#beginTime#,'yyyy-mm-dd hh24:mi:ss')
+				 		</isNotEmpty>
+				 		
+				 		<isNotEmpty prepend="and" property="endTime" > 
+				 			t.end_time<![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+				 		</isNotEmpty>
+				 		
+				 		<isNotEmpty  property="wareIds">
+			                 <iterate prepend="and 	k.ware_id in " open="(" close=")" conjunction="," property="wareIds">
+			                      <![CDATA[#wareIds[]#]]>
+			                 </iterate>
+                         </isNotEmpty>
+				 		<isNotEmpty  property="xiuCodes">
+			                 <iterate prepend="and 	k.xiucode in " open="(" close=")" conjunction="," property="xiuCodes">
+			                      <![CDATA[#xiuCodes[]#]]>
+			                 </iterate>
+                         </isNotEmpty>
+				 		
+				 		<isNotEmpty  property="skuSns">
+			                 <iterate prepend="and 	k.skusn in " open="(" close=")" conjunction="," property="skuSns">
+			                      <![CDATA[#skuSns[]#]]>
+			                 </iterate>
+                         </isNotEmpty>
+				 		
+				 		<isNotEmpty  property="jdSkus">
+			                 <iterate prepend="and 	k.jdskuid in " open="(" close=")" conjunction="," property="jdSkus">
+			                      <![CDATA[#jdSkus[]#]]>
+			                 </iterate>
+                         </isNotEmpty>
+				 		
+				 		
+				 		<isNotEmpty prepend="and" property="type" > 
+				 			t.type=#type#
+				 		</isNotEmpty>
+				 		
+				 		
+				 		
+				 	</dynamic> 
+                                         
+                   order by t.create_time desc) n
+           where rownum <![CDATA[<]]> #end#)
+   where rn <![CDATA[>=]]> #start#
+       
+    </select>
+    
+    <select id="getCount" parameterClass="java.util.Map" resultClass="java.lang.Long" >
+          select                  
+                 count(1) from 
+                   jd_promo t
+                    left join jd_promo_sku k
+                      on t.promo_id = k.promo_id                  
+                   where 1=1               
+			         <dynamic >
+				 		<isNotEmpty prepend="and" property="promoId" > 
+				 			t.promo_id = #promoId#
+				 		</isNotEmpty>
+				 		<isNotEmpty prepend="and" property="name" > 
+				 			t.name=#name#
+				 		</isNotEmpty>
+				 		<isNotEmpty prepend="and" property="beginTime" > 
+				 			t.begin_time<![CDATA[>=]]>to_date(#beginTime#,'yyyy-mm-dd hh24:mi:ss')
+				 		</isNotEmpty>
+				 		
+				 		<isNotEmpty prepend="and" property="endTime" > 
+				 			t.end_time<![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+				 		</isNotEmpty>
+				 		
+				 		<isNotEmpty prepend="and" property="wareId" > 
+				 			t.ware_id=#wareId#
+				 		</isNotEmpty>
+				 		
+				 		<isNotEmpty prepend="and" property="xiucode" > 
+				 			t.xiucode=#xiucode#
+				 		</isNotEmpty>
+				 		
+				 		<isNotEmpty prepend="and" property="skuSn" > 
+				 			t.skusn=#skuSn#
+				 		</isNotEmpty>
+				 		
+				 		<isNotEmpty prepend="and" property="jdSkuid" > 
+				 			t.jdskuid=#jdSkuid#
+				 		</isNotEmpty>
+				 		
+				 		<isNotEmpty prepend="and" property="type" > 
+				 			t.type=#type#
+				 		</isNotEmpty>		 		
+				 		
+				 		
+				 	</dynamic> 
+                                         
+                   order by t.create_time desc
+    </select>
+    
+    
+    <select id="getPromoSku" resultClass="JdPromoSku" parameterClass="java.util.Map" >
+     select *
+	    from (select n.*, rownum rn
+	            from (select  
+	                        t.ware_id   wareId   ,
+	                        t.xiucode  xiuCode  ,
+	                        t.jdskuid   jdSkuId  ,
+	                        t.sku_name  skuName  ,
+	                        t.promo_id   promoId,
+	                        t.jd_price  jdPrice  ,
+	                        t.promo_price promoPrice,
+	                        t.status     status ,
+	                        t.fail_desc  failDesc,
+	                        t.skusn       skuSn,
+	                        t.create_time createTime
+	                  from jd_promo_sku t where 1=1 
+	                  <dynamic> 
+	                  <isNotEmpty prepend="and" property="promoId" > 
+				 			t.promo_id=#promoId#
+				 	  </isNotEmpty>
+				 	  <isNotEmpty prepend="and" property="xiuCode" > 
+				 			t.xiucode=#xiuCode#
+				 	  </isNotEmpty>
+				 	  <isNotEmpty prepend="and" property="wareId" > 
+				 		    t.ware_id=#wareId#
+				 	  </isNotEmpty>
+				 	  <isNotEmpty prepend="and" property="startTime" > 
+				 		  t.create_time <![CDATA[<=]]> to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+				 	  </isNotEmpty>
+				 	   <isNotEmpty prepend="and" property="endTime" > 
+				 		  t.create_time <![CDATA[>=]]> to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+				 	  </isNotEmpty>
+	                  
+	                   </dynamic>  
+	                   order by t.create_time desc) n
+	           where rownum  <![CDATA[<=]]>#end#)
+	   where rn <![CDATA[>=]]> #start#
+    </select>
+    
+    <insert id="insertJdPromoSkuRec"  parameterClass="jdPromoSkuRec" >
+    
+     insert into jd_promo_sku_rec
+		  (promo_id      ,
+		  file_type     ,
+		  file_name     ,
+		  import_count  ,
+		  success_count ,
+		  fail_count)
+		  values(
+			  #promoId#,
+			  #fileType#,
+			  #fileName#,
+			  #importCount#,
+			  #successCount#,
+			  #failCount#  
+		  
+		  )  
+    </insert>
+    
+    <select id="getJdPromoSkuRec" resultClass="jdPromoSkuRec" parameterClass="java.util.Map">
+   
+    
+     select *
+	    from (select n.*, rownum rn
+	            from (select  
+	                        t.promo_id promoId,
+							t.file_type fileType,
+							t.file_name fileName,
+							t.import_count importCount,
+							t.success_count successCount,
+							t.fail_count failCount,
+							to_char(t.create_time,'yyyy-mm-dd hh24:mi:ss') createTime
+	                  from jd_promo_sku_rec t where 1=1 
+	                <dynamic> 
+	                  <isNotEmpty prepend="and" property="fileName" > 
+				 			t.file_name like =#fileName#
+				 	  </isNotEmpty>
+				 	  <isNotEmpty prepend="and" property="promoId" > 
+				 			t.promo_id=#promoId#
+				 	  </isNotEmpty>
+				 	  <isNotEmpty prepend="and" property="startTime" > 
+				 		  t.create_time <![CDATA[<=]]> to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+				 	  </isNotEmpty>
+				 	   <isNotEmpty prepend="and" property="endTime" > 
+				 		  t.create_time <![CDATA[>=]]> to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+				 	  </isNotEmpty>
+	                  
+	                </dynamic>  
+	                   order by t.create_time desc) n
+	           where rownum  <![CDATA[<=]]>#end#)
+	   where rn <![CDATA[>=]]> #start#
+    </select>
+    
+     <select id="getJdPromoSkuRecCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+           select  
+              count(1)
+           from jd_promo_sku_rec t where 1=1 
+            <dynamic> 
+              <isNotEmpty prepend="and" property="fileName" > 
+ 			   t.file_name =#fileName#
+		 	  </isNotEmpty>
+		 	  <isNotEmpty prepend="and" property="promoId" > 
+		 			t.promo_id=#promoId#
+		 	  </isNotEmpty>
+		 	  <isNotEmpty prepend="and" property="startTime" > 
+		 		  t.create_time <![CDATA[<=]]> to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+		 	  </isNotEmpty>
+		 	   <isNotEmpty prepend="and" property="endTime" > 
+		 		  t.create_time <![CDATA[>=]]> to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+		 	  </isNotEmpty>
+            </dynamic>  
+                order by t.create_time desc
+	        
+    </select>
+    
+   
+    <select id="getJdOrderMode" resultClass="jdOrderMode" parameterClass="java.util.Map" >
+		select  
+		  promo_id   promoId,
+		  favor_mode favorMode ,
+		  quota      quota ,
+		  rate       rate ,
+		  link       link ,
+		  jd_desc     jdDesc
+		  from jd_ordermode t
+		where t.promo_id=#promoId#
+    </select>
+    
+</sqlMap>

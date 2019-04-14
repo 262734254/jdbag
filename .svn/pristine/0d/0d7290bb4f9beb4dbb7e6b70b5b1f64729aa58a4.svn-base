@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JdXiuSkuInfoDaoBean">
+    
+    <typeAlias alias="JDXiuColorAndSize" type="com.xiu.jd.bean.ware.JDXiuColorAndSize"/>
+    <typeAlias alias="JDSkuInfo" type="com.xiu.jd.bean.ware.JDSkuInfo"/>
+
+    <select id="findSkuColor" parameterClass="JDXiuColorAndSize" resultClass="int">
+    	 <![CDATA[
+    	 	select count(*) from jd_xiu_color t
+    	 	where 1=1
+    	 ]]>
+    	 <dynamic>
+    	 	<isNotEmpty prepend="and" property="jdFirstCname">
+    	 		t.jdFirstCname = #jdFirstCname#
+    	 	</isNotEmpty>
+    	 	<isNotEmpty prepend="and" property="jdSecondCname">
+    	 		t.jdSecondCname = #jdSecondCname#
+    	 	</isNotEmpty>
+    	 	<isNotEmpty prepend="and" property="xiuColor">
+    	 		t.xiuColor = #xiuColor#
+    	 	</isNotEmpty>
+    	 </dynamic>
+    </select>
+    
+    <select id="findSkuSize" parameterClass="JDXiuColorAndSize" resultClass="int">
+    	 <![CDATA[
+    	 	select count(*) from jd_xiu_size t
+    	 	where 1=1
+    	 ]]>
+    	 <dynamic>
+    	 	<isNotEmpty prepend="and" property="jdFirstCname">
+    	 		t.jdFirstCname = #jdFirstCname#
+    	 	</isNotEmpty>
+    	 	<isNotEmpty prepend="and" property="jdSecondCname">
+    	 		t.jdSecondCname = #jdSecondCname#
+    	 	</isNotEmpty>
+    	 	<isNotEmpty prepend="and" property="xiuSize">
+    	 		t.xiuSize = #xiuSize#
+    	 	</isNotEmpty>
+    	 </dynamic>
+    </select>
+    
+    <insert id="insertBatchColor" parameterClass="JDXiuColorAndSize">
+    	<![CDATA[
+    	 	insert into jd_xiu_color
+    	 	(
+    	 		jdFirstCname,
+    	 		jdSecondCname,
+    	 		jdthreecname,
+    	 		jdColor,
+    	 		xiuColor
+    	 	)
+    	 	values(
+    	 		#jdFirstCname#,
+    	 		#jdSecondCname#,
+    	 		#jdThreeCname#,
+    	 		#jdColor#,
+    	 		#xiuColor#
+    	 	)
+    	 ]]>
+    </insert>
+    
+     <insert id="insertBatchSize" parameterClass="JDXiuColorAndSize">
+    	<![CDATA[
+    	 	insert into jd_xiu_size
+    	 	(
+    	 		jdFirstCname,
+    	 		jdSecondCname,
+    	 		jdthreecname,
+    	 		jdSize,
+    	 		xiuSize
+    	 	)
+    	 	values(
+    	 		#jdFirstCname#,
+    	 		#jdSecondCname#,
+    	 		#jdThreeCname#,
+    	 		#jdSize#,
+    	 		#xiuSize#
+    	 	)
+    	 ]]>
+    </insert>
+    
+    
+	<select id="querySkuInfoList" parameterClass="java.util.Map" resultClass="JDSkuInfo">
+		<![CDATA[ 
+		select 
+		  n.skuSn skuSn,
+		  n.cid cid,
+		  n.jdwarejd jdWareId,
+		  n.xiucode xiuCode,
+		  n.status status,
+		  n.jdskuid jdSkuId,
+		  n.createDate createDate,
+		  n.mainimagepath mainImagePath
+		  from (select m.*, rownum rn
+	          from (
+	              	 select w.*,p.jd_ware_id,p.cid,p.mainimagepath from jd_product_sku_info w 
+	              			left join jd_product_info p on w.xiucode = p.xiucode 
+	              	 where 1=1 
+	   ]]> 
+	    <dynamic>
+     		<isNotEmpty prepend="and" property="cid"> 
+           	p.cid <![CDATA[=]]>#cid#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="xiuCode"> 
+           	w.xiucode <![CDATA[=]]>#xiuCode#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="jdWareId"> 
+           	w.jdWarejd<![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="startTime"> 
+           	w.createdate <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="endTime"> 
+             w.createdate <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="skuSn"> 
+             w.skuSn<![CDATA[=]]>#skuSn#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="status"> 
+             w.status<![CDATA[=]]>#status#
+            </isNotEmpty>
+             <isNotEmpty property="jdSkuIds"> 
+            	 <iterate prepend="and 	w.jdskuid in " open="(" close=")" conjunction="," property="jdSkuIds">
+                      <![CDATA[#jdSkuIds[]#]]>
+                     
+                 </iterate>
+            </isNotEmpty>
+       </dynamic>
+	                order by  w.createdate desc ) m
+		         where  rownum  <![CDATA[ <=]]> #lastNum#) n
+		 where rn >= #firstNum#
+	</select>
+	
+	<select id="getSkuInfoCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+		<![CDATA[ 
+		select count(*) from jd_product_sku_info w 
+	           left join jd_product_info p on w.xiucode = p.xiucode 
+	     where 1=1 
+	   ]]> 
+	    <dynamic>
+     		<isNotEmpty prepend="and" property="cid"> 
+           	p.cid <![CDATA[=]]>#cid#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="xiuCode"> 
+           	w.xiucode <![CDATA[=]]>#xiuCode#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="jdWareId"> 
+           	p.jd_ware_id <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="startTime"> 
+           	w.createdate <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="endTime"> 
+             w.createdate <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="skuSn"> 
+             w.skuSn<![CDATA[=]]>#skuSn#
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="status"> 
+             w.status<![CDATA[=]]>#status#
+            </isNotEmpty>
+            <isNotEmpty property="jdSkuIds"> 
+            	 <iterate prepend="and 	w.jdskuid in " open="(" close=")" conjunction="," property="jdSkuIds">
+                      <![CDATA[#jdSkuIds[]#]]>
+                     
+                 </iterate>
+            </isNotEmpty>
+       </dynamic>
+	</select>
+	<!-- 根据京东商品sku编码删除京东商品sku -->
+	<delete id="deleteSkubySkuId" parameterClass="java.lang.String">
+		delete from jd_product_sku_info t where t.jdSkuId = #jdSkuId#
+	</delete>
+	<!-- 根据京东商品skuid查询商品wareId -->
+	<select id="queryWareId" parameterClass="java.lang.String" resultClass="java.lang.String">
+		select t.jdwarejd from jd_product_sku_info t where t.jdskuid = #jdSkuId# and rownum = 1
+	</select>
+	<!-- 根据商品ID删除京东商品 -->
+	<delete id="deleteWareByWareId" parameterClass="java.lang.String">
+		delete from jd_product_info t where t.jd_ware_id = #jdWareId#
+	</delete>
+	<!-- 根据商品ID删除京东商品 SKU-->
+	<delete id="deleteSkuByWareId" parameterClass="java.lang.String">
+		delete from jd_product_sku_info t where t.jdwarejd = #jdWareId#
+	</delete>
+</sqlMap>

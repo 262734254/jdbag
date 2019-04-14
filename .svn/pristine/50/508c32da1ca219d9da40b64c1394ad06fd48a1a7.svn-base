@@ -1,0 +1,282 @@
+package com.xiu.jd.web.action;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+
+import com.xiu.jd.service.ware.JDBatchNumService;
+import com.xiu.jd.service.ware.impl.JDWareServiceBean;
+import com.xiu.jd.utils.FileUtils;
+import com.xiu.usermanager.provider.bean.LocalOperatorsDO;
+
+/**
+ * 导入商品走秀码
+ * @author liweibiao
+ *
+ */
+public class ExportGoodsSnAction extends BaseAction {
+	
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private static final Logger logger=Logger.getLogger(ExportGoodsSnAction.class);
+    
+	private static Map<String, String > title=new LinkedHashMap<String, String>();
+	 
+    private File uploadFile;//得到上传的文件
+    
+	  //application/vnd.ms-excel
+    private String uploadFileContentType;//得到文件的类型
+	  
+	  
+    private String uploadFileFileName;//得到文件的名称
+   
+	@Resource
+	private JDWareServiceBean jDWareServiceBean;
+	
+	@Resource
+	private JDBatchNumService jDBatchNumServiceBean;
+	
+	
+	/***
+	 * 显示 导入商品走秀码页面
+	 * @return
+	 */
+
+	static{
+		title.put("xiuCode", "走秀码");
+	}
+
+	public String exportExcelUI(){
+		logger.info("显示 导入商品走秀码页面");
+		return "success";
+	}
+	
+	/***
+	 * 解析Excel
+	 * @return
+	 */
+	public String goodsXiuCodeUpload(){
+		logger.info("显示 导入商品走秀码动作");
+		String redirectUrl=request.getContextPath()+"/jdWare/exportExcelUI.action";
+		long batchNum = 0;
+		Workbook wb=null;
+		FileInputStream fis=null;
+		 String messages="";
+		if(uploadFile!=null){
+			
+			//取得文件后缀名
+			String ext=FileUtils.getFileExt(uploadFileFileName);
+			if(!"xls".equals(ext) && !"xlsx".equals(ext)){
+				request.setAttribute("message", "上传文件必须为Excle文件");
+				request.setAttribute("redirectUrl", redirectUrl);
+				return "message";
+			}
+			logger.info("上传的文件类型:"+uploadFileContentType+",   application/vnd.ms-excel  --  aplication/msexcel");
+		  /*if(!"application/vnd.ms-excel".equalsIgnoreCase(uploadFileContentType) && !"aplication/msexcel".equalsIgnoreCase(uploadFileContentType)){
+				request.setAttribute("message", "文件类型不正确");
+				request.setAttribute("redirectUrl", redirectUrl);
+				return "message";
+			}*/
+			try {
+				fis = new FileInputStream(uploadFile);
+				if("xls".equals(ext)){
+					wb = new HSSFWorkbook(fis);
+				}else{
+					wb = new XSSFWorkbook(fis);
+				}
+			
+				
+				//取得第一个工作表
+				Sheet sheet=wb.getSheetAt(0);
+				int firseRowNum=0;
+				//第一行为标题
+				Row hssfRow=sheet.getRow(firseRowNum);
+				int lastCellNum=hssfRow.getLastCellNum();
+				//是否包含走秀码列
+				int skuAndInventory=0;
+				for(int cellnum=0 ;cellnum<lastCellNum;cellnum++ ){
+					Cell cell= hssfRow.getCell(cellnum);
+					if(cell!=null){
+						String title=cell.getStringCellValue();
+						if(title!=null && !title.isEmpty()){
+							if(title.trim().equalsIgnoreCase("走秀码")){
+								skuAndInventory++;
+								
+							}
+						}
+					}
+					
+				}
+				if(skuAndInventory==1){
+					StringBuffer solrXiuCodes=new StringBuffer();
+					StringBuffer productXiuCodes=new StringBuffer();
+					
+					firseRowNum++;
+					int lastRowNum=sheet.getLastRowNum();
+					for(int rowIndex=firseRowNum;rowIndex<=lastRowNum;rowIndex++){
+						Row row=sheet.getRow(rowIndex);
+						if(null==row){
+							continue;
+						}
+						
+						Cell cell=row.getCell(0);
+						if(cell!=null){
+							String xiuCode =getCellValue(cell,"xiuCode");
+							if(xiuCode==null || xiuCode.isEmpty()){
+								continue;
+							}
+							productXiuCodes.append(xiuCode).append(',');
+							solrXiuCodes.append("partNumber").append(':').append(xiuCode).append(" ");
+						}
+					}
+					logger.info("走秀码为:\n "+solrXiuCodes.toString());
+					String solrXiuSns=solrXiuCodes.toString();
+					if(solrXiuSns.length()>0){
+						String userName="";
+						LocalOperatorsDO localOperatorsDO=getLoginUser();
+						if(localOperatorsDO!=null){
+							userName=localOperatorsDO.getLoginName();
+						}
+						//保存商品信息和商品sku信息
+						batchNum=jDBatchNumServiceBean.updateAndSelectBatchNum();
+						logger.info("Excel批次号为: "+batchNum);
+						 messages=jDWareServiceBean.insertProductAndSKU(this.request,solrXiuSns, productXiuCodes.toString(), lastRowNum, userName,batchNum);
+					    
+					}
+					
+				}else{
+					request.setAttribute("message", "Excle模板必须包含走秀码列,文件内容格式不正确");
+					redirectUrl = request.getContextPath()+"/jdWare/exportExcelUI.action";
+					request.setAttribute("redirectUrl",redirectUrl );
+					return "message";
+					
+				}
+			} catch (Exception e) {
+				request.setAttribute("message", "Excle文件上传异常:"+e.getMessage());
+				redirectUrl = request.getContextPath()+"/jdWare/exportExcelUI.action";
+				request.setAttribute("redirectUrl",redirectUrl );
+				logger.error(e);
+				e.printStackTrace();
+				return "message";
+				
+				
+			}
+			request.setAttribute("message", messages);
+		}else{
+			request.setAttribute("message", "请上传Excle文件");
+		}
+		redirectUrl = request.getContextPath()+"/jdWare/wareInfoList.action?num="+batchNum+"&status=0";
+		request.setAttribute("redirectUrl",redirectUrl );
+		return "message";
+	
+	}
+	
+	
+	/**
+	 * 商品库存模板下载动作
+	 * @return
+	 */
+	public String xiuCodeTemplateDown()throws Exception{
+	   logger.info("商品库存模板下载动作");
+		try{
+		String fileName = "xiuCode_template";
+		response.setContentType("aplication/msexcel"); // 设置文件类型
+		response.setHeader("Content-disposition", "attachment; filename="+fileName+".xls");
+
+		HSSFWorkbook workbook =new HSSFWorkbook();// 创建工作薄
+	
+		//// 创建工作表
+		HSSFSheet sheet=workbook.createSheet("sheet");
+		//获取工作表中的第一行
+		HSSFRow row=sheet.createRow(0);
+        //设置第一行的表头
+		List<String> title=getTitleValue();
+		for(int i=0;i<title.size();i++){
+			
+			HSSFCell  cell=row.createCell(i);
+			cell.setCellValue(title.get(i));
+		}
+		workbook.write(response.getOutputStream());
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+		return null;
+	}
+	private static List<String> getTitleValue(){
+		List<String> value=new ArrayList<String>();
+		for(Map.Entry<String, String> t:title.entrySet()){
+			value.add(t.getValue());
+		}
+		return value;
+	}
+	
+   /**
+    * 获取Excel单元格中的数据
+    * @param cell  单元格对象
+    * @param tag   单元格标志
+    * @return
+    */
+	private static String getCellValue(Cell cell,String tag){
+		String value = null;
+		switch (cell.getCellType()) {		 
+	        case HSSFCell.CELL_TYPE_NUMERIC: // 数字           
+	        	if(tag=="xiuCode"){
+	        		value=""+((int)cell.getNumericCellValue());
+	        	}
+	            break;  
+	        case HSSFCell.CELL_TYPE_STRING: // 字符串             
+	            value=cell.getStringCellValue();
+	            break;  
+	        case HSSFCell.CELL_TYPE_BOOLEAN: // Boolean  	         
+	            break;  
+	        case HSSFCell.CELL_TYPE_FORMULA: // 公式  	         
+	            break;  
+	        case HSSFCell.CELL_TYPE_BLANK: // 空值  
+	        	value=null;
+	            break;  
+	        case HSSFCell.CELL_TYPE_ERROR: // 故障  
+	        	value=null;
+	            break;  
+	        default:  
+	        	value=null;
+	            break;  
+	        }  		
+		return value;
+	}
+	
+	
+	/***属性的set方法***/
+
+	public void setUploadFile(File uploadFile) {
+		this.uploadFile = uploadFile;
+	}
+
+	public void setUploadFileContentType(String uploadFileContentType) {
+		this.uploadFileContentType = uploadFileContentType;
+	}
+
+	public void setUploadFileFileName(String uploadFileFileName) {
+		this.uploadFileFileName = uploadFileFileName;
+	}
+	
+}

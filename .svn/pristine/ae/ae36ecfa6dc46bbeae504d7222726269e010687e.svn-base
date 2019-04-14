@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE struts PUBLIC
+		 "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+		 "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	  <package name="adminIntercepter" extends="jdGoods">
+
+	  	<interceptors>
+			<interceptor name="permissionIntercepter" 	class="com.xiu.jd.web.action.AdminInterceptor"/>
+			<interceptor-stack name="admin">
+				<interceptor-ref name="defaultStack"/>
+				<interceptor-ref name="permissionIntercepter"></interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="admin"></default-interceptor-ref>
+		
+	  </package>
+</struts>

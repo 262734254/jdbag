@@ -1,0 +1,79 @@
+
+
+###################\u5404\u4e2a\u4e2d\u5fc3\u7684\u63a5\u53e3URL\u914d\u7f6e#########################
+
+#\u6e20\u9053\u4e2d\u5fc3 channel    http://channel-web.xiu.com:6080/remoting/inventoryservice
+remote.url.channel=http://channel-web.xiu.com/remoting/inventoryservice
+#\u5546\u54c1\u4e2d\u5fc3 goods  product.xiu.com
+remote.url.goods=http://product.xiu.com/webapp/wcs/stores/hessianService
+
+<<<<<<< .mine
+#remote.url.osc.import=http://osc.xiu.com:8083/remote/fxOrderService
+remote.url.osc.import=http://osc.xiu.com/remote/fxOrderService
+
+remote.url.osc.buyerId=351
+remote.url.osc.buyerName=\u8279
+remote.url.osc.AppKey=xiufx
+remote.url.osc.AppPwd=0E5D7F7A51659C25440ED2810459072A
+=======
+
+>>>>>>> .r310
+################### JDBC \u5c5e\u6027\u914d\u7f6e#########################
+
+defaultUserManagerHessianServicesUrl=http://cas.xiu.com/remoting/userManagerService
+
+
+
+#jdbc.driver.class=oracle.jdbc.driver.OracleDriver
+
+#moile db
+<<<<<<< .mine
+#jdbc.m.url=jdbc:oracle:thin:@192.168.3.106:1521:WCSDB
+#jdbc.m.username=xiu_ebay_jd
+#jdbc.m.password=xiu_ebay_jd
+=======
+#jdbc.m.url=jdbc:oracle:thin:@10.0.0.79:1526:ORCL
+#jdbc.m.username=xiu_mobile
+#jdbc.m.password=xiu_mobile*testing
+
+jdbc.m.url=jdbc:oracle:thin:@192.168.3.106:1521:WCSDB
+jdbc.m.username=xiu_ebay_jd
+jdbc.m.password=xiu_ebay_jd
+#jdbc.m.pool.init.size=5
+>>>>>>> .r310
+#jdbc.m.pool.max.active=10
+#jdbc.m.pool.max.wait=60000
+#jdbc.m.idleConnectionTestPeriodInMinutes=0
+#jdbc.m.idleMaxAgeInMinutes=60
+#jdbc.m.maxConnectionsPerPartition=6
+#jdbc.m.minConnectionsPerPartition=0
+#jdbc.m.partitionCount=3
+#jdbc.m.acquireIncrement=2
+#jdbc.m.statementsCacheSize=0
+#jdbc.m.releaseHelperThreads=3
+
+
+
+
+#æç´¢å¼æsearch http://192.168.80.180:3736/solr2/xiu/
+#remote.url.solr=http://10.0.0.161:3736/solr2/xiu/ 
+# http://10.0.0.161:3736/solr2/xiu
+#http://172.16.3.48:3736/solr2/xiu/select
+#http://172.16.3.212:3736/solr2/xiu/
+#solr.xiu.com
+
+remote.url.solr=http://solr.xiu.com:3736/solr2/xiu
+
+#image server ip address 119.134.253.45
+#IMG_PREFIX=http://images.xiustatic.com
+IMG_PREFIX=http://img1.xiu.com
+
+<<<<<<< .mine
+IMAGE_SIZE=g1_220_220.jpg
+=======
+ratio=0.95
+
+lastNumber=9
+
+IMAGE_SIZE=g1_220_220.jpg
+>>>>>>> .r310

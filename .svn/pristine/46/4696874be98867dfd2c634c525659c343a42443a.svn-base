@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<constant name="struts.i18n.encoding"  value="utf-8"></constant>
+ 
+    <package name="jdGoods" extends="struts-default">
+      <global-results>
+			<result name="login" >/admin/view/nologin.jsp</result>
+			<result name="message" >/WEB-INF/share/message.jsp</result>
+			<result name="input" >/WEB-INF/share/message.jsp</result>
+			<result name="view">${view}</result>
+	 	</global-results>
+	   
+	   
+	   <!-- 导入商品走秀码界面 -->
+	    <action name="exportExcelUI" class="com.xiu.jd.web.action.ExportGoodsSnAction" method="exportExcelUI" >
+	         <result name="success">/WEB-INF/system/goodsSNImportUI.jsp</result>	      
+	    </action>
+	    
+	      <!--  下载商品走秀码excle模板 -->
+        <action name="xiuCodeTemplateDown" class="com.xiu.jd.web.action.ExportGoodsSnAction" method="xiuCodeTemplateDown" />
+         
+          <!--  上传excle并解析 -->
+	    <action name="goodsXiuCodeUpload" class="com.xiu.jd.web.action.ExportGoodsSnAction" method="goodsXiuCodeUpload" />
+	     <!--  日志分页列表-->
+	    <action name="logListRecord" class="com.xiu.jd.web.action.log.LogListAction" method="logListRecord">
+	        <result name="success">/WEB-INF/system/log/logListRecord.jsp</result>
+	        
+	    </action>
+	    
+	    <action name="wareInfoList" class="com.xiu.jd.web.action.WareInfoAction" method="findWareInfo">
+	    	<result>/WEB-INF/system/wareInfoList.jsp</result>
+	    </action>
+	    <action name="wareInfoModify" class="com.xiu.jd.web.action.WareInfoAction" method="modifyWareInfo">
+	    	<result>/WEB-INF/system/wareInfo.jsp</result>
+	    </action>
+	    <!-- 删除商品和商品SKU信息界面 (不包含京东上的商品)-->
+	    <action name="deleWareUI" class="com.xiu.jd.web.action.WareInfoAction" method="deleWareUI">
+	    	<result  name="success">/WEB-INF/system/deleware.jsp</result>
+	    </action>
+	    
+	    <action name="deleWare" class="com.xiu.jd.web.action.WareInfoAction" method="deleWare"/>
+	    
+	    <!-- 删除商品和商品SKU信息界面 (可选删除京东上的商品)-->
+	    <action name="deleProductUI" class="com.xiu.jd.web.action.WareInfoAction" method="deleProductUI">
+	    	<result name="success">/WEB-INF/system/deleProduct.jsp</result>
+	    </action>
+	    
+	    <action name="deleProduct" class="com.xiu.jd.web.action.WareInfoAction" method="deleProduct">
+	          <result  name="success">/WEB-INF/system/wareInfoList.jsp</result>
+	     </action>
+	     
+	     
+	     <!-- 更新广告词-->
+	    <action name="updateAdContentUI" class="com.xiu.jd.web.action.WareInfoAction" method="updateAdContentUI">
+	    	<result name="success">/WEB-INF/system/updateAdContentUI.jsp</result>
+	    </action>
+	    
+	    <action name="updateAdContent" class="com.xiu.jd.web.action.WareInfoAction" method="updateAdContent">
+	          <result  name="success">/WEB-INF/system/wareInfoList.jsp</result>
+	     </action>
+	    
+	    <!-- 商品标题修改界面 -->
+	    <action name="updateProductTitleUI" class="com.xiu.jd.web.action.WareInfoAction" method="updateProductTitleUI">
+	    	<result>/WEB-INF/system/updateProductTitle.jsp</result>
+	    </action>
+	   <!-- 商品标题修改界面动作   -->
+	    <action name="updateProductTitle" class="com.xiu.jd.web.action.WareInfoAction" method="updateProductTitle"/>
+	    
+	    <action name="exportWareInfo" class="com.xiu.jd.web.action.WareInfoAction" method="exportWareInfo">
+	    	<result>/WEB-INF/system/wareInfoList.jsp</result>
+	    </action>
+	    <action name="wareInfoUpdateList" class="com.xiu.jd.web.action.WareInfoAction" method="findWareInfo">
+	    	<result>/WEB-INF/system/wareInfoUpdateList.jsp</result>
+	    </action> 
+	    <action name="updateWareInfo" class="com.xiu.jd.web.action.WareInfoAction" method="updateWareInfo"></action>
+	    
+	     <action name="wareTem" class="com.xiu.jd.web.action.WareInfoAction" method="exportExcelUI">
+	    	<result>/WEB-INF/system/wareTemPush.jsp</result>
+	    </action>
+	    <action name="wareTemPush" class="com.xiu.jd.web.action.WareInfoAction" method="wareTemPush">
+	    </action>
+	     <action name="wareSkuTemPush" class="com.xiu.jd.web.action.WareInfoAction" method="wareSkuTemPush">
+	    </action>
+	    
+	     <action name="warePush" class="com.xiu.jd.web.action.WareInfoAction" method="warePush">
+	    </action>
+	    <!-- 查询京东店内分类 -->
+	    <action name="shopCategoryList" class="com.xiu.jd.web.action.WareInfoAction" method="shopCategoryList">
+	    	<result>/WEB-INF/system/shopCategoryList.jsp</result>
+	    </action>
+	    <!-- 批量更新（覆盖）京东店内分类 -->
+	    <action name="updateShopCategory" class="com.xiu.jd.web.action.WareInfoAction" method="updateShopCategory"></action>
+	    <!-- 批量更新（新增）京东店内分类 -->
+	    <action name="addShopCategory" class="com.xiu.jd.web.action.WareInfoAction" method="addShopCategory"></action>
+	     <action name="deleAndAddPic" class="com.xiu.jd.web.action.WareInfoAction" method="deleAndAddPic">
+	    </action>
+	    <!-- 异步ajax请求 查询京东分类  -->
+	     <action name="getJdCategory" class="com.xiu.jd.web.action.WareInfoAction" method="getJdCategory"/>
+	     <!-- 异步ajax请求查询京东店内分类 -->
+	     <action name="getJdShopCategory" class="com.xiu.jd.web.action.WareInfoAction" method="getJdShopCategory"/>
+	    <action name="exportLog" class="com.xiu.jd.web.action.log.LogListAction" method="exportLogExcel"></action>
+	   
+	    <action name="order" class="com.xiu.jd.web.action.OrderAction"></action>
+	    
+	    <action name="orderInfoList" class="com.xiu.jd.web.action.OrderAction" method="findOrderInfo">
+	    	<result>/WEB-INF/order/orderInfoList.jsp</result>
+	    </action>
+	    <!-- 商品sku列表 -->
+	    <action name="skuInfoList" class="com.xiu.jd.web.action.SkuInfoAction" method="skuInfoList">
+	    	<result>/WEB-INF/system/skuInfoList.jsp</result>
+	    </action>
+	    <!-- 删除京东商品SKU编码 -->
+	     <action name="deleteSku" class="com.xiu.jd.web.action.SkuInfoAction" method="deleteSku">
+	    	<result>/WEB-INF/system/skuInfoList.jsp</result>
+	    </action>
+	     <!-- 删除京东商品SKU编码 -->
+	    <action name="deleteSkuBySkuIds" class="com.xiu.jd.web.action.SkuInfoAction" method="deleteSkuBySkuIds">
+	    	<result>/WEB-INF/system/skuInfoList.jsp</result>
+	    </action>
+	    <!-- 导入商品销售属性映射表 -->
+	    <action name="importSkuInfo" class="com.xiu.jd.web.action.SkuInfoAction" method="importSkuInfo"></action>
+	    <!-- 导入商品销售属性界面 -->
+	    <action name="importSkuInfoUI" class="com.xiu.jd.web.action.SkuInfoAction" method="importSkuInfoUI">
+	    	<result>/WEB-INF/system/importSkuInfo.jsp</result>
+	    </action>
+	    
+	    <!--   更新处理状态-->
+	     <action name="updateProcessState" class="com.xiu.jd.web.action.OrderAction" method="updateProcessState">
+	         <result>/WEB-INF/order/orderInfoList.jsp</result>
+	     </action>
+	     <!-- 查询数据库中的数据界面 -->
+	      <action name="getDataUI" class="com.xiu.jd.web.action.QueryDataAction" method="getDataUI">
+	         <result>/WEB-INF/system/queryData.jsp</result>
+	     </action>
+	     <!-- 查询数据库中的数据动作 -->
+	      <action name="getData" class="com.xiu.jd.web.action.QueryDataAction" method="getData">
+	         <result>/WEB-INF/system/queryData.jsp</result>
+	     </action>
+	     
+	     
+	     
+	      <!--   查看订单SKU详情信息(也就是订单项中的信息)-->
+	     <action name="getOrderSkuInfo" class="com.xiu.jd.web.action.OrderAction" method="getOrderSkuInfo">
+	         <result>/WEB-INF/order/orderItemInfo.jsp</result>
+	     </action>
+	         
+	    <action name="exportOrderInfo" class="com.xiu.jd.web.action.OrderAction" method="exportOrderExcel"></action> 
+	    <action name="cate" class="com.xiu.jd.web.action.CategoryAction"></action>  
+	    <!-- 拉取京东属性页面 -->
+	    <action name="pullAttrAndValueUI" class="com.xiu.jd.web.action.WareInfoAction" method="pullAttrAndValueUI">
+	    	<result>/WEB-INF/system/pullJdAttrAndValue.jsp</result>
+	    </action>
+	    <!-- 拉取京东属性和属性值 -->
+	    <action name="pullAttrAndValue" class="com.xiu.jd.web.action.WareInfoAction" method="pullAttrAndValue"></action>
+	    <action name="pullProduct" class="com.xiu.jd.web.action.WareInfoAction" method="pullProduct"></action>
+	    
+	    
+	       <!--  进入黑名单导入界面 -->
+	    <action name="exportExcelBlackUI" class="com.xiu.jd.web.action.ProductBlackAction" method="exportExcelBlackUI" >
+	         <result name="success">/WEB-INF/black/offAndOnlineBlack.jsp</result>	      
+	    </action>
+	    
+	      <!--  黑名单模板下载动作-->
+        <action name="blackTemplateDown" class="com.xiu.jd.web.action.ProductBlackAction" method="blackTemplateDown" />
+         
+          <!--  解析上传的商品黑名单Excle -->
+	    <action name="blackExcleUpload" class="com.xiu.jd.web.action.ProductBlackAction" method="blackExcleUpload" />
+	    
+	      <!-- 上下架不对接黑名单商品列表-->
+	      <action name="blackProductListUI" class="com.xiu.jd.web.action.ProductBlackAction" method="blackProductListUI" >
+	         <result name="success">/WEB-INF/black/blackProductList.jsp</result>	      
+	    </action>
+	    
+	        <!-- 上下架不对接黑名单商品列表-->
+	      <action name="blackProductList" class="com.xiu.jd.web.action.ProductBlackAction" method="blackProductList" >
+	         <result name="success">/WEB-INF/black/blackProductList.jsp</result>	      
+	    </action>
+	    
+	    <!-- 导入单品促销页面 -->
+	    <action name="importPromoUI" class="com.xiu.jd.web.action.JdPromoAction" method="importPromoUI">
+	    	<result>/WEB-INF/system/importPromo.jsp</result>
+	    </action>
+	    
+	    <action name="importPromo" class="com.xiu.jd.web.action.JdPromoAction" method="importPromo"></action>
+	    
+	    <action name="promoInfoList" class="com.xiu.jd.web.action.JdPromoAction" method="getPromoList">
+	    	<result>/WEB-INF/system/PromoList.jsp</result>
+	    </action>
+	    
+	     <action name="addPromoUI" class="com.xiu.jd.web.action.JdPromoAction" method="addPromoUI">
+	    	<result>/WEB-INF/system/addPromo.jsp</result>
+	    </action>
+	      <action name="addPromo" class="com.xiu.jd.web.action.JdPromoAction" method="addPromo"></action>
+	   <action name="importPromoSkuUI" class="com.xiu.jd.web.action.JdPromoSkuAction" method="importPromoSkuUI">
+	   
+	      <result>/WEB-INF/system/importPromoSku.jsp</result>
+	   </action>
+	   
+	   <action name="importPromoSku" class="com.xiu.jd.web.action.JdPromoSkuAction" method="importPromoSku">
+	    <result>/WEB-INF/system/importPromoSku.jsp</result>
+	   </action>
+	     <action name="getJdPromoSkuRecList" class="com.xiu.jd.web.action.JdPromoSkuAction" method="getJdPromoSkuRecList">
+	         <result>/WEB-INF/system/importPromoSku.jsp</result>
+	   </action>
+	   
+	       <action name="wareInfoBatchList" class="com.xiu.jd.web.action.WareInfoAction" method="findBatchWareInfo">
+	    	<result>/WEB-INF/system/wareInfoBatchList.jsp</result>
+	    </action>
+	    
+	     <action name="pushWareInBatch" class="com.xiu.jd.web.action.WareInfoAction" method="pushWareInBatch">
+	    	<result>/WEB-INF/system/wareInfoBatchList.jsp</result>
+	    </action>
+	   
+	   
+	   
+	   
+	   
+	    
+	      <!-- 设置不对接商品上下架(单个或批量) -->
+	     <action name="setOnLine" class="com.xiu.jd.web.action.ProductBlackAction" method="setOnLine" >
+	         <result name="success">/WEB-INF/black/blackProductList.jsp</result>
+	               <result name="success" type="redirectAction">
+	               <param name="namespace">/jdGoods</param>
+                   <param name="actionName">blackProductList</param>
+                    <param name="productForm.xiuCode">${productForm.xiuCode}</param>
+                   <param name="productForm.title">${productForm.title}</param>
+                   <param name="productForm.importUserName">${productForm.importUserName}</param>
+                   <param name="productForm.confirmStatus">${productForm.confirmStatus}</param>
+                   <param name="productForm.timeType">${productForm.timeType}</param>
+                   <param name="productForm.startDate">${productForm.startDate}</param>
+                   <param name="productForm.endDate">${productForm.endDate}</param>
+                   <param name="productForm.onLineStatus">${productForm.onLineStatus}</param>
+                   <param name="productForm.isButtJoint">${productForm.isButtJoint}</param>
+                    <param name="pageSize">${pageSize}</param>
+                   <param name="currentPage">${currentPage}</param>
+                   <param name="onClickQueryButton">${onClickQueryButton}</param>
+	         </result>
+	    </action>
+	    
+	        <!-- 设置商品为删除状态(单个或批量) --> 
+	     <action name="deleteProduct" class="com.xiu.jd.web.action.ProductBlackAction" method="deleteProduct" >
+	          <result name="success" type="redirectAction">
+	               <param name="namespace">/jdGoods</param>
+                   <param name="actionName">blackProductList</param>
+                   <param name="productForm.xiuCode">${productForm.xiuCode}</param>
+                   <param name="productForm.title">${productForm.title}</param>
+                   <param name="productForm.importUserName">${productForm.importUserName}</param>
+                   <param name="productForm.confirmStatus">${productForm.confirmStatus}</param>
+                   <param name="productForm.timeType">${productForm.timeType}</param>
+                   <param name="productForm.startDate">${productForm.startDate}</param>
+                   <param name="productForm.endDate">${productForm.endDate}</param>
+                   <param name="productForm.onLineStatus">${productForm.onLineStatus}</param>
+                   <param name="productForm.isButtJoint">${productForm.isButtJoint}</param>
+                    <param name="pageSize">${pageSize}</param>
+                   <param name="currentPage">${currentPage}</param>
+                   <param name="onClickQueryButton">${onClickQueryButton}</param>
+               </result>
+	    </action>
+	    
+	    
+	     <!-- 导出黑名单商品 -->
+	     <action name="exportBlackProduct" class="com.xiu.jd.web.action.ProductBlackAction" method="exportBlackProduct" />
+	      
+	      
+    </package>
+    
+    <package name="jdWare-ajax" extends="json-default" namespace="/jdGoodsajax">
+		<action name="logSkuList" class="com.xiu.jd.web.action.log.LogListAction" method="findAllLogSku">
+			<result type="json">
+				<param name="root">ajaxResultMap</param>
+				<param name="contentType">text/html</param>
+			</result>
+		</action>
+	</package>
+</struts>

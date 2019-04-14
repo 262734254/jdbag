@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+</head>
+<body>
+<table style="border-collapse:collapse;border-spacing:0;border-left:1px solid #888;border-top:1px solid #888;">
+    
+    <thead>
+	    <tr style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;font-size:14px;background:#efefef;">	      
+	        <th style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">京东订单ID</th>
+	        <th style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">下单时间</th>
+	        <th style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">商品名称</th>
+	        <th style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">商品sku码</th>
+	        <th style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">商品单价</th>
+	         <th style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">购买数量</th>
+	        <th style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">订单推送osc状态</th>
+	        <th style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">下单失败原因</th>
+	    </tr>
+    </thead>
+    <tbody>
+    	#foreach($item in $jdOrderItemInfoList)
+    	 <tr style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;font-size:12px">
+	        <td style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">$!{item.jdOrderId}</td>
+	        <td style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">$!{item.placeTime}</td>
+	        <td style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">$!{item.skuName}</td>
+	        <td style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">$!{item.skuId}</td>
+	        
+	         <td style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">$!{item.jdPrice}</td>
+	        <td style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">
+	           $!{item.itemTotal}
+	         
+	        </td>
+	        <td style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">
+	          #if($item.placeResult==0) 未推送  #end
+	           #if($item.placeResult==2) 推送失败 #end
+	           #if($item.placeResult==3) 库存扣减失败  #end
+	        </td>
+	        <td style="border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;">$!{item.failDescri}</td>
+	        
+	    
+	    </tr>
+				
+	    #end
+	   
+    
+    </tbody>
+   
+</table>
+
+</body>
+</html>

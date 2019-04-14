@@ -1,0 +1,420 @@
+package com.xiu.jd.web.action;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+
+import com.xiu.jd.bean.page.PageView;
+import com.xiu.jd.bean.page.QueryResult;
+import com.xiu.jd.bean.ware.JDCategory;
+import com.xiu.jd.bean.ware.JDSkuInfo;
+import com.xiu.jd.bean.ware.JDXiuColorAndSize;
+import com.xiu.jd.service.CategoryService;
+import com.xiu.jd.service.ware.JdXiuSkuInfoService;
+import com.xiu.jd.utils.FileUtils;
+import com.xiu.jd.utils.ImportExcelUtil;
+import com.xiu.jd.web.form.JdSkuInfoForm;
+
+@SuppressWarnings("serial")
+@Scope("prototype")
+public class SkuInfoAction extends BaseAction {
+	private Logger logger = Logger.getLogger(SkuInfoAction.class);
+	/**上传的文件**/
+	private File uploadFile;
+	private String uploadFileFileName;
+	private String uploadFileContentType;
+	
+	private PageView<JDSkuInfo> pageView;
+	
+	@Autowired
+	private JdXiuSkuInfoService jdXiuSkuInfoServiceBean;
+	@Resource
+	private CategoryService categoryService;
+	/**封装的前台数据**/
+	private JdSkuInfoForm jdSkuInfoForm =new JdSkuInfoForm();
+	/**京东查询商品多个sku编码**/
+	private String jdSkuIds;
+	/**需要删除的京东多个商品sku编码**/
+	private String delJdSkuIds;
+	/**
+	 * 京东分类ID(一级，二级，三级) 0为一级分类
+	 */
+	private Integer categoryId = 0;
+	// 京东一级分类
+	private List<JDCategory> jdCategories;
+
+	private List<JDCategory> jdCategories2 = new ArrayList<JDCategory>();
+
+	private List<JDCategory> jdCategories3 = new ArrayList<JDCategory>();
+
+	private Integer firstCategoryId;
+
+	private Integer sendCategoryId;
+
+    private Integer threeCategoryId;
+	
+	public String importSkuInfoUI(){
+		return SUCCESS;
+	}
+	
+	/**
+	 * 导入京东销售属性(颜色，尺寸)和走秀sku(颜色，尺寸)的映射数据
+	 * @return
+	 */
+	public String importSkuInfo(){
+		String redirectUrl = request.getContextPath() + "/jdGoods/importSkuInfoUI.action";
+		if(uploadFile!= null){
+			// 取得文件后缀名
+			String ext = FileUtils.getFileExt(uploadFileFileName);
+			if (!"xls".equals(ext) && !"xlsx".equals(ext)) {
+				request.setAttribute("message", "上传文件必须为Excle文件");
+				request.setAttribute("redirectUrl", redirectUrl);
+				return "message";
+			}
+	    /*if (!"application/vnd.ms-excel".equalsIgnoreCase(uploadFileContentType) && !"aplication/msexcel".equalsIgnoreCase(uploadFileContentType)) {
+				request.setAttribute("message", "文件类型不正确");
+				request.setAttribute("redirectUrl", redirectUrl);
+				return "message";
+			}*/
+			
+			try {
+				Object wb = ImportExcelUtil.getWorkbook(uploadFile, uploadFileFileName);
+				Object sheet = null;
+				String sku="";
+				if(wb instanceof HSSFWorkbook){
+					sheet = ((HSSFWorkbook) wb).getSheetAt(0);
+				}
+				if(wb instanceof XSSFWorkbook){
+					sheet = ((XSSFWorkbook) wb).getSheetAt(0);
+				}
+				Object row = null;
+				int rowCount = 0;
+				if(sheet instanceof HSSFSheet){
+					row = ((HSSFSheet) sheet).getRow(0);
+					rowCount = ((HSSFSheet) sheet).getLastRowNum();
+				}
+				if(sheet instanceof XSSFSheet){
+					row = ((XSSFSheet) sheet).getRow(0);
+					rowCount = ((XSSFSheet) sheet).getLastRowNum();
+				}
+				Object cellSkuInfo = ImportExcelUtil.getCell(row, 3);
+				if(cellSkuInfo != null){
+					sku = ImportExcelUtil.getCellValueStr(cellSkuInfo);
+				}
+				List<JDXiuColorAndSize> jxcList = null;
+				List<JDXiuColorAndSize> jxsList = null;
+				if(!"".equals(sku)){
+					if(sku.contains("颜色")){
+						jxcList = new ArrayList<JDXiuColorAndSize>();
+						for(int i=1;i<=rowCount;i++){
+							JDXiuColorAndSize jxc = new JDXiuColorAndSize();
+							String jdFirstCname=getSkuMapInfo(sheet,row,i,0);
+							if(jdFirstCname==null || "".equals(jdFirstCname.trim())){
+								continue;
+							}
+							jxc.setJdFirstCname(jdFirstCname);
+							jxc.setJdSecondCname(getSkuMapInfo(sheet,row,i,1));
+							String jdThreeCname=getSkuMapInfo(sheet,row,i,2);
+							if(jdThreeCname==null || "".equals(jdThreeCname.trim())){
+								logger.info("京东第三级分类为null==>");
+								continue;
+							}
+							jxc.setJdThreeCname(jdThreeCname);
+							jxc.setJdColor(getSkuMapInfo(sheet,row,i,3));
+							jxc.setXiuColor(getSkuMapInfo(sheet,row,i,4));
+							jxcList.add(jxc);
+						}
+						if(jxcList!=null && jxcList.size()>0){
+							logger.info("颜色==>"+jxcList.size());
+						}
+						
+					}else if(sku.contains("尺寸")){
+						jxsList = new ArrayList<JDXiuColorAndSize>();
+						for(int i=1;i<=rowCount;i++){
+							JDXiuColorAndSize jxs = new JDXiuColorAndSize();
+							String jdFirstCname=getSkuMapInfo(sheet,row,i,0);
+							if(jdFirstCname==null || "".equals(jdFirstCname.trim())){
+								continue;
+							}
+							jxs.setJdFirstCname(jdFirstCname);
+							jxs.setJdSecondCname(getSkuMapInfo(sheet,row,i,1));
+							String jdThreeCname=getSkuMapInfo(sheet,row,i,2);
+							if(jdThreeCname==null || "".equals(jdThreeCname.trim())){
+								logger.info("京东第三级分类为null==>");
+								continue;
+							}
+							jxs.setJdThreeCname(jdThreeCname);
+							String jdSize=getSkuMapInfo(sheet,row,i,3);
+							if(jdSize!=null){
+								if(jdSize.trim().endsWith(".0")){
+									jxs.setJdSize(jdSize.trim().replace(".0",""));
+								}else{
+									jxs.setJdSize(jdSize.trim());
+								}
+								
+							}
+							String xiuSize=getSkuMapInfo(sheet,row,i,4);
+							if(xiuSize!=null){
+								if(xiuSize.trim().endsWith(".0")){
+									jxs.setXiuSize(xiuSize.trim().replace(".0",""));
+								}else{
+									jxs.setXiuSize(xiuSize.trim());
+								}
+								
+							}
+							
+							jxsList.add(jxs);
+						}
+						if(jxsList!=null && jxsList.size()>0){
+							logger.info("尺寸==>"+jxsList.size());
+						}
+					}
+				}
+				
+				addSkuInfo(jxcList,jxsList);
+				request.setAttribute("message", "文件已经上传");
+			} catch (IOException e) {
+				request.setAttribute("message", "文件上传异常");
+				e.printStackTrace();
+			}
+		}
+		request.setAttribute("redirectUrl", redirectUrl);
+		return "message";
+	}
+	
+	private void addSkuInfo(List<JDXiuColorAndSize> jxcList,List<JDXiuColorAndSize> jxsList) {
+		if(jxcList != null && jxcList.size()>0){
+			//List<JDXiuColorAndSize> jdXiuColorList = getJdXiuSkuInfo(jxcList);
+			List<JDXiuColorAndSize> jdXiuColorList = jxcList;
+			if(jdXiuColorList != null && jdXiuColorList.size()>0){
+				jdXiuSkuInfoServiceBean.insertBatch(jdXiuColorList,10);
+				logger.info("保存的数据颜色");
+			}
+		}
+		
+		if(jxsList != null && jxsList.size()>0){
+			//List<JDXiuColorAndSize> jdXiuSizeList =getJdXiuSkuInfo(jxsList);
+			List<JDXiuColorAndSize> jdXiuSizeList =jxsList;
+			if(jdXiuSizeList != null && jdXiuSizeList.size()>0){
+				jdXiuSkuInfoServiceBean.insertBatch(jdXiuSizeList, 10);
+				logger.info("保存的数据尺寸");
+			}
+		}
+		
+	}
+	
+	public List<JDXiuColorAndSize> getJdXiuSkuInfo(List<JDXiuColorAndSize> jdXiuColoeAndSize){
+		List<JDXiuColorAndSize> list = new ArrayList<JDXiuColorAndSize>();
+		for (JDXiuColorAndSize jdXiuColor : jdXiuColoeAndSize) {
+			boolean isExist = jdXiuSkuInfoServiceBean.isExistJdXiuSku(jdXiuColor);
+			if(!isExist){
+				list.add(jdXiuColor);
+			}
+		}
+		return list;
+	}
+	/**
+	 * 获取excel单元格的信息
+	 * @param sheet
+	 * @param row
+	 * @param rowIndex
+	 * @param index
+	 * @return
+	 */
+	private String getSkuMapInfo(Object sheet,Object row,int rowIndex, int index) {
+		String skuInfo = "";
+		if (sheet instanceof HSSFSheet) {
+			row = ((HSSFSheet) sheet).getRow(rowIndex);
+		}
+		if (sheet instanceof XSSFSheet) {
+			row = ((XSSFSheet) sheet).getRow(rowIndex);
+		}
+		Object cellSku = ImportExcelUtil.getCell(row, index);
+		if(cellSku != null){
+			skuInfo = ImportExcelUtil.getCellValue2(cellSku);
+		}
+		return skuInfo;
+	}
+	
+	/**
+	 * 查询sku列表信息
+	 * @return
+	 */
+	public String skuInfoList(){
+		try{
+			Map<String,Object> paramers = jdSkuInfoForm.getJdSkuInfoForm();
+			List<String> skuIds = new ArrayList<String>();
+			if(this.jdSkuIds != null && !"".equals(jdSkuIds.trim())){
+				String[] skuids = this.jdSkuIds.split("\r\n");
+				for (String skuid : skuids) {
+					skuIds.add(skuid.trim());
+				}
+				paramers.put("jdSkuIds", skuIds);
+			}
+			// 查询京东一级分类
+			if (this.jdCategories == null) {
+				this.jdCategories = categoryService.queryJDCategoryByFid(this.categoryId);
+			}
+			// 第一个分类的id
+			if (this.firstCategoryId != null && this.firstCategoryId > 0) {
+				this.jdCategories2 = categoryService.queryJDCategoryByFid(this.firstCategoryId);
+			}
+	
+			if (this.threeCategoryId != null && this.threeCategoryId > 0) {
+				this.jdCategories3 = categoryService.queryJDCategoryByFid(this.sendCategoryId);
+				paramers.put("cid", this.threeCategoryId);
+			}
+			pageView = new PageView<JDSkuInfo>(this.getPageSize(), this.getCurrentPage());
+			paramers.put("firstNum", pageView.getFirstResult());
+			paramers.put("lastNum", pageView.getMaxresult());
+			QueryResult<JDSkuInfo> qr = jdXiuSkuInfoServiceBean.querySkuInfoList(paramers);
+			pageView.setQueryResult(qr);
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.error(e);
+		}
+		return SUCCESS;
+	}
+	/**
+	 * 通过选择商品复选框删除SKU
+	 * @return
+	 */
+	public String deleteSku(){
+		if(this.delJdSkuIds!= null && !"".equals(delJdSkuIds.trim())){
+			List<String> delSkus = new ArrayList<String>();
+			String[] skuArrays = this.delJdSkuIds.split(",");
+			for (String delSku : skuArrays) {
+				delSkus.add(delSku.trim());
+			}
+			Map<String,List<String>> maps = new HashMap<String, List<String>>();
+			maps.put("jdSkuIds", delSkus);
+			jdXiuSkuInfoServiceBean.deleteSku(maps);
+		}
+		return skuInfoList();
+	}
+	/**
+	 * 通过在文本区域输入商品SKUID删除sku
+	 * @return
+	 */
+	public String deleteSkuBySkuIds(){
+		if(this.jdSkuIds != null && !"".equals(jdSkuIds.trim())){
+			List<String> skuIds = new ArrayList<String>();
+			String[] skuids = this.jdSkuIds.split("\r\n");
+			for (String skuid : skuids) {
+				skuIds.add(skuid.trim());
+			}
+			Map<String,List<String>> maps = new HashMap<String, List<String>>();
+			maps.put("jdSkuIds", skuIds);
+			jdXiuSkuInfoServiceBean.deleteSku(maps);
+		}
+		return skuInfoList();
+	}
+
+	public File getUploadFile() {
+		return uploadFile;
+	}
+
+	public void setUploadFile(File uploadFile) {
+		this.uploadFile = uploadFile;
+	}
+
+	public String getUploadFileFileName() {
+		return uploadFileFileName;
+	}
+
+	public void setUploadFileFileName(String uploadFileFileName) {
+		this.uploadFileFileName = uploadFileFileName;
+	}
+
+	public String getUploadFileContentType() {
+		return uploadFileContentType;
+	}
+
+	public void setUploadFileContentType(String uploadFileContentType) {
+		this.uploadFileContentType = uploadFileContentType;
+	}
+
+	public JdSkuInfoForm getJdSkuInfoForm() {
+		return jdSkuInfoForm;
+	}
+
+	public void setJdSkuInfoForm(JdSkuInfoForm jdSkuInfoForm) {
+		this.jdSkuInfoForm = jdSkuInfoForm;
+	}
+
+	public PageView<JDSkuInfo> getPageView() {
+		return pageView;
+	}
+
+	public void setPageView(PageView<JDSkuInfo> pageView) {
+		this.pageView = pageView;
+	}
+
+	public String getJdSkuIds() {
+		return jdSkuIds;
+	}
+
+	public void setJdSkuIds(String jdSkuIds) {
+		this.jdSkuIds = jdSkuIds;
+	}
+
+	public String getDelJdSkuIds() {
+		return delJdSkuIds;
+	}
+
+	public void setDelJdSkuIds(String delJdSkuIds) {
+		this.delJdSkuIds = delJdSkuIds;
+	}
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public List<JDCategory> getJdCategories() {
+		return jdCategories;
+	}
+
+	public List<JDCategory> getJdCategories2() {
+		return jdCategories2;
+	}
+
+	public List<JDCategory> getJdCategories3() {
+		return jdCategories3;
+	}
+
+	public Integer getFirstCategoryId() {
+		return firstCategoryId;
+	}
+
+	public void setFirstCategoryId(Integer firstCategoryId) {
+		this.firstCategoryId = firstCategoryId;
+	}
+
+	public Integer getSendCategoryId() {
+		return sendCategoryId;
+	}
+
+	public void setSendCategoryId(Integer sendCategoryId) {
+		this.sendCategoryId = sendCategoryId;
+	}
+
+	public Integer getThreeCategoryId() {
+		return threeCategoryId;
+	}
+
+	public void setThreeCategoryId(Integer threeCategoryId) {
+		this.threeCategoryId = threeCategoryId;
+	}
+}

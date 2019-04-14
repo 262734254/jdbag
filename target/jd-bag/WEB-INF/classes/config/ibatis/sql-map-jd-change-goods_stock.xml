@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JdChangeGoodsStockServiceBean">
+	<typeAlias alias="JdChangedGoodsStock" type="com.xiu.jd.bean.ware.JdChangedGoodsStock" />
+
+	<!-- 添加变化库存至本地 -->
+	<insert id="insertBatch" parameterClass="JdChangedGoodsStock">
+	    <selectKey resultClass="long" keyProperty="recordId" > 
+         select seq_jd_changed_goods_stock.nextval as recordId from dual
+        </selectKey>
+        <![CDATA[
+           insert into jd_changed_goods_stock (
+                recordId,
+                skuCode,
+                skuId,
+	            xiuCode,
+	            xiuStock,
+	            jdStock,
+	            updatestatus,
+	            wareId,
+	            createdate
+           )values(
+                seq_jd_changed_goods_stock.currval,
+               	#skuCode#,	
+               	#skuId#,
+               	#xiuCode#,
+               	#xiuStock#,
+               	#jdStock#,
+               	#updateStatus#,
+               	#wareId#,
+			   	sysdate
+           )
+        ]]>
+
+	</insert>
+	<!-- 分页查询需要同步商品库存到京东的商品 -->
+	<select id="getPageResule" parameterClass="java.util.Map"
+		resultClass="JdChangedGoodsStock">
+		<![CDATA[ 
+			select 
+				n.skuCode skuCode,
+				n.skuId skuId,
+				n.xiuCode xiuCode,
+				n.xiuStock xiuStock,
+				n.jdStock jdStock,
+				n.updateStatus updateStatus,
+				n.wareId wareId,
+				n.createdate createdate,
+				n.recordId recordId 
+			from (select m.*,rownum as rn 
+				  from (select t.*,
+			                       row_number() over(partition by t.skuCode order by t.createdate desc) as rown
+			            from jd_changed_goods_stock t where 1=1
+			      ]]>
+		<dynamic>
+			<isNotEmpty prepend="and" property="updateStatus">
+				t.updateStatus <![CDATA[=]]>#updateStatus#
+			</isNotEmpty>
+		</dynamic>
+				<![CDATA[
+					) m where 1=1 
+				]]>
+		<dynamic>
+			<isNotEmpty prepend="and" property="rown">
+				rown = 1 
+		            </isNotEmpty>
+		</dynamic>
+		and rownum <![CDATA[<= ]]>
+		#lastNum#
+		  order by m.recordid asc ) n where 1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="skuCode">
+				n.skuCode <![CDATA[=]]>#skuCode#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="jdWareId">
+				n.wareId <![CDATA[=]]>#jdWareId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="updateStatus">
+				n.updatestatus <![CDATA[=]]>#updateStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="startTime">
+				to_date(n.createdate,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd
+				hh24:mi:ss')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="endTime">
+				to_date(n.createdate,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd
+				hh24:mi:ss')
+			</isNotEmpty>
+		</dynamic>
+			and rn <![CDATA[ >= ]]>#firstNum#
+	</select>
+
+	<select id="getCount" parameterClass="java.util.Map"
+		resultClass="java.lang.Long">
+		select count(*)
+		from (select t.*,
+		row_number() over(partition by t.skuCode order by t.createdate desc) as rown
+		from jd_changed_goods_stock t
+		where t.updatestatus = 0) n
+		where 1 = 1
+		<dynamic>
+			<isNotEmpty prepend="and" property="rown">
+				rown = 1 
+		    </isNotEmpty>
+
+			<isNotEmpty prepend="and" property="skuCode">
+				n.skuCode <![CDATA[=]]>#skuCode#
+			</isNotEmpty>
+
+			<isNotEmpty prepend="and" property="updateStatus">
+				n.updateStatus <![CDATA[=]]>#updateStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="startTime">
+				to_date(k.createdate,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd
+				hh24:mi:ss')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="endTime">
+				to_date(k.createdate,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd
+				hh24:mi:ss')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<update id="update" parameterClass="JdChangedGoodsStock">
+		update jd_changed_goods_Stock t
+
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="xiuCode"
+				removeFirstPrepend="true">
+				t.xiuCode=#xiuCode#
+		 		</isNotEmpty>
+		 	<isNotEmpty prepend="," property="skuCode"
+				removeFirstPrepend="true">
+				t.skuCode=#skuCode#
+		 		</isNotEmpty>
+		 	<isNotEmpty prepend="," property="skuId"
+				removeFirstPrepend="true">
+				t.skuId=#skuId#
+		 		</isNotEmpty>
+			<isNotEmpty prepend="," property="xiuStock"
+				removeFirstPrepend="true">
+				t.xiuStock=#xiuStock#
+		 		</isNotEmpty>
+			<isNotEmpty prepend="," property="jdStock"
+				removeFirstPrepend="true">
+				t.jdStock=#jdStock#
+		 		</isNotEmpty>
+
+			<isNotEmpty prepend="," property="updateStatus"
+				removeFirstPrepend="true">
+				t.updateStatus=#updateStatus#
+		 		</isNotEmpty>
+			<isNotEmpty prepend="," property="wareId"
+				removeFirstPrepend="true">
+				t.wareId=#wareId#
+		 		</isNotEmpty>
+
+		</dynamic>
+		where 1=1
+		<isNotEmpty prepend="and" property="skuId">
+				t.skuId=#skuId#
+		 </isNotEmpty>
+		 
+		<isNotEmpty prepend="and" property="skuCode">
+				t.skuCode=#skuCode#
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="recordId">
+				t.recordId=#recordId#
+		</isNotEmpty>
+
+	</update>
+</sqlMap>

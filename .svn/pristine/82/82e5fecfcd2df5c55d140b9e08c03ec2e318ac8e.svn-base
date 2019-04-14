@@ -1,0 +1,90 @@
+
+
+###################\u5404\u4e2a\u4e2d\u5fc3\u7684\u63a5\u53e3URL\u914d\u7f6e#########################
+
+#\u6e20\u9053\u4e2d\u5fc3 channel    http://channel-web.xiu.com:6080/remoting/inventoryservice
+remote.url.channel=http://channel-web.xiu.com/remoting/inventoryservice
+#\u5546\u54c1\u4e2d\u5fc3 goods  product.xiu.com
+remote.url.goods=http://product.xiu.com/webapp/wcs/stores/hessianService
+
+#remote.url.osc.import=http://osc.xiu.com/remote/fxOrderService
+remote.url.osc.import=http://osc.xiu.com/remote/fxOrderService
+
+remote.url.settlement=http://settle.xiu.com/remote/prodSettlementHessianService
+
+
+
+remote.url.osc.buyerId=10129223841
+remote.url.osc.buyerName=jd@jdbagxiu.com
+remote.url.osc.AppKey=xiufx
+remote.url.osc.AppPwd=0E5D7F7A51659C25440ED2810459072A
+
+################### JDBC \u5c5e\u6027\u914d\u7f6e#########################
+
+#defaultUserManagerHessianServicesUrl=http://cas.xiu.com:4080/remoting/userManagerService
+
+defaultUserManagerHessianServicesUrl=http://cas.xiu.com/remoting/userManagerService
+
+#10.0.0.119 jiangxiang 10.0.0.67 
+goods_center.mq.url=failover:(tcp://10.0.0.119:61616)?maxReconnectDelay=10000
+
+goodsprice_change_queue_name=GoodsPriceChangeTopic
+
+goodsinventory_change_queue_name=inventorySKUChangeTopic
+
+goodsonsale_change_queue_name=ProductObjectModifiedTopic
+
+
+#moile db
+#jdbc.m.url=jdbc:oracle:thin:@192.168.3.106:1521:WCSDB
+#jdbc.m.username=xiu_ebay_jd
+#jdbc.m.password=xiu_ebay_jd
+
+#jdbc.m.url=jdbc:oracle:thin:@10.0.0.79:1526:ORCL
+#jdbc.m.username=xiu_ebay_jd
+#jdbc.m.password=xiu_ebay_jd*testing
+jdbc.m.url=jdbc:oracle:thin:@192.168.3.106:1521:WCSDB
+jdbc.driver.class=oracle.jdbc.driver.OracleDriver
+jdbc.m.username=xiu_jd_bag
+jdbc.m.password=xiu_jd_bag
+jdbc.m.pool.init.size=5
+jdbc.m.pool.max.active=10
+jdbc.m.pool.max.wait=60000
+jdbc.m.idleConnectionTestPeriodInMinutes=0
+jdbc.m.idleMaxAgeInMinutes=60
+jdbc.m.maxConnectionsPerPartition=6
+jdbc.m.minConnectionsPerPartition=0
+jdbc.m.partitionCount=3
+jdbc.m.acquireIncrement=2
+jdbc.m.statementsCacheSize=0
+jdbc.m.releaseHelperThreads=33
+										
+							
+							
+#moile db
+#jdbc.m.url=jdbc:oracle:thin:@10.0.0.79:1526:ORCL
+
+
+
+remote.url.solr=http://solr.xiu.com:3736/solr2/xiu
+
+#image server ip address 119.134.253.45
+#IMG_PREFIX=http://images.xiustatic.com http://img1.xiu.com  images.xiustatic.com
+IMG_PREFIX=http://images.xiustatic.com
+
+IMAGE_PREFIX=http://image.zoshow.com
+_
+IMAGE_SIZE=g1_720_960.jpg
+
+ratio=1
+
+lastNumber=0
+
+storeId=15
+storeName=xiufx
+payType=JDPAY_XIU
+is_activity_price=false
+max_package_fail_count=3
+
+remote.url.image=http://imgmanager.xiu.com:7080/remoting/oriImageCheckHessianService
+remote.url.email=http://email.xiu.com:9080/hessian/emailHessianService

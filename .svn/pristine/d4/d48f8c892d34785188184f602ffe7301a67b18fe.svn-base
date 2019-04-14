@@ -1,0 +1,217 @@
+package com.xiu.jd.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.stereotype.Service;
+
+import com.xiu.jd.bean.page.QueryResult;
+import com.xiu.jd.bean.ware.JDAttribute;
+import com.xiu.jd.bean.ware.JDAttributeValue;
+import com.xiu.jd.bean.ware.JDCategory;
+import com.xiu.jd.bean.ware.XiuCategory;
+import com.xiu.jd.bean.ware.XiuJdAttValue;
+import com.xiu.jd.bean.ware.XiuJdBrand;
+import com.xiu.jd.bean.ware.XiuJdCategory;
+import com.xiu.jd.dao.ware.impl.JDCategoryDaoBean;
+import com.xiu.jd.service.CategoryService;
+import com.xiu.jd.sku.ExportTem;
+import com.xiu.jd.vo.DictVo;
+
+@Service("categoryService") 
+public class CategoryServiceImpl implements CategoryService{
+	
+	@Resource
+	private JDCategoryDaoBean jdCategoryDao;
+	@Resource(name="exportTem")
+	private ExportTem exportTem;
+
+	public List<DictVo> queryXiuCategoryForValueRef()throws Exception{
+		return jdCategoryDao.queryXiuCategoryForValueRef();
+	}
+	
+	public List<DictVo> queryXiuAttrForValueRef(String cid)throws Exception{
+		return jdCategoryDao.queryXiuAttrForValueRef(cid);
+	}
+	
+	public List<DictVo> queryXiuAttrValueForValueRef(String aid)throws Exception{
+		return jdCategoryDao.queryXiuAttrValueForValueRef(aid);
+	}
+	
+	public List<XiuJdCategory> queryXiuJdCategory(XiuJdCategory xiuJdCategory)throws Exception{
+		return jdCategoryDao.queryXiuJdCategory(xiuJdCategory);
+	}
+	
+	public void deleteXiuJdCategory(Integer id)throws Exception{
+		jdCategoryDao.delXiuJdCategory(id);
+	}
+	
+	public void updateXiuJdCategory(XiuJdCategory xiuJdCategory)throws Exception{
+		jdCategoryDao.updateXiuJdCategory(xiuJdCategory);
+	}
+	
+	public XiuJdCategory getXiuJdCategory(Integer id)throws Exception{
+		return jdCategoryDao.getXiuJdCategory(id);
+	}
+	
+	public QueryResult<XiuJdCategory> getXiuJdCategoryPageResule(XiuJdCategory xiuJdCategory,int pageNum,int pageSize)throws Exception{
+		return jdCategoryDao.getXiuJdCategoryPageResule(xiuJdCategory,pageNum,pageSize);
+	}
+	
+	public void insertXiuJdCategory(List<XiuJdCategory> list)throws Exception{
+		jdCategoryDao.insertXiuJdCategory(list);  
+	}
+	
+	public List<XiuCategory> queryXiuCategory(XiuCategory xiuCategory)throws Exception{
+		return jdCategoryDao.queryXiuCategory(xiuCategory);
+	}
+	
+	/**
+	 * 查询子类目
+	 * @return
+	 * @throws Exception
+	 */
+	public List<JDCategory> queryJDCategoryByFid(Integer fid)throws Exception{
+		return jdCategoryDao.queryJDCategoryByFid(fid);
+	}
+	
+	public Integer queryJDCategoryMaxLev() throws Exception{
+		return jdCategoryDao.queryJDCategoryMaxLev();
+	}
+	
+	public void deleteAll() throws Exception{
+		jdCategoryDao.deleteAll();
+	}
+	
+	/**
+	 * 查询所有类目
+	 * @return
+	 * @throws Exception
+	 */
+	public List<JDCategory> queryJDCategory()throws Exception{
+		return jdCategoryDao.queryJDCategory();
+	}
+	
+	/**
+	 * 根据类目ID查询属性信息
+	 * @param cid
+	 * @return
+	 * @throws Exception
+	 */
+	public List<JDAttribute> queryJDAttributeByCid(String cid)throws Exception{
+		return jdCategoryDao.queryJDAttributeByCid(cid);
+	}
+	
+	/**
+	 * 根据属性ID查询属性值信息
+	 * @param aid
+	 * @return
+	 * @throws Exception
+	 */
+	public List<JDAttributeValue> queryJDAttrValueByAid(Long aid)throws Exception{
+		return jdCategoryDao.queryJDAttrValueByAid(aid);
+	}
+	
+	public void deleteXiuJdAttValue(Integer id)throws Exception{
+		jdCategoryDao.delXiuJdAttValue(id);
+	}
+	
+	public void updateXiuJdAttValue(XiuJdAttValue xiuJdAttValue)throws Exception{
+		jdCategoryDao.updateXiuJdAttValue(xiuJdAttValue);
+	}
+	
+	public XiuJdAttValue getXiuJdAttValue(Integer id)throws Exception{
+		return jdCategoryDao.getXiuJdAttValue(id);
+	}
+	
+	public QueryResult<XiuJdAttValue> getXiuJdAttValuePageResule(
+			XiuJdAttValue xiuJdAttValue, int pageNum, int pageSize)
+			throws Exception{
+		return jdCategoryDao.getXiuJdAttValuePageResule(xiuJdAttValue, pageNum, pageSize);
+	}
+	
+	@Override
+	public int updateBrandByJdCid(XiuJdBrand brand) {
+		return jdCategoryDao.updateBrandByJdCid(brand);
+	}
+	
+	public void insertXiuJdAttValue(List<XiuJdAttValue> list)throws Exception{
+		jdCategoryDao.insertXiuJdAttValue(list);
+	}
+	
+	public QueryResult<XiuJdBrand> getXiuJdBrandPageResule(
+			XiuJdBrand xiuJdBrand, int pageNum, int pageSize)
+			throws Exception{
+		return jdCategoryDao.getXiuJdBrandPageResule(xiuJdBrand, pageNum, pageSize);
+	}
+	@Override
+	public JDCategory getJdCategoryById(int categoryId) throws Exception {
+		return jdCategoryDao.getEntityById(categoryId);
+	}
+	
+	public void insertXiuJdBrand(List<XiuJdBrand> list)throws Exception{
+		 jdCategoryDao.insertXiuJdBrand(list);
+	}
+	
+	public void deleteXiuJdBrand(Integer id)throws Exception{
+		jdCategoryDao.deleteXiuJdBrand(id);
+	}
+	
+	public QueryResult<XiuJdBrand> getXiuBrandPageResule(
+			XiuJdBrand xiuJdBrand, int pageNum, int pageSize)
+			throws Exception{
+		return jdCategoryDao.getXiuBrandPageResule(xiuJdBrand, pageNum, pageSize);
+	}
+
+	@Override
+	public int batchDeleteAttri(Map<String, Object> parames) {
+	      return jdCategoryDao.batchDeleteAttri(parames);
+	}
+	@Override
+	public int batchDeleteBrand(Map<String, Object> parames) {
+		 return jdCategoryDao.batchDeleteBrand(parames);
+	}
+	
+	
+	@Override
+	public void createWb(HSSFWorkbook wb, Map<String, List<JDAttributeValue>> map,String jdCid) {
+		exportTem.createJDAttrWb(wb,map,jdCid);
+	}
+	@Override
+	public String queryXiuBrand2(List<XiuJdBrand> list) throws Exception {
+	   return jdCategoryDao.queryXiuBrand2(list);
+	}
+
+	@Override
+	public List<XiuJdAttValue> queryXiuJdAttValue(Map<String,Object> maps) {
+		return jdCategoryDao.queryXiuJdAttValue(maps);
+	}
+
+	@Override
+	public boolean isExistXiuJdCategory(XiuJdCategory xiuJdCategory) {
+		return jdCategoryDao.isExistXiuJdCategory(xiuJdCategory);
+	}
+
+	@Override
+	public boolean isExistXiuJdValue(XiuJdAttValue xiuJdAttValue) {
+		return jdCategoryDao.isExistXiuJdValue(xiuJdAttValue);
+	}
+
+	
+
+	
+
+
+
+
+
+
+
+
+	
+}

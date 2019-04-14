@@ -1,0 +1,45 @@
+package com.xiu.jd.service.ware.impl;
+
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.xiu.jd.bean.page.QueryResult;
+import com.xiu.jd.bean.ware.JdSkuIdSyn;
+import com.xiu.jd.dao.ware.JdSkuIdSynDao;
+import com.xiu.jd.service.ware.JdSkuIdSynService;
+
+@Service("jdSkuIdSynServiceBean")
+public class JdSkuIdSynServiceBean  implements
+		JdSkuIdSynService {
+	
+	@Resource(name="jdSkuIdSynDaoBean")
+	private JdSkuIdSynDao<JdSkuIdSyn>  jdSkuIdSynDaoBean;
+	@Override
+	public JdSkuIdSyn insertJdSkuIdSynService(JdSkuIdSyn entity){
+		
+		return jdSkuIdSynDaoBean.insert(entity);
+	}
+	@Override
+	public JdSkuIdSyn insertEbayJdSkuIdSynService(JdSkuIdSyn entity){
+		
+		return jdSkuIdSynDaoBean.insertEbay(entity);
+	}
+	@Override
+	public JdSkuIdSyn insertXiuJdSkuIdSynService(JdSkuIdSyn entity){
+		
+		return jdSkuIdSynDaoBean.insertXiu(entity);
+	}
+	@Override
+	public QueryResult<JdSkuIdSyn> getPageResule(Map<String, Object> parames) {
+		return jdSkuIdSynDaoBean.getPageResule(parames);
+	}
+	@Override
+	public int deleteById(String wareId) {
+		return jdSkuIdSynDaoBean.deleteById(wareId);
+	}
+
+	
+}

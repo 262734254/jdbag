@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JdSkuIdSynDaoBean">
+    
+    <typeAlias alias="JdSkuIdSyn" type="com.xiu.jd.bean.ware.JdSkuIdSyn"/>
+
+    
+    <insert id="insert" parameterClass="JdSkuIdSyn">
+        <![CDATA[
+           insert into xiu_jd_bag.jd_skuid_syn (
+	           jdWareId
+           )values(
+              
+	           #jdWareId#
+           )
+        ]]>
+        
+    </insert>
+    
+    <insert id="insertXiu" parameterClass="JdSkuIdSyn">
+        <![CDATA[
+           insert into xiu_jd.jd_skuid_syn (
+	           jdWareId
+           )values(
+              
+	           #jdWareId#
+           )
+        ]]>
+        
+    </insert>
+    
+    <insert id="insertEbay" parameterClass="JdSkuIdSyn">
+        <![CDATA[
+           insert into xiu_ebay_jd.jd_skuid_syn (
+	           jdWareId
+           )values(
+              
+	           #jdWareId#
+           )
+        ]]>
+        
+    </insert>
+    
+	 <insert id="insertBatch" parameterClass="JdSkuIdSyn">
+		   <![CDATA[
+           insert into xiu_jd_bag.jd_skuid_syn (
+	           jdWareId
+           )values(
+              
+	           #jdWareId#
+           )
+        ]]>
+	    
+	</insert>
+	
+	 <select id="getPageResule" parameterClass="java.util.Map" resultClass="JdSkuIdSyn">
+	  select 
+		  e.jdwareid jdWareId
+     from(
+      select k.*,rownum as rn from (
+            select t.jdwareid from xiu_jd_bag.jd_skuid_syn  t  where 1=1 
+          <dynamic>
+     		<isNotEmpty prepend="and" property="jdWareId"> 
+            t.jdwareid <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+           </dynamic>   
+            
+     ) k where rownum <![CDATA[<= ]]> #lastNum#
+     ) e where rn <![CDATA[ >=]]>  #firstNum#
+	     
+	 </select>
+	 
+	 <select id="getCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+	    <![CDATA[ 
+	    select count(t.jdwareid) from xiu_jd_bag.jd_skuid_syn  t
+	    where 1=1
+	    ]]>
+	    <dynamic>
+     		<isNotEmpty prepend="and" property="jdWareId"> 
+            t.jdwareid <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+          </dynamic>   
+           
+	    </select>
+	    
+	 
+	 <delete id="deleteById" parameterClass="java.lang.String">
+	     
+	      delete from xiu_jd_bag.jd_skuid_syn  t where t.jdwareid=#wareId#
+	 </delete>
+	    
+</sqlMap>

@@ -1,0 +1,421 @@
+package com.xiu.jd.dao.ware.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Repository;
+
+import com.xiu.jd.bean.page.QueryResult;
+import com.xiu.jd.bean.ware.JDAttribute;
+import com.xiu.jd.bean.ware.JDAttributeValue;
+import com.xiu.jd.bean.ware.JDCategory;
+import com.xiu.jd.bean.ware.XiuCategory;
+import com.xiu.jd.bean.ware.XiuJdAttValue;
+import com.xiu.jd.bean.ware.XiuJdBrand;
+import com.xiu.jd.bean.ware.XiuJdCategory;
+import com.xiu.jd.dao.BaseDaoImpl;
+import com.xiu.jd.vo.DictVo;
+
+@Repository("jdCategoryDaoBean")
+public class JDCategoryDaoBean extends BaseDaoImpl<JDCategory>{
+	
+	/**
+	 * 查询京东-走秀类目映射
+	 * @param xiuJdCategory
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<XiuJdCategory> queryXiuJdCategory(XiuJdCategory xiuJdCategory)throws Exception{
+		return getSqlMapClientTemplate().queryForList("JDCategoryDaoBean.queryXiuJdCategory",xiuJdCategory);
+	}
+	
+	/**
+	 * 删除京东-走秀类目映射
+	 * @param id
+	 * @throws Exception
+	 */
+	public void delXiuJdCategory(Integer id)throws Exception{
+		getSqlMapClientTemplate().delete("JDCategoryDaoBean.delXiuJdCategory",id);
+	}
+	
+	/**
+	 * 更新京东-走秀类目映射
+	 * @param xiuJdCategory
+	 * @throws Exception
+	 */
+	public void updateXiuJdCategory(XiuJdCategory xiuJdCategory)throws Exception{
+		getSqlMapClientTemplate().update("JDCategoryDaoBean.updateXiuJdCategory",xiuJdCategory);
+	}
+	
+	@Override
+	public void deleteAll() {
+		this.getSqlMapClientTemplate().delete("JDCategoryDaoBean.deleteAll");
+		
+	}
+	
+	/**
+	 * 根据id获取京东-走秀类目映射
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public XiuJdCategory getXiuJdCategory(Integer id)throws Exception{
+		
+		return (XiuJdCategory) getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.getXiuJdCategory",id);
+	}
+	
+	/**
+	 * 分布查询京东-走秀类目映射
+	 * @param xiuJdCategory
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public QueryResult<XiuJdCategory> getXiuJdCategoryPageResule(
+			XiuJdCategory xiuJdCategory, int pageNum, int pageSize)
+			throws Exception {
+		QueryResult<XiuJdCategory> qr = new QueryResult<XiuJdCategory>();
+		List<XiuJdCategory> lists = getSqlMapClientTemplate().queryForList(
+				"JDCategoryDaoBean.queryXiuJdCategory2", xiuJdCategory, (pageNum - 1)*pageSize,
+				pageSize);
+		qr.setResultlist(lists);
+		qr.setTotalrecord(queryXiuJdCategoryCount(xiuJdCategory));
+		return qr;
+	}
+	
+	/**
+	 * 获取京东-走秀类目映射数量
+	 * @param xiuJdCategory
+	 * @return
+	 * @throws Exception
+	 */
+	public long queryXiuJdCategoryCount(XiuJdCategory xiuJdCategory)throws Exception{
+		return (Long) getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.queryXiuJdCategoryCount",xiuJdCategory);
+	}
+	
+	/**
+	 * 插入京东-走秀类目映射
+	 * @param list
+	 * @throws Exception
+	 */
+	public void insertXiuJdCategory(List<XiuJdCategory> list)throws Exception{
+		for (XiuJdCategory xiuJdCategory : list) {
+			XiuJdCategory bean = (XiuJdCategory) getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.queryXiuJdCategory",xiuJdCategory);
+			if(bean == null){
+				getSqlMapClientTemplate().insert("JDCategoryDaoBean.insertXiuJdCategory",xiuJdCategory);
+			}
+		}
+	}
+	
+	/**
+	 * 查询本地类目
+	 * @param xiuCategory
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<XiuCategory> queryXiuCategory(XiuCategory xiuCategory)throws Exception{
+		return getSqlMapClientTemplate().queryForList("JDCategoryDaoBean.queryXiuCategory",xiuCategory);
+	}
+	
+	/**
+	 * 获取京东类目层次深度
+	 * @return
+	 * @throws Exception
+	 */
+	public Integer queryJDCategoryMaxLev()throws Exception{
+		return (Integer) getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.queryJDCategoryMaxLev");
+	}
+	
+	/**
+	 * 查询子类目
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<JDCategory> queryJDCategoryByFid(Integer fid)throws Exception{
+		return getSqlMapClientTemplate().queryForList("JDCategoryDaoBean.queryJDCategoryByFid",fid);
+	}
+	
+	/**
+	 * 查询所有类目
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<JDCategory> queryJDCategory()throws Exception{
+		return getSqlMapClientTemplate().queryForList("JDCategoryDaoBean.queryJDCategory");
+	}
+	
+	/**
+	 * 根据类目ID查询属性信息
+	 * @param cid
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<JDAttribute> queryJDAttributeByCid(String cid)throws Exception{
+		return getSqlMapClientTemplate().queryForList("JDCategoryDaoBean.queryJDAttributeByCid",cid);
+	}
+	
+	/**
+	 * 根据属性ID查询属性值信息
+	 * @param aid
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<JDAttributeValue> queryJDAttrValueByAid(Long aid)throws Exception{
+		return getSqlMapClientTemplate().queryForList("JDCategoryDaoBean.queryJDAttrValueByAid",aid); 
+	}
+	
+	/**
+	 * 插入类目信息
+	 * @param list
+	 * @throws Exception
+	 */
+	public void insertJDCategorys(List<JDCategory> list)throws Exception{
+		for (JDCategory bean : list) {
+			JDCategory cur = (JDCategory) super.getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.getJDCategory",bean.getId());
+			if(cur == null){
+				super.getSqlMapClientTemplate().insert("JDCategoryDaoBean.insertJDCategory", bean);
+			}
+		}
+	}
+	
+	/**
+	 * 插入类目属性信息
+	 * @param bean
+	 * @throws Exception
+	 */
+	public void insertJDAttributes(List<JDAttribute> list)throws Exception{
+		for (JDAttribute bean : list) {
+			JDAttribute cur = (JDAttribute) super.getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.getJDAttribute",bean.getAid());
+			if(cur == null){
+				super.getSqlMapClientTemplate().insert("JDCategoryDaoBean.insertJDAttribute", bean);
+			}
+		}
+	}
+	
+	/**
+	 * 插入类目属性值信息
+	 * @param bean
+	 * @throws Exception
+	 */
+	public void insertJDAttributeValues(List<JDAttributeValue> list)throws Exception{
+		for (JDAttributeValue bean : list) {
+			/*JDAttributeValue cur = (JDAttributeValue) super.getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.getJDAttributeValue",bean.getVid());
+			if(cur == null){
+				
+			}*/
+			super.getSqlMapClientTemplate().insert("JDCategoryDaoBean.insertJDAttributeValue", bean);
+		}
+	}
+	
+	/**
+	 *  查询走秀属性值对应中的类目
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<DictVo> queryXiuCategoryForValueRef()throws Exception{
+		return getSqlMapClientTemplate().queryForList("JDCategoryDaoBean.queryXiuCategoryForValueRef");
+	}
+	
+	/**
+	 * 查询走秀属性值对应中的属性
+	 * @param cid
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<DictVo> queryXiuAttrForValueRef(String cid)throws Exception{
+		return getSqlMapClientTemplate().queryForList("JDCategoryDaoBean.queryXiuAttrForValueRef",cid);
+	}
+	
+	/**
+	 * 查询走秀属性值
+	 * @param aid
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<DictVo> queryXiuAttrValueForValueRef(String aid)throws Exception{
+		return getSqlMapClientTemplate().queryForList("JDCategoryDaoBean.queryXiuAttrValueForValueRef",aid);
+	}
+	
+	/**
+	 * 删除走秀-京东属性值映射
+	 * @param id
+	 * @throws Exception
+	 */
+	public void delXiuJdAttValue(Integer id)throws Exception{
+		getSqlMapClientTemplate().delete("JDCategoryDaoBean.delXiuJdAttValue",id);
+	}
+	
+	/**
+	 * 更新走秀-京东属性值映射
+	 * @param xiuJdAttValue
+	 * @throws Exception
+	 */
+	public void updateXiuJdAttValue(XiuJdAttValue xiuJdAttValue)throws Exception{
+		getSqlMapClientTemplate().update("JDCategoryDaoBean.updateXiuJdAttValue",xiuJdAttValue);
+	}
+	
+	/**
+	 * 根据id获取走秀-京东属性值映射
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public XiuJdAttValue getXiuJdAttValue(Integer id)throws Exception{
+		return (XiuJdAttValue) getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.getXiuJdAttValue",id);
+	}
+	
+	/**
+	 * 分页查询走秀-京东属性值映射
+	 * @param xiuJdCategory
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public QueryResult<XiuJdAttValue> getXiuJdAttValuePageResule(
+			XiuJdAttValue xiuJdAttValue, int pageNum, int pageSize)
+			throws Exception {
+		QueryResult<XiuJdAttValue> qr = new QueryResult<XiuJdAttValue>();
+		List<XiuJdAttValue> lists = getSqlMapClientTemplate().queryForList(
+				"JDCategoryDaoBean.queryXiuJdAttValue", xiuJdAttValue, (pageNum - 1)*pageSize,
+				pageSize);
+		qr.setResultlist(lists);
+		qr.setTotalrecord(queryXiuJdAttValueCount(xiuJdAttValue));
+		return qr;
+	}
+	
+	/**
+	 * 获取查询走秀-京东属性值映射
+	 * @param xiuJdAttValue
+	 * @return
+	 * @throws Exception
+	 */
+	public long queryXiuJdAttValueCount(XiuJdAttValue xiuJdAttValue)throws Exception{
+		return (Long) getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.queryXiuJdAttValueCount",xiuJdAttValue);
+	}
+	
+	/**
+	 * 添加分页查询走秀-京东属性值映射
+	 * @param list
+	 * @throws Exception
+	 */
+	public void insertXiuJdAttValue(List<XiuJdAttValue> list)throws Exception{
+		for (XiuJdAttValue xiuJdAttValue : list) {
+			getSqlMapClientTemplate().insert("JDCategoryDaoBean.insertXiuJdAttValue",xiuJdAttValue);
+		}
+	}
+	
+	/**
+	 * 分布查询京东-走秀品牌映射
+	 * @param xiuJdBrand
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public QueryResult<XiuJdBrand> getXiuJdBrandPageResule(
+			XiuJdBrand xiuJdBrand, int pageNum, int pageSize)
+			throws Exception {
+		QueryResult<XiuJdBrand> qr = new QueryResult<XiuJdBrand>();
+		List<XiuJdBrand> lists = getSqlMapClientTemplate().queryForList(
+				"JDCategoryDaoBean.queryXiuJdBrand", xiuJdBrand, (pageNum - 1)*pageSize,
+				pageSize);
+		qr.setResultlist(lists);
+		qr.setTotalrecord((Long)getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.queryXiuJdBrandCount",xiuJdBrand));
+		return qr;
+	}
+	
+	public void insertXiuJdBrand(List<XiuJdBrand> list)throws Exception{
+		for (XiuJdBrand xiuJdBrand :list) {
+			XiuJdBrand bean = (XiuJdBrand) getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.queryXiuBrand2", xiuJdBrand);
+			if(bean==null){
+				getSqlMapClientTemplate().insert("JDCategoryDaoBean.insertXiuJdBrand",xiuJdBrand);
+			}
+		}
+	}
+	
+	public String queryXiuBrand2(List<XiuJdBrand> list) throws Exception{
+		String message="";
+		for (XiuJdBrand xiuJdBrand :list) {
+			XiuJdBrand bean = (XiuJdBrand) getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.queryXiuBrand2", xiuJdBrand);
+			if(bean!=null){
+				message= "走秀品牌编码："+bean.getXiuBrandCode()+",走秀品牌名称："+bean.getXiuBrandName()+"已经映射</br>";
+			}
+		}
+		return message;
+	}
+	
+	public int batchDeleteAttri(Map<String, Object> parames) {
+		return getSqlMapClientTemplate().delete("JDCategoryDaoBean.batchDeleteAttri", parames);
+	}
+	
+	public int batchDeleteBrand(Map<String, Object> parames) {
+		return getSqlMapClientTemplate().delete("JDCategoryDaoBean.batchDeleteBrand", parames);
+	}
+	
+	public void deleteXiuJdBrand(Integer id)throws Exception{
+		getSqlMapClientTemplate().delete("JDCategoryDaoBean.deleteXiuJdBrand",id);
+	}
+	/**
+	 * 
+	 * 更新jd_xiu_brand表通过京东第三级类目ID
+	 * @param brand
+	 * @return
+	 */
+	public int updateBrandByJdCid(XiuJdBrand brand) {
+		return this.getSqlMapClientTemplate().update("JDCategoryDaoBean.updateBrandByJdCid",brand);
+	}
+	@SuppressWarnings("unchecked")	
+	public QueryResult<XiuJdBrand> getXiuBrandPageResule(
+			XiuJdBrand xiuJdBrand, int pageNum, int pageSize)
+			throws Exception {
+		QueryResult<XiuJdBrand> qr = new QueryResult<XiuJdBrand>();
+		List<XiuJdBrand> lists = getSqlMapClientTemplate().queryForList(
+				"JDCategoryDaoBean.queryXiuBrand", xiuJdBrand, (pageNum - 1)*pageSize,
+				pageSize);
+		qr.setResultlist(lists);
+		qr.setTotalrecord((Long)getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.queryXiuBrandCount",xiuJdBrand));
+		return qr;
+	}
+	@SuppressWarnings("unchecked")
+	public List<XiuJdAttValue> queryXiuJdAttValue(Map<String,Object> maps){
+		List<XiuJdAttValue> lists = getSqlMapClientTemplate().queryForList("JDCategoryDaoBean.queryXiuJdAttValue2", maps);
+		return lists;
+	}
+
+	public boolean isExistXiuJdCategory(XiuJdCategory xiuJdCategory) {
+		Object obj = this.getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.isExistXiuJdCategory",xiuJdCategory);
+		if(obj==null){
+			return false;
+		}
+		int count=Integer.valueOf(obj.toString());
+		return count>=1?true:false;
+	}
+
+	public boolean isExistXiuJdValue(XiuJdAttValue xiuJdAttValue) {
+		Object obj = this.getSqlMapClientTemplate().queryForObject("JDCategoryDaoBean.isExistXiuJdValue",xiuJdAttValue);
+		if(obj==null){
+			return false;
+		}
+		int count=Integer.valueOf(obj.toString());
+		return count>=1?true:false;
+	}
+	
+
+	
+
+	
+}

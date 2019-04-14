@@ -1,0 +1,207 @@
+package com.xiu.jd.service.ware;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
+import com.xiu.jd.bean.page.QueryResult;
+import com.xiu.jd.bean.ware.JDAttributeValue;
+import com.xiu.jd.bean.ware.JDProduct;
+import com.xiu.jd.bean.ware.JDSku;
+import com.xiu.jd.bean.ware.JDWareAndSkuInfo;
+import com.xiu.jd.bean.ware.JDWareSkuBrand;
+import com.xiu.jd.bean.ware.OnLineBlackProductBean;
+import com.xiu.jd.bean.ware.ProductAttributeInfoModel;
+import com.xiu.jd.bean.ware.XOPBaseCategory;
+
+
+
+public interface JDWareService{
+
+    /**
+     * @param request 
+     * @param solrXiuSns 搜索xiuSn表达式
+     * @param productXiuCodes 商品xiuSn表达式
+     * @param rownum 从Excle中读取的行数
+     * @param userName 导入Excel的用户名
+     * @param 导入Excel的批次号
+     */
+	public String insertProductAndSKU(HttpServletRequest request,String solrXiuSns,String productXiuCodes ,int rownum,String userName,long batchNum) throws Exception;
+	
+	 /**分页查询日志**/
+	 public  QueryResult<JDWareAndSkuInfo> getPageResule(Map<String, Object> parames);
+	 
+	 /**查询商品信息**/
+	 public  JDProduct queryWareInfo(Map<String, Object> parames);
+	 /**查询商品sku信息**/
+	 public List<JDSku> querySkuInfo(Map<String, Object> parames);
+	 
+	 /**查询商品分类信息信息**/
+	 public XOPBaseCategory  queryXopCategory(Map<String, Object> parames);
+	 
+	 /**查询商品属性信息**/
+//	 public Map<Map<String,String>,Map<String,List<Map<String,JDAttributeValue>>>> queryAttrbuteInfo(Map<String, Object> parames);
+	 public Map<Map<String,String>,Map<String,List<JDAttributeValue>>> queryAttrbuteInfo(Map<String, Object> parames);
+	 public String findResultString(Map<String,Object> parames); 
+	 
+	 public void deleteAllProduct();
+	 
+	 public String addWare(JDProduct product,List<JDSku> skuInfoList);
+	 /**
+	  * 查询商品并锁住该商品,不让别的用户进行修改过
+	  * @param parames
+	  * @param userName
+	  * @param flag
+	  * @return
+	  */
+	 
+	 public JDProduct queryWareInfoAndLockWareObject(Map<String, Object> parames,String userName,String flag);
+	 
+		/**
+		 *  从商品中心查询商品的属性信息
+		 * @param partNumbers 商品走秀码
+		 * @return
+		 */
+		public List<ProductAttributeInfoModel> findProductAttributeList(List<String> partNumbers );
+	 
+	 /**
+	 * 走秀码是否在本地数据库在存在
+	 * @param xiuCode
+	 * @return  true:本地不存在,false本地存在
+	 */
+    public boolean xiuCodeIsExistsNation(String xiuCode);
+    
+    /**
+	 * 京东商品是否在本地数据库在存在
+	 * @param wareId 京东商品ID
+	 * @return  true:本地不存在,false本地存在
+	 */
+    public boolean wareIdIsExistsNation(String wareId);
+    
+    
+    /**根据走秀码根系商品价格(本地数据库jd_product_info表)**/
+    public int updateJdProductPrice(Map<String, Object> parames);
+	 /**根据实体ID查询**/
+	 public JDProduct getProductById(String xiuCode);
+	 /**更新实体**/
+	 public int updateJDProduct(JDProduct jdProduct);
+
+	 /***
+	  * 根据走秀码删除商品已经商品底下的SKU信息
+	  * @param xiucodes
+	  * @return
+	  */
+	 public int deleteWareInfoAndXiuSnByXiuCodes(List<String> xiucodes);
+	 
+	 
+	 public int deleteNationProductByWareId(String wareId);
+	 
+	 /**根据商品信息模板导出sku模板**/
+	 public String importTemWare(String jdCid,String skuCode,Map<String,List<String>>attrMap);
+
+	  /**根据走秀码查询对应的京东ID**/
+	 public List<JDProduct> queryWardIdsByXiuCodes(Map<String, Object> parames);
+	  /**根据京东商品ID查询对应的走秀码**/
+	 public List<JDProduct> queryXiuCodesByWardIds(Map<String, Object> parames);
+	 /**
+	  * 更新商品上下架状态 
+	  * @param productParmes
+	  * @return
+	  */
+	 public int updateProductOnline(Map<String, Object> productParmes);
+	 public void updateProductOnlineBatch( final List<JDProduct> jdProducts,  final int batchSize);
+	 
+		
+	public void updateProduct(JDProduct jdProduct);
+	
+	/**
+	 * 
+	 * @param xiuCode 走秀码
+	 * @param wareId  京东商品 ID
+	 * @param synStatus 是否同步给京东商品 0:否 ,1是
+	 */
+	public String deleteXiuProductAndJdProduct(String xiuCode, String wareId,
+				int synStatus);
+	 
+	 /**导入京东商品**/
+	 public String addJdProduct(HttpServletRequest request,Map<JDProduct,Map<String,List<String>>> jdMap);
+	 
+	 /**推送商品**/
+	 public String pushWare(String jdCid,List<JDSku> skuList);
+	 /**查询商品信息，sku信息以及走秀品牌**/
+	 public List<JDWareSkuBrand> queryWareSkuBrand(Map<String,Object> maps);
+
+	public void createWareSkuBrand(HSSFWorkbook wb, List<JDWareSkuBrand> lists);
+	/**查询京东类目下是否存在品牌**/
+	public boolean jdBrandIsExist(String trim);
+
+	public String updateWareInfo(JDProduct product, List<JDSku> skuList);
+
+
+
+	
+    public String getJdProductMainPic(String jdWareId);
+    /**批量更新商品信息**/
+	public void updateJdProductBatch(List<JDProduct> jdProductList, int size);
+
+	/**根据商品ID查询商品**/
+	public JDProduct getJdProductByWareId(String wareId) throws Exception;
+	
+	
+   /**
+    * 分页导出商品数据
+    * @param parames
+    * @return
+    */
+	public QueryResult<JDWareSkuBrand> queryWareSkuBrandPage(Map<String, Object> parames);
+
+  public void createWareSkuBrandPage(HSSFWorkbook wb, List<JDWareSkuBrand> lists,
+		int i, int total);
+
+ /**
+  * 获取商品通过走秀码
+  * @param xiuCode 走秀码
+  * @return
+  */
+public JDProduct getProductByXiuCode(String xiuCode);
+
+/**
+ * 获取商品信息
+ * @param parames
+ * @param userName
+ * @param flag
+ * @return
+ */
+public JDProduct queryWareInfoAndLockWareObjects(Map<String, Object> parames,
+		String userName, String flag);
+
+/**
+ * 根据走秀码，查询商品总库存
+ * @param  xiuCode
+ * @return
+ */
+public String getProductTotalStockNum(String xiuCode);
+
+/**
+ * 根据京东商品ID，查询商品总库存
+ * @param  xiuCode
+ * @return
+ */
+public String getProductTotalStockNumByWareId(String wareId);
+
+/**
+ * 导出不对接上下架黑名单商品
+ * @param wb
+ * @param productBeans
+ *  @return 对应Excle工作表的索引
+ */
+public int writeDataToExcel(HSSFSheet sheet, int rowIndex,
+		List<OnLineBlackProductBean> productBeans);
+	
+
+	
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JDBatchNumDaoBean">
+    
+    <typeAlias alias="JDBatchNum" type="com.xiu.jd.bean.ware.JDBatchNum"/>
+
+    <select id="getBatchNum" resultClass="java.lang.Long">
+        select num from jd_batch_num 
+    </select>
+   
+    <update id="update" parameterClass="JDBatchNum">
+        update jd_batch_num t
+        set t.num=t.num+#num#
+        
+    </update>
+    
+	 
+</sqlMap>

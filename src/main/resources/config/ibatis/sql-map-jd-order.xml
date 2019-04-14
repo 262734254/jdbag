@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JDOrderTrackDaoBean">
+    
+    <typeAlias alias="JDOrderTrack" type="com.xiu.jd.bean.ware.JDOrderTrack"/>
+    <!-- 根据jdOrderId获取 JDOrderTrack-->
+    <select id="getJDOrderTrack" resultClass="JDOrderTrack" parameterClass="String">
+    	<![CDATA[
+    	SELECT jdOrderId 		jdOrderId,
+		       localOrderId 	localOrderId,
+		       placeTime 		placeTime,
+		       placeResult 		placeResult,
+		       orderCode        orderCode
+		       FROM JD_ORDER_TRACK WHERE jdOrderId= #jdOrderId#
+     	]]>
+    </select>
+
+    <!-- 根据条件获取 所有JDOrderTrack-->
+    <select id="queryJDOrderTrack" resultClass="JDOrderTrack" parameterClass="JDOrderTrack">
+    	<![CDATA[
+    	SELECT jdOrderId 		jdOrderId,
+		       localOrderId 	localOrderId,
+		       placeTime 		placeTime,
+		       placeResult 		placeResult,
+		       orderCode        orderCode
+		       FROM JD_ORDER_TRACK where 1=1
+     	]]>
+     		<isNotEmpty property="placeResult" prepend="AND">
+     			placeResult=#placeResult#
+     		</isNotEmpty>
+    </select>
+
+    <insert id="insertJDOrderTrack" parameterClass="JDOrderTrack">
+        <![CDATA[
+           insert into JD_ORDER_TRACK (
+	           jdOrderId,
+		       localOrderId,
+		       placeTime,
+		       placeResult
+           )values(
+               #jdOrderId#,
+		       #localOrderId#,
+		       #placeTime#,
+		       #placeResult#
+		     
+           )
+        ]]>
+    </insert>
+   <!-- 批量保存数据 -->
+  <insert id="insertBatch" parameterClass="JDOrderTrack">
+        <![CDATA[
+           insert into JD_ORDER_TRACK (
+	           jdOrderId,
+		       localOrderId,
+		       placeTime,
+		       placeResult,
+		       mobile,
+		       packageFailCount
+		      
+           )values(
+               #jdOrderId#,
+		       #localOrderId#,
+		       #placeTime#,
+		       #placeResult#,
+		       #mobile#,
+		       #packageFailCount#
+           )
+        ]]>
+    </insert>
+    
+    <update id="updateJDOrderTrack" parameterClass="JDOrderTrack">
+        UPDATE JD_ORDER_TRACK 
+                SET
+				   localOrderId=#localOrderId#,	
+				   placeTime=#placeTime#,   	
+				   placeResult=#placeResult#,
+				   orderCode=#orderCode#,
+				   failDescri=#failDescri#
+         WHERE jdOrderId=#jdOrderId#
+    </update>
+    
+    
+     <update id="updateJDOrderIssyncplace" parameterClass="JDOrderTrack">
+        UPDATE JD_ORDER_TRACK
+         <dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="isSyncPlace" removeFirstPrepend="true"> 
+		 			ISSYNCPLACE=#isSyncPlace#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="packageFailDesci" removeFirstPrepend="true"> 
+		 			packageFailDesci=#packageFailDesci#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="packageFailCount" removeFirstPrepend="true"> 
+		 			packageFailCount=#packageFailCount#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="isprocess" removeFirstPrepend="true"> 
+		 			isprocess=#isprocess#
+		 		</isNotEmpty>
+		 		
+		 		<isNotEmpty prepend="," property="processtime" removeFirstPrepend="true"> 
+		 			processtime= to_char(sysdate,'yyyy-mm-dd hh24:mi:ss')
+		 		</isNotEmpty>
+		 </dynamic>
+		  WHERE jdOrderId=#jdOrderId#
+    </update>
+    
+        
+    
+    <update id="updateJDOrderTrackSync" parameterClass="JDOrderTrack">
+        UPDATE JD_ORDER_TRACK SET placeResult=#placeResult# WHERE jdOrderId=#jdOrderId#
+    </update>
+    
+     <select id="getSupplierCode" resultClass="String" parameterClass="String">
+    	<![CDATA[
+    	select p.provider_code from xiu_goods.x_data_prd_info p 
+    		where p.product_sn=substr(#sku#,0,8)
+     	]]>
+    </select>
+    
+     <select id="queryPostcode" resultClass="String" 
+     	parameterClass="com.xiu.jd.bean.ware.XiuAddress">
+    	<![CDATA[
+    	select t.post_code postcode from xiu_jd.jd_xiu_post_code t WHERE 1=1
+    	]]>
+    	<dynamic>
+    		<isNotEmpty prepend="and" property="province"> 
+              t.prov_name LIKE '%$province$%'
+           </isNotEmpty>
+           <isNotEmpty prepend="and"  property="city">
+             t.city_name LIKE '%$city$%'
+         	</isNotEmpty>
+         	 <isNotEmpty prepend="and" property="area"> 
+             t.area_name LIKE '%$area$%'
+         </isNotEmpty>
+		</dynamic>
+	 and rownum =1
+    </select>
+    
+         <select id="queryXiuAddress" resultClass="com.xiu.jd.bean.ware.XiuAddress" 
+     	parameterClass="com.xiu.jd.bean.ware.XiuAddress">
+    	<![CDATA[
+    	select 
+		   	t.post_code postcode,
+		   	t.prov_name province,
+		   	t.city_name city,
+		   	t.area_name area 
+    	 from xiu_jd.jd_xiu_post_code t WHERE 1=1
+    	]]>
+    	<dynamic>
+    		<isNotEmpty prepend="and" property="province"> 
+              t.prov_name LIKE '%$province$%'
+           </isNotEmpty>
+           <isNotEmpty prepend="and"  property="city">
+             t.city_name LIKE '%$city$%'
+         	</isNotEmpty>
+         	 <isNotEmpty prepend="and" property="area"> 
+             t.area_name LIKE '%$area$%'
+         </isNotEmpty>
+		</dynamic>
+	 and rownum =1
+    </select>
+    
+    <!-- 废弃了,目前没有 -->
+     <select id="getStockNum" resultClass="int" 
+     	parameterClass="String">
+    	<![CDATA[
+    	SELECT STOCKNUM FROM jd_product_info WHERE JD_WARE_ID=#wareId#
+     	]]>
+    </select>
+    
+    <select id="queryWareInfo" resultClass="com.xiu.jd.bean.ware.XiuProductInfo" 
+     	parameterClass="String">
+    	<![CDATA[
+    	  SELECT
+    	     p.BRAND_CODE brandCode,
+	         p.BASE_CLASS_ID catCode,
+	         p.PRODUCT_SN xiuCode,
+	         p.PRODUCT_ID itemId,
+	         p.PRODUCT_NAME itemName,
+	         p.SIZEIMGURL picturePath,
+	         p.ITEM_COLOR itemColor,
+	         p.ITEM_SIZE itemSize,
+	         p.supplier_code supplierCode,
+	         (
+	           SELECT xiu_brand_name
+	            FROM v_xiu_brand
+	           WHERE xiu_brand_code = p.BRAND_CODE
+	         ) 
+           brandName,
+	         (
+	           SELECT CHILD_NAME
+	            from xiu_xop.x_xop_base_category_v
+	           WHERE CHILD_CODE = p.BASE_CLASS_CODE || ''
+	          )
+          childName
+        from xiu_goods.x_data_prd_info p
+          WHERE p.product_sn = substr(#sku#, 0, 8)
+
+     	]]> 
+    </select>
+    
+    
+    
+    
+  <!-- 分页查询有包裹信息的走秀京东把走秀包裹信息推送给京东 -->
+ <select id="getPageResule" parameterClass="java.util.Map" resultClass="JDOrderTrack">
+     <![CDATA[ 
+	    select 
+			 e.jdOrderId jdOrderId,
+			 e.localOrderId localOrderId,
+			 e.placeTime placeTime,
+			 e.placeResult placeResult,
+			 e.issyncplace issyncplace,
+			 e.ordercode orderCode,
+			 e.packageFailCount packageFailCount
+	     from(
+	      select k.*,rownum as rn from (
+	            select * from JD_ORDER_TRACK  t  where 1=1 
+	  ]]>
+	     <dynamic>
+	     		<isNotEmpty prepend="and" property="placeResult"> 
+	             t.placeResult <![CDATA[=]]>#placeResult#
+	            </isNotEmpty>
+	            <isNotEmpty prepend="and"  property="issyncplace">
+	             t.issyncplace <![CDATA[=]]>#issyncplace#
+	          	</isNotEmpty>
+	          	 <isNotEmpty prepend="and" property="startTime"> 
+		           to_date(t.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+			  	 <isNotEmpty prepend="and" property="endTime"> 
+		           to_date(t.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+		         </isNotEmpty>
+	           
+		</dynamic>
+	
+	   <!-- order by t.createdate desc -->
+	) k where rownum <![CDATA[<= ]]> #lastNum#
+	) e where rn <![CDATA[ >=]]>  #firstNum#
+     
+</select>
+
+ <update id="updateUserMobileByOrderId"  parameterClass="java.util.Map">
+     
+     update jd_order_track t set t.mobile=#mobile# where t.jdorderid=#orderId#
+ </update>
+    
+    <select id="getCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+	    <![CDATA[ 
+	    select count(jdOrderId) from JD_ORDER_TRACK  t
+	    where 1=1
+	    ]]>
+	     <dynamic>
+     		<isNotEmpty prepend="and" property="placeResult"> 
+             t.placeResult <![CDATA[=]]>#placeResult#
+            </isNotEmpty>
+            <isNotEmpty prepend="and"  property="issyncplace">
+             t.issyncplace <![CDATA[=]]>#issyncplace#
+          	</isNotEmpty>    
+	</dynamic>
+	</select>
+	
+	<select id="getListResult" parameterClass="java.util.Map" resultClass="JDOrderTrack">
+	    <![CDATA[ 
+	    select t.jdOrderId jdOrderId,
+			 t.localOrderId localOrderId,
+			 t.placeTime placeTime,
+			 t.placeResult placeResult,
+			 t.issyncplace issyncplace,
+			 t.ordercode orderCode,
+			 t.failDescri failDescri
+			 from JD_ORDER_TRACK  t
+	    where 1=1
+	    ]]>
+	     <dynamic>
+     		<isNotEmpty prepend="and" property="placeResult"> 
+             t.placeResult <![CDATA[=]]>#placeResult#
+            </isNotEmpty>
+            <isNotEmpty prepend="and"  property="issyncplace">
+             t.issyncplace <![CDATA[=]]>#issyncplace#
+          	</isNotEmpty>  
+          	<isNotEmpty prepend="and" property="startTime"> 
+	           to_date(t.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+	         </isNotEmpty>
+		  	 <isNotEmpty prepend="and" property="endTime"> 
+	           to_date(t.placeTime,'yyyy-mm-dd hh24:mi:ss') <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+	         </isNotEmpty>  
+	</dynamic>
+	  order by t.placetime desc
+	</select>
+    
+</sqlMap>

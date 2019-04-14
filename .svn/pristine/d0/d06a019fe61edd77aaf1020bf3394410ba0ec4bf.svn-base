@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	
+	<!-- 商品中心 -->
+	<bean id="goodsCenterService"
+		class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl"	value="${remote.url.goods}" />
+		<property name="serviceInterface" value="com.xiu.commerce.hessian.server.GoodsCenterService" />
+	</bean>
+	
+	<!-- 渠道中心 -->
+	<bean id="inventoryService"
+		class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl"	value="${remote.url.channel}" />
+		<property name="serviceInterface" value="com.xiu.channel.inventory.api.InventoryService" />
+	</bean>
+
+
+	<!-- 搜索中心 -->
+	<bean id="commonsHttpSolrServer" class="org.apache.solr.client.solrj.impl.CommonsHttpSolrServer">
+		<constructor-arg value="${remote.url.solr}" />
+	</bean>
+	
+	
+	
+	<!-- osc订单 -->
+	<bean id="fxOrderService"
+		class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl"	value="${remote.url.osc.import}" />
+		<property name="serviceInterface" value="com.xiu.osc.client.fx.service.FxOrderService" />
+	</bean>
+	
+	
+	<!-- 结算系统 -->
+	<bean id="prodSettlementHessianService"
+		class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl"	value="${remote.url.settlement}" />
+		<property name="serviceInterface" value="com.xiu.settlement.common.ProdSettlementHessianService" />
+	</bean>
+	
+	<!-- 商品中心价格变化MQ topic  jms链接工厂 
+
+	<bean id="goodCeneterPriceChangeListener" class="com.xiu.jd.service.jms.GoodCeneterPriceChangeListener"></bean>
+	-->
+    <!-- 消息服务器连接工厂 --> 
+    <bean id="connectionFactory"  
+        class="org.apache.activemq.ActiveMQConnectionFactory" destroy-method="stop"> 
+        <property name="brokerURL" value="${goods_center.mq.url}" />   
+    </bean>
+     
+     <!--商品价格 定义订阅主题--> 
+    <bean id="DestinationTopic" class="org.apache.activemq.command.ActiveMQTempTopic"> 
+      <constructor-arg index="0" value="${goodsprice_change_queue_name}"></constructor-arg> 
+    </bean> 
+
+     <!--监听公共消息(持久订阅者) price--> 
+    <bean id="listenerContainer"  
+        class="org.springframework.jms.listener.DefaultMessageListenerContainer">   
+        <property name="connectionFactory" ref="connectionFactory" />  
+        <property name="pubSubDomain" value="true"/> 
+        <property name="destinationName" value="${goodsprice_change_queue_name}"></property> 
+        <property name="messageListener" ref="goodCeneterPriceChangeListener"/> 
+    </bean> 
+    
+       <bean id="jmsTopicTemplate"  
+        class="org.springframework.jms.core.JmsTemplate">  
+        <property name="connectionFactory" ref="connectionFactory"/>  
+        <property name="pubSubDomain" value="true"/>  
+        <property name="receiveTimeout" value="10000"/> 
+        <property name="timeToLive" value="86400000"/> 
+        <property name="explicitQosEnabled" value="true" /><!-- deliveryMode, priority, timeToLive 的开关，要生效，必须配置为true，默认false--> 
+        <property name="deliveryMode" value="2"></property> 
+        <property name="pubSubNoLocal" value="false"></property> 
+    </bean> 
+    
+       
+     <!-- 商品sku库存 定义订阅主题  goodCenterStockChangeListener--> 
+    <bean id="DestinationTopicInVentory" class="org.apache.activemq.command.ActiveMQTempTopic"> 
+      <constructor-arg index="0" value="${goodsinventory_change_queue_name}"></constructor-arg> 
+    </bean> 
+      
+       <!-- 商品sku库存 监听公共消息(持久订阅者) stock--> 
+    <bean id="listenerContainerStock"  
+        class="org.springframework.jms.listener.DefaultMessageListenerContainer">   
+        <property name="connectionFactory" ref="connectionFactory" />  
+        <property name="pubSubDomain" value="true"/> 
+        <property name="destinationName" value="${goodsinventory_change_queue_name}"></property> 
+        <property name="messageListener" ref="goodCenterStockChangeListener"/> 
+    </bean> 
+    
+    
+    
+      <!-- 商品上下架变化  goodCeneterOnSaleChangeListener  --> 
+    <bean id="DestinationTopicOnSale" class="org.apache.activemq.command.ActiveMQTempTopic"> 
+      <constructor-arg index="0" value="${goodsonsale_change_queue_name}"></constructor-arg> 
+    </bean> 
+  
+      
+       <!-- 商品上下架变化  监听公共消息(持久订阅者)--> 
+    <bean id="listenerContainerOnSale"  
+        class="org.springframework.jms.listener.DefaultMessageListenerContainer">   
+        <property name="connectionFactory" ref="connectionFactory" />  
+        <property name="pubSubDomain" value="true"/> 
+        <property name="destinationName" value="${goodsonsale_change_queue_name}"></property> 
+        <property name="messageListener" ref="goodCeneterOnSaleChangeListener"/> 
+    </bean>
+      
+    <!-- 图片 -->
+	<bean id="imageHessianService"
+		class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl"	value="${remote.url.image}" />
+		<property name="serviceInterface" value="com.xiu.image.biz.hessian.interfaces.OriImageCheckHessianService" />
+	</bean>
+	
+	<bean id="emailSendService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+	  	<property name="serviceUrl" value="${remote.url.email}"/> 
+	  	<property name="overloadEnabled" value="true"/>
+	  	<property name="serviceInterface">
+	   		<value>com.xiu.email.hessian.IEmailHessianService</value>
+	 	</property>
+	</bean>
+
+</beans>
+

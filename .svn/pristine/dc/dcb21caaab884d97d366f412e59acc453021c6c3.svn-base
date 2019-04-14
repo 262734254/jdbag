@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    <!-- 定时的更新京东上的商品价格和库存 -->
+	<bean id="scanJDWareInfoSchedule" class="com.xiu.jd.schedule.ware.ScanJDWareInfoSchedule" singleton="true"/>
+	
+	<!-- 定时更新京东商品价格,扫描jd_changed_goods_price表 -->
+	<bean id="updateJdProdcutPriceSchedule" class="com.xiu.jd.schedule.ware.UpdateJdProdcutPriceSchedule" singleton="true"/>
+	<!-- 定时更新京东商品库存,扫描jd_changed_goods_stock表 -->
+	<bean id="updateJdProductStockSchedule" class="com.xiu.jd.schedule.ware.UpdateJdProductStockSchedule" singleton="true"/>
+	
+	<!-- 定时更新京东商品上下架状态,扫描jd_changed_goods_online表 -->
+	<bean id="updateJdProductOnSaleSchedule" class="com.xiu.jd.schedule.ware.UpdateJdProductOnSaleSchedule" singleton="true"/>
+
+	 <!-- 定时的把京东上的商品入到本地数据库 -->
+	<bean id="getJdProductSchedule" class="com.xiu.jd.schedule.ware.GetJdProductSchedule" singleton="true" />
+	
+	<!-- 定时推送商品图片到京东 -->
+	<bean id="pushSkuPicSchedule" class="com.xiu.jd.schedule.ware.PushWareSkuPicSchedule" singleton="true" />
+	
+	<!-- 同步京东商品skuid到本地数据jd_product_sku_info中的jdskuid字段 -->
+	<bean id="jdSkuIdSynSchedule" class="com.xiu.jd.schedule.ware.JdSkuIdSynSchedule" singleton="true" />
+	
+	
+	<bean id="jobDetailscanJDWareInfoScheduleBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="scanJDWareInfoSchedule" />
+		<property name="targetMethod" value="getJdWareInfo" />
+	</bean>
+	
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="jobDetailscanJDWareInfoScheduleBean" />
+		</property>
+		<property name="cronExpression">
+		     <!-- 定时的更新京东上的商品价格和库存 0 0/5 14 * * ?" 在每天下午2点到下午2:55期间的每5分钟触发   2-3 -->
+			<value>0 0/59 12 * * ?</value>
+		</property>
+	</bean>
+
+	
+	<bean id="jobDetailscanGetJdProductSchedule"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="getJdProductSchedule" />
+		<property name="targetMethod" value="getJdProdcut" />
+	</bean>
+	
+	<bean id="cronTriggerJdProduct" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="jobDetailscanGetJdProductSchedule" />
+		</property>
+		<property name="cronExpression">
+		     <!--定时把东上的商品入到本地数据库  0 0/5 14 * * ?" 在每天下午2点到下午2:55期间的每5分钟触发   2-3 -->
+			<value>0 0/59 4 * * ?</value>
+		</property>
+	</bean>
+	
+	
+	
+	<bean id="jobDetailscanPushSkuPicSchedule"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="pushSkuPicSchedule" />
+		<property name="targetMethod" value="pushWareSkuPic" />
+	</bean>
+	
+	<bean id="cronTriggerPushSkuPic" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="jobDetailscanPushSkuPicSchedule" />
+		</property>
+		<property name="cronExpression">
+		     <!-- 0 0/5 14 * * ?" 在每天下午2点到下午2:55期间的每5分钟触发   2-3  0 0/59 3 * * ?-->
+			<value>0 0/30 * * * ?</value>
+		</property>
+	</bean>
+	
+	
+	
+	<bean id="jobDetailjdSkuIdSynScheduleBean"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="jdSkuIdSynSchedule" />
+		<property name="targetMethod" value="updateJdSkuIdToProductSku" />
+	</bean>
+	
+	<bean id="cronTriggerJdSkuIdSynScheduleBean" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="jobDetailjdSkuIdSynScheduleBean" />
+		</property>
+		<property name="cronExpression">
+		     <!-- 同步京东商品skuid到本地数据jd_product_sku_info中的jdskuid字段,确保商品sku信息的完整性  -->
+			<value>0 0/30 * * * ?</value>
+		</property>
+	</bean>
+	
+	
+	<bean id="jobDetailUpdateJdProdcutPriceSchedule"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="updateJdProdcutPriceSchedule" />
+		<property name="targetMethod" value="updateJdProdcutPrice" />
+	</bean>
+	
+	<bean id="cronTriggerUpdateJdProdcutPriceSchedule" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="jobDetailUpdateJdProdcutPriceSchedule" />
+		</property>
+		<property name="cronExpression">
+		     <!-- 定时的更新京东上的商品价格-->
+			<value>0 0/2 * * * ?</value>
+		</property>
+	</bean>
+	
+	
+	<bean id="jobDetailUpdateJdProductStockSchedule"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="updateJdProductStockSchedule" />
+		<property name="targetMethod" value="updateJdProductStock" />
+	</bean>
+	
+	<bean id="cronTriggerUpdateJdProductStockSchedule" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="jobDetailUpdateJdProductStockSchedule" />
+		</property>
+		<property name="cronExpression">
+		     <!-- 定时的更新京东上的商品库存-->
+			<value>0 0/2 * * * ?</value>
+		</property>
+	</bean>
+	
+	
+	
+  <bean id="jobDetailUpdateJdProductOnSaleSchedule"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="updateJdProductOnSaleSchedule" />
+		<property name="targetMethod" value="updateJdProductOnSale" />
+	</bean>
+	
+	<bean id="cronTriggerUpdateJdProductOnSaleSchedule" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="jobDetailUpdateJdProductOnSaleSchedule" />
+		</property>
+		<property name="cronExpression">
+		     <!-- 定时的更新京东上的商品上下架状态-->
+			<value>0 0/2 * * * ?</value>
+		</property>
+	</bean>
+	
+	
+	<bean autowire="no"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="quartzProperties">
+		<props>
+		 <prop key="org.quartz.scheduler.skipUpdateCheck">true</prop>
+		</props>
+				  
+		</property>
+		<property name="triggers"> 
+			<list>
+				   <!--  定时的更新京东上的商品价格和库存    -->
+				   <ref local="cronTrigger"/>
+				
+				    <!--定时的更新京东上的商品价格--> 
+				   <ref local="cronTriggerUpdateJdProdcutPriceSchedule"/>
+				   
+				   	<!-- 定时更新京东上商品的库存 -->
+				   	<ref local="cronTriggerUpdateJdProductStockSchedule"/> 
+				   	
+				   	<!--定时更新京东上商品的上下架状态 -->
+				   	 <ref local="cronTriggerUpdateJdProductOnSaleSchedule"/> 
+				   	
+				   	 <!-- 同步京东商品skuid到本地数据jd_product_sku_info中的jdskuid字段-->
+				    <ref local="cronTriggerJdSkuIdSynScheduleBean"/> 
+				   	 
+				   	  <!--定时推送商品图片到京东--> 
+				   <ref local="cronTriggerPushSkuPic"/>  
+				   	
+				   <!--定时的把京东上的商品入到本地数据库   -->
+				   <ref local="cronTriggerJdProduct"/> 
+				   
+			</list>
+		</property>
+	</bean>
+</beans>
+

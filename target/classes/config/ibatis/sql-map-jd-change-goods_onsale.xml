@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JdChangeGoodsOnSaleServiceBean">
+<typeAlias alias="JdChangedGoodsOnSale" type="com.xiu.jd.bean.ware.JdChangedGoodsOnSale"/>
+	
+	<!-- 保存上下架状态到本地 -->
+    <insert id="insert" parameterClass="JdChangedGoodsOnSale">
+         <selectKey resultClass="long" keyProperty="recordid" > 
+          select SEQ_JD_CHANGED_GOODS_ONSALE.nextval as recordid from dual
+        </selectKey>
+        <![CDATA[
+           insert into jd_changed_goods_online (
+                recordid,
+	            xiucode,
+	            updatestatus,
+	            onsale,
+	            createtime,
+	            jdwareid,
+	            faildesc
+           )values(
+                SEQ_JD_CHANGED_GOODS_ONSALE.currval,
+               	#xiuCode#,
+               	#updateStatus#,
+               	#onSale#,
+			   	sysdate,
+			   	#jdWareId#,
+			   	#failDesc#
+           )
+        ]]>
+         
+    </insert>
+    
+    <!-- 保存上下架状态到本地 -->
+    <insert id="insertBatch" parameterClass="JdChangedGoodsOnSale">
+         <selectKey resultClass="long" keyProperty="recordid" > 
+          select SEQ_JD_CHANGED_GOODS_ONSALE.nextval as recordid from dual
+        </selectKey>
+        <![CDATA[
+              insert into jd_changed_goods_online (
+                recordid,
+	            xiucode,
+	            updatestatus,
+	            onsale,
+	            createtime,
+	            jdwareid,
+	            faildesc
+           )values(
+                SEQ_JD_CHANGED_GOODS_ONSALE.currval,
+               	#xiuCode#,
+               	#updateStatus#,
+               	#onSale#,
+			   	sysdate,
+			   	#jdWareId#,
+			   	#failDesc#
+           )
+        ]]>
+         
+    </insert>
+
+       <!-- 分页查询需要同步商品上下架信息 -->
+     <select id="getPageResule" parameterClass="java.util.Map" resultClass="JdChangedGoodsOnSale">
+ select 
+  n.recordid recordid, 
+  n.xiucode xiuCode,
+  n.updatestatus updateStatus,
+  n.onsale onSale,
+  n.jdwareid jdWareId
+
+  from (select k.*, rownum as rn
+          from (select t.*,
+                       row_number() over(partition by t.xiucode order by t.createtime asc) as rown
+                  from jd_changed_goods_online t
+                 where 1 = 1
+                   <dynamic>
+                       <isNotEmpty prepend="and" property="updateStatus"> 
+		               t.updatestatus <![CDATA[=]]>#updateStatus#
+		               </isNotEmpty>
+                   </dynamic>
+                   ) k
+         where 1 = 1
+              and rown=1
+              and rownum  <![CDATA[<=  ]]> #lastNum#) n
+ where 1 = 1
+           <dynamic>
+              <isNotEmpty prepend="and" property="updateStatus"> 
+               n.updatestatus <![CDATA[=]]>#updateStatus#
+              </isNotEmpty>
+            </dynamic>
+   and rn <![CDATA[>=  ]]> #firstNum#
+         
+     </select>
+      
+     
+  <select id="getCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+ select 
+   count(1)
+  from (select k.*
+          from (select t.*,
+                       row_number() over(partition by t.xiucode order by t.createtime asc) as rown
+                  from jd_changed_goods_online t
+                 where 1 = 1
+                   <dynamic>
+                       <isNotEmpty prepend="and" property="updateStatus"> 
+		               t.updatestatus <![CDATA[=]]>#updateStatus#
+		               </isNotEmpty>
+                   </dynamic>
+                   ) k
+         where 1 = 1
+              and rown=1
+         ) n
+ where 1 = 1
+    <dynamic>
+       <isNotEmpty prepend="and" property="updateStatus"> 
+        n.updatestatus <![CDATA[=]]>#updateStatus#
+       </isNotEmpty>
+     </dynamic>
+   </select>
+   
+  <!-- 更新商品状态 -->
+        <update id="update" parameterClass="JdChangedGoodsOnSale">
+           update jd_changed_goods_online t
+           
+              <dynamic prepend="set">
+		 		<isNotEmpty prepend="," property="updateStatus" removeFirstPrepend="true"> 
+		 			 t.updatestatus=#updateStatus#
+		 		</isNotEmpty>
+		 		<isNotEmpty prepend="," property="failDesc" removeFirstPrepend="true"> 
+		 			 t.faildesc=#failDesc#
+		 		</isNotEmpty>
+		 	  </dynamic>
+		 	  where 1=1
+		 	  <dynamic>
+		 	      <isNotEmpty prepend="and" property="recordid"> 
+		 			t.recordid=#recordid#
+		 		</isNotEmpty>
+		 		
+		 	     <isNotEmpty prepend="and" property="xiuCode"> 
+		 			t.xiucode=#xiuCode#
+		 		</isNotEmpty>
+		 	      
+		 	      <isNotEmpty prepend="and" property="jdWareId"> 
+		 			t.jdwareid=#jdWareId#
+		 		</isNotEmpty>
+		 	      
+		 	  </dynamic>
+          
+          
+      </update>
+</sqlMap>

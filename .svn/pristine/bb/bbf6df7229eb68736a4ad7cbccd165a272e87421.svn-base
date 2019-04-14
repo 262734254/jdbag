@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="JdLogDaoBean">
+    
+    <typeAlias alias="JdLog" type="com.xiu.jd.bean.log.JdLog"/>
+
+   
+    <insert id="insert" parameterClass="JdLog">
+        <![CDATA[
+           insert into jd_log (
+	            logid,
+				describe,
+				logtype,
+				xiucode,
+				xiusn,
+				wareid,
+				status
+           )values(
+               seq_jd_log.nextval,
+	           #describe#,
+	           #logtype#,
+	           #xiucode#,
+	           #xiusn#,
+	           #wareid#,
+	           #status#
+           )
+        ]]>
+       <selectKey resultClass="long" keyProperty="logid" > 
+          select seq_jd_log.currval as logid from dual
+       </selectKey>
+    </insert>
+    
+    <update id="update" parameterClass="JdLog">
+    	 <![CDATA[
+    	 	update jd_log set status = 1 where xiusn = #xiusn#
+    	 ]]>
+    </update>
+    
+    <delete id="deleteAll">
+        
+        delete from jd_log
+    </delete>
+    
+    <!-- 
+
+  <![CDATA[ ]]>
+分页查询日志 getPageResule getCount
+     -->
+<select id="getPageResule" parameterClass="java.util.Map" resultClass="JdLog">
+     <![CDATA[ 
+    select 
+		 e.describe describe,
+		 e.logtype logtype,
+		 to_char(e.createdate,'yyyy-mm-dd hh24:mi:ss') createdate,
+		 e.xiusn xiusn,
+		 e.wareid wareid,
+		 e.status status
+     from(
+      select k.*,rownum as rn from (
+            select * from jd_log  t  where 1=1 
+  ]]>
+     <dynamic>
+     		<isNotEmpty prepend="and" property="skuCode"> 
+           t.xiusn <![CDATA[=]]>#skuCode#
+            </isNotEmpty>
+            <isNotEmpty  property="logType">
+            <isNotEqual property="logType" prepend="and" compareValue="0">
+          			 t.logtype <![CDATA[=]]>#logType#
+          	</isNotEqual>
+          	<isNotEmpty prepend="and" property="jdWareId"> 
+           	t.wareid <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+          	</isNotEmpty>
+		   <isNotEmpty prepend="and" property="startTime"> 
+           t.createdate <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+           
+            <isNotEmpty prepend="and" property="endTime"> 
+              t.createdate <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="status"> 
+              t.status <![CDATA[=]]>#status#
+            </isNotEmpty>
+           
+	</dynamic>
+
+   order by t.createdate desc
+) k where rownum <![CDATA[<= ]]> #lastNum#
+) e where rn <![CDATA[ >=]]>  #firstNum#
+     
+</select>
+
+	<select id="getCount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+	    <![CDATA[ 
+	    select count(logid) from jd_log  t
+	    where 1=1
+	    ]]>
+	     <dynamic>
+	     	<isNotEmpty prepend="and" property="skuCode"> 
+           t.xiusn <![CDATA[=]]>#skuCode#
+            </isNotEmpty>
+            <isNotEmpty  property="logType">
+	            <isNotEqual property="logType" prepend="and" compareValue="0">
+	          			 t.logtype <![CDATA[=]]>#logType#
+	          	</isNotEqual>
+          	</isNotEmpty>
+          	<isNotEmpty prepend="and" property="jdWareId"> 
+           	t.wareid <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+		   <isNotEmpty prepend="and" property="startTime"> 
+           t.createdate <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+           
+            <isNotEmpty prepend="and" property="endTime"> 
+              t.createdate <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+           <isNotEmpty prepend="and" property="status"> 
+              t.status <![CDATA[=]]>#status#
+            </isNotEmpty>
+	</dynamic>
+	</select>
+	
+	<select id="getListResult" parameterClass="java.util.Map" resultClass="JdLog">
+	    <![CDATA[ 
+	    select * from jd_log  t
+	    where 1=1
+	    ]]>
+	     <dynamic>
+	     	<isNotEmpty prepend="and" property="skuCode"> 
+           t.xiusn <![CDATA[=]]>#skuCode#
+            </isNotEmpty>
+            <isNotEmpty  property="logType">
+	            <isNotEqual property="logType" prepend="and" compareValue="0">
+	          			 t.logtype <![CDATA[=]]>#logType#
+	          	</isNotEqual>
+          	</isNotEmpty>
+          	<isNotEmpty prepend="and" property="jdWareId"> 
+           	t.wareid <![CDATA[=]]>#jdWareId#
+            </isNotEmpty>
+		   <isNotEmpty prepend="and" property="startTime"> 
+           t.createdate <![CDATA[>=]]>to_date(#startTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+           
+            <isNotEmpty prepend="and" property="endTime"> 
+              t.createdate <![CDATA[<=]]>to_date(#endTime#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+           <isNotEmpty prepend="and" property="status"> 
+              t.status <![CDATA[=]]>#status#
+            </isNotEmpty>
+	</dynamic>
+	</select>
+	
+	<select id="isExist" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		<![CDATA[ 
+			select count(*) from jd_log t 
+			where 1=1 
+		]]>
+		<dynamic>
+			<isNotEmpty prepend="and" property="xiusn"> 
+	              t.xiusn <![CDATA[=]]>#xiusn#
+	        </isNotEmpty>
+	        <isNotEmpty prepend="and" property="currentDate"> 
+	              to_char(t.createDate,'yyyy-mm-dd') <![CDATA[=]]>#currentDate#
+	        </isNotEmpty>
+        </dynamic>
+	</select>
+	
+	<select id="findAllLogSku"  resultClass="JdLog">
+	    <![CDATA[ 
+	    select distinct t.xiusn from jd_log  t
+	    ]]>
+	</select>
+	
+	<!-- 查询商品的价格 -->
+	<select id="queryPrice" parameterClass="java.lang.String" resultClass="java.lang.Double">
+			select a.xiu_price from xiu_goods.x_catentry_info_view a 
+			where a.partnumber=substr(#skusn#,1,8)
+	</select>
+</sqlMap>

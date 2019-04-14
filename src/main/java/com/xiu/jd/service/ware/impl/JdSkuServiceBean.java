@@ -1,0 +1,410 @@
+package com.xiu.jd.service.ware.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+
+import com.jd.open.api.sdk.FileItem;
+import com.jd.open.api.sdk.JdException;
+import com.jd.open.api.sdk.domain.ware.WarePropimg;
+import com.jd.open.api.sdk.request.ware.WarePropimgAddRequest;
+import com.jd.open.api.sdk.request.ware.WarePropimgDeleteRequest;
+import com.jd.open.api.sdk.request.ware.WarePropimgsGetRequest;
+import com.jd.open.api.sdk.response.ware.WarePropimgAddResponse;
+import com.jd.open.api.sdk.response.ware.WarePropimgDeleteResponse;
+import com.jd.open.api.sdk.response.ware.WarePropimgsGetResponse;
+import com.xiu.image.biz.dto.GoodsInfoDTO;
+import com.xiu.image.biz.hessian.interfaces.OriImageCheckHessianService;
+import com.xiu.image.biz.hessian.interfaces.SkuImagesPair;
+import com.xiu.jd.bean.ware.JDSku;
+import com.xiu.jd.dao.ware.JdSkuDao;
+import com.xiu.jd.service.ware.JdSkuService;
+import com.xiu.jd.utils.BaseUtils;
+import com.xiu.jd.utils.HttUtils;
+import com.xiu.jd.utils.ParseProperties;
+
+@Service("jdSkuServiceBean")
+public class JdSkuServiceBean extends BaseUtils implements JdSkuService<JDSku> {
+	
+	private static final Logger logger = Logger.getLogger(JdSkuServiceBean.class);
+	
+	@Resource(name="jdSkuDaoBean")
+	private JdSkuDao jdSkuDaoBean;
+	
+	/**图片获取接口**/
+	@Resource(name="imageHessianService")
+	private OriImageCheckHessianService imageHessianService ;
+	
+	
+
+	@Override
+	public boolean xiuSnIsExistsNation(String outerId) {
+	   return jdSkuDaoBean.xiuSnIsExistsNation(outerId);
+	}
+
+	@Override
+	public void insert(JDSku jdSku) {
+		jdSkuDaoBean.insert(jdSku);
+		
+	}
+	@Override
+	public int updateJdProductSkuStock(Map<String, Object> parames) {
+		return jdSkuDaoBean.updateJdProductSkuStock(parames);
+	}
+
+	@Override
+	public void insertBatch(List<JDSku> jdSkus, int batchSize) {
+		jdSkuDaoBean.insertBatch(jdSkus, batchSize)	;	
+	}
+
+	@Override
+	public List<JDSku> isUpLoadToJd() {
+		return jdSkuDaoBean.isUpLoadToJd();
+	}
+
+	@Override
+	public void deleteAll() {
+		jdSkuDaoBean.deleteAll();
+		
+	}
+	@Override
+	public void updateStatus(JDSku jdSku) {
+		jdSkuDaoBean.updateStatus(jdSku);
+	}
+
+	@Override
+	public String findPicDate(JDSku jdSku) {
+		return jdSkuDaoBean.findPicDate(jdSku);
+	}
+
+	@Override
+	public String findLocalSkuAttr(String outerId) {
+		return jdSkuDaoBean.findLocalSkuAttr(outerId);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void updateBatch(List<JDSku> jdSkus, int batchSize) {
+		jdSkuDaoBean.updateBatch(jdSkus, batchSize);
+	}
+
+	@Override
+	public List<JDSku> findSku(Map<String, Object> skuParames) {
+		return jdSkuDaoBean.findSku(skuParames);
+	}
+	
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public int update(JDSku jdSku) {
+		return jdSkuDaoBean.update(jdSku);
+	}
+
+	public String pushSkuPic(List<JDSku> jdSkus,String mainPic){
+		String message = "";
+		List<String> colorList = new ArrayList<String>();
+		for (JDSku jdSku : jdSkus) {
+			WarePropimgAddRequest picRequest = new WarePropimgAddRequest();
+			picRequest.setWareId(jdSku.getWareId());
+			String[] attrId = null;
+			String[] valueID = null;
+			String jdColorAttr = "";
+			if(jdSku.getAttributes() != null && !"".equals(jdSku.getAttributes())){
+				attrId = jdSku.getAttributes().split("\\^");
+				valueID = attrId[0].split(":");
+				String jdAttrName = findSaleAttrName(valueID[0]);
+				if(attrId.length==2){
+					if(jdAttrName.trim().equals("颜色") || jdAttrName.trim().equals("颜 色")){
+						jdColorAttr = valueID[1];
+					}else{
+						jdColorAttr = attrId[1].split(":")[1];
+					}
+				}else{
+					if(jdAttrName.trim().equals("颜色") || jdAttrName.trim().equals("颜 色")){
+						jdColorAttr = valueID[1];
+					}else{
+						jdColorAttr = "0000000000";
+					}
+				}
+//				valueID = attrId[0].split(":");
+				List<WarePropimg> picList = getWareImge(jdSku.getWareId(),jdColorAttr);
+				if(colorList.size()==0){
+					colorList.add(jdSku.getWareId()+"_"+jdColorAttr);
+				}else{
+					if(colorList.contains(jdSku.getWareId()+"_"+jdColorAttr)){
+						message = message +"商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+",颜色属性值为："+jdColorAttr+"该颜色的sku图片已经上传<br>";
+						jdSku.setStatus("3");
+						jdSkuDaoBean.updateStatus(jdSku);
+						logger.info("该颜色的sku图片已经上传");
+						continue;
+					}else{
+						colorList.add(jdSku.getWareId()+"_"+jdColorAttr);
+					}
+				}
+				if(picList != null && picList.size() != 0 && picList.size() != 1){
+					message = message+ delSkuPic(picList,jdSku);
+					try {
+						logger.info("程序暂停");
+						Thread.sleep(1000*10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}else{
+//				valueID = new String[2];
+//				valueID[1] = "0000000000";
+				jdColorAttr = "0000000000";
+				logger.info("商品编码为："+jdSku.getWareId()+",商品SKU为:"+jdSku.getSkusn()+"属性为空,属性值ID用0000000000代替");
+				List<WarePropimg> picList =  getWareImge(jdSku.getWareId(),jdColorAttr);
+				if(colorList.size()==0){
+					colorList.add(jdSku.getWareId()+"_"+jdColorAttr);
+				}else{
+					if(colorList.contains(jdSku.getWareId()+"_"+jdColorAttr)){
+						message = message +"商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+",颜色属性值为："+jdColorAttr+"该颜色的sku图片已经上传<br>";
+						jdSku.setStatus("3");
+						jdSkuDaoBean.updateStatus(jdSku);
+						logger.info("该颜色的sku图片已经上传");
+						continue;
+					}else{
+						colorList.add(jdSku.getWareId()+"_"+jdColorAttr);
+					}
+				}
+				if(picList != null && picList.size() != 0 && picList.size() != 1){
+					message = message + delSkuPic(picList,jdSku);
+					try {
+						logger.info("程序暂停");
+						Thread.sleep(1000*10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
+			picRequest.setAttributeValueId(jdColorAttr);
+			picRequest.setMainPic(true);
+			FileItem fileItem = null;
+			String picDate = jdSkuDaoBean.findPicDate(jdSku);
+			String image = ParseProperties.getPropertiesValue("IMAGE_PREFIX")+ "/upload/goods" +picDate+"/"+jdSku.getXiucode()+"/"+jdSku.getSkusn()+"/g1_800_800.jpg";
+			fileItem = new FileItem(jdSku.getSkusn()+".jpg",HttUtils.getResponseData(image));
+			picRequest.setImage(fileItem);
+			WarePropimgAddResponse warePropimgUploadResponse = null;
+			try {
+				WarePropimgsGetRequest getImageRequest=new WarePropimgsGetRequest();
+				getImageRequest.setWareId(jdSku.getWareId());
+				getImageRequest.setAttributeValueId(jdColorAttr);
+				WarePropimgsGetResponse getImageResponse;					
+				getImageResponse = client.execute(getImageRequest);
+				WarePropimgDeleteRequest delImageRequest=new WarePropimgDeleteRequest();
+		        List<WarePropimg> l=getImageResponse.getWarePropimg();
+		        if (l!=null) {
+					for (WarePropimg warePropimg : l) {
+						if (warePropimg.getMain().equals("是")) {
+							delImageRequest.setWareId(Long.toString(warePropimg
+									.getWareId()));
+							delImageRequest.setAttributeValueId(jdColorAttr);
+							delImageRequest.setImageId(Long.toString(warePropimg.getImgId()));
+							logger.info("商品编码为：" + jdSku.getWareId()
+									+ ",skusn码为:" + jdSku.getSkusn() + "颜色属性："
+									+ jdColorAttr + " sku主图上传后该图片会被删除");
+							break;
+						}
+					}
+				}
+				warePropimgUploadResponse = client.execute(picRequest);	
+		        WarePropimgDeleteResponse delImageResponse=client.execute(delImageRequest);	//上传主图会将原来主图覆盖，会出现主图重复或者第二张图不显示情况，所以上传主图后将原来主图删除					
+				if(delImageResponse!=null&&delImageResponse.getCode().equals("0")){
+					logger.info("商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+"sku主图删除成功");
+				}	
+				else{
+					logger.info("商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+"sku主图删除失败");
+				}
+				
+				if(warePropimgUploadResponse != null && warePropimgUploadResponse.getCode().equals("0")&&delImageResponse.getCode().equals("0")){
+					message = message +"商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+",颜色属性值为："+jdColorAttr+"sku主图片上传成功<br>";
+					logger.info("商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+",颜色属性值为："+jdColorAttr+"sku主图片上传成功");
+					int imageCount=this.getSkuImageCount(jdSku, picDate);
+					for(int i = 2;i<=5;i++){							
+						int index=0;
+						if (i<=imageCount){
+							index=i;
+						}else{
+							index=1;
+						}
+						WarePropimgAddRequest picRequestpic = new WarePropimgAddRequest();
+						picRequestpic.setWareId(jdSku.getWareId());
+						picRequestpic.setMainPic(false);
+						picRequestpic.setAttributeValueId(jdColorAttr);
+						String img = ParseProperties.getPropertiesValue("IMAGE_PREFIX")+ "/upload/goods" +picDate+"/"+jdSku.getXiucode()+"/"+jdSku.getSkusn()+"/g"+index+"_800_800.jpg";
+						fileItem = new FileItem(jdSku.getSkusn()+"_"+index+".jpg",HttUtils.getResponseData(img));
+						picRequestpic.setImage(fileItem);
+						warePropimgUploadResponse = client.execute(picRequestpic);
+						if(warePropimgUploadResponse != null && warePropimgUploadResponse.getCode().equals("0")){
+							message = message+"商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+"_"+i+"_sku附图片上传成功<br>";
+							logger.info("商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+"_"+i+"_sku附图片上传成功");
+						}else{
+							message = message+"商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+"_"+i+"_sku附图片上传失败<br>";
+							logger.info("商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+"_"+i+"_sku附图片上传失败");
+						}
+					}
+					jdSku.setStatus("1");
+					jdSkuDaoBean.updateStatus(jdSku);
+				}else{
+					message = message +"\n"+"商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+",颜色属性值为："+jdColorAttr+"主图片上传失败<br>";
+					if(warePropimgUploadResponse != null){
+						message=message+",京东错误原因:"+warePropimgUploadResponse.getZhDesc();
+					}
+					jdSku.setStatus("2");
+					jdSkuDaoBean.updateStatus(jdSku);
+					logger.info(warePropimgUploadResponse.getZhDesc()+warePropimgUploadResponse.getMsg());
+					logger.info("商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+",颜色属性值为："+jdColorAttr+"主图片上传失败");
+				}
+			} catch (JdException e) {
+				message = message +"\n"+"商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+",颜色属性值为："+jdColorAttr+"主图片上传异常<br>";
+				jdSku.setStatus("4");
+				jdSkuDaoBean.updateStatus(jdSku);
+				logger.error("商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+",颜色属性值为："+jdColorAttr+"主图片上传异常",e);
+				e.printStackTrace();
+			}
+		}
+		return message;
+	}
+
+	public List<WarePropimg>  getWareImge(String wareId,String colorId){
+		List<WarePropimg> warePropList = null;
+		WarePropimgsGetRequest warePropimgGetRequest = new WarePropimgsGetRequest();
+		warePropimgGetRequest.setWareId(wareId);
+		warePropimgGetRequest.setAttributeValueId(colorId);
+		try {
+			WarePropimgsGetResponse response = client.execute(warePropimgGetRequest);
+			if(response != null && "0".equals(response.getCode())){
+				warePropList = response.getWarePropimg();
+			}
+		} catch (JdException e) {
+			logger.error("查询商品"+wareId+"的图片出现异常", e);
+			e.printStackTrace();
+		}
+		return warePropList;
+	}
+	/**
+	 * 删除sku图片
+	 * @param picList：京东sku图片集合
+	 * @param jdSku：商品sku对象
+	 * @return
+	 */
+	public String delSkuPic(List<WarePropimg> picList,JDSku jdSku){
+		String message = "";
+		for (WarePropimg warePropimg : picList) {
+			WarePropimgDeleteRequest warePropimgDeleteRequest = new WarePropimgDeleteRequest();
+			warePropimgDeleteRequest.setWareId(warePropimg.getWareId()+"");
+			warePropimgDeleteRequest.setAttributeValueId(warePropimg.getColorId());
+			warePropimgDeleteRequest.setImageId(warePropimg.getImgId()+"");
+			try {
+				WarePropimgDeleteResponse warePropimgDeleteResponse = client.execute(warePropimgDeleteRequest);
+				if(warePropimgDeleteResponse != null && "0".equals(warePropimgDeleteResponse.getCode())){
+					message ="商品ID为："+warePropimg.getWareId()+"的sku图片删除成功";
+					logger.info("商品ID为："+warePropimg.getWareId()+",京东Sku为："+jdSku.getSkusn()+"的图片已经删除");
+				}else{
+					message ="商品ID为："+warePropimg.getWareId()+"的sku图片删除失败";
+					logger.info("商品ID为："+warePropimg.getWareId()+",京东Sku为："+jdSku.getSkusn()+"的图片删除失败");
+				}	
+				
+			} catch (JdException e) {
+				e.printStackTrace();
+			}
+		}
+		return message;
+	}
+	/**
+	 * 商品附图上传
+	 * @param warePropimgUploadResponse
+	 * @param fileItem ：
+	 * @param jdSku：商品sku对象
+	 * @param picDate：图片创建时间
+	 * @param valueId：图片颜色ID
+	 * @throws JdException 
+	 */
+	private  void attachPic(WarePropimgAddResponse warePropimgUploadResponse,FileItem fileItem,JDSku jdSku,String picDate,String valueId) throws JdException{
+		for(int i = 2;i<=5;i++){
+			WarePropimgAddRequest picRequestpic = new WarePropimgAddRequest();
+			picRequestpic.setWareId(jdSku.getWareId());
+			picRequestpic.setMainPic(false);
+			picRequestpic.setAttributeValueId(valueId);
+			String img = ParseProperties.getPropertiesValue("IMAGE_PREFIX")+ "/upload/goods" +picDate+"/"+jdSku.getXiucode()+"/"+jdSku.getSkusn()+"/g"+i+"_800_800.jpg";
+			fileItem = new FileItem(jdSku.getSkusn()+"_"+i+".jpg",HttUtils.getResponseData(img));
+			picRequestpic.setImage(fileItem);
+			warePropimgUploadResponse = client.execute(picRequestpic);
+			if(warePropimgUploadResponse != null && warePropimgUploadResponse.getCode().equals("0")){
+				logger.info("商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+"_"+i+"_sku附图片上传成功");
+			}else{
+				logger.info("商品编码为："+jdSku.getWareId()+",skusn码为:"+jdSku.getSkusn()+"_"+i+"_sku附图片上传失败");
+			}
+		}
+		jdSku.setStatus("1");
+		jdSkuDaoBean.updateStatus(jdSku);
+	}
+	
+	private int getSkuImageCount(JDSku jdSku,String picStr){
+		int count=0;
+		GoodsInfoDTO DTO = new GoodsInfoDTO();
+		String[] skuCode = new String[1];
+		skuCode[0] = jdSku.getSkusn();
+		DTO.setSkuCodes(skuCode);
+		DTO.setXiuCode(jdSku.getXiucode());
+		DTO.setLength(5);
+		DTO.setCreateTimeStr(picStr);
+		List<SkuImagesPair> list =null;
+		try {
+			logger.info("调用图片hessian" + jdSku.getSkusn());
+			list = imageHessianService.checkImageExists(DTO);
+			logger.info("调用图片hessian结束" + jdSku.getSkusn());
+			if (list != null && list.size() > 0) {
+				int[] images = list.get(0).getImages();
+				for (int i : images) {
+					if (i == 1) {
+						count++;
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error("使用图片hessian失败"+"sku"+jdSku.getSkusn());
+		}
+		return count;
+		
+	}
+	
+
+	@Override
+	public String findSaleAttrName(String jdSaleAttr) {
+		return jdSkuDaoBean.findSaleAttrName(jdSaleAttr);
+	}
+
+	@Override
+	public int deleteNationProductSkuByWareId(String wareId) {
+		return jdSkuDaoBean.deleteNationProductSkuByWareId(wareId);
+	}
+
+	@Override
+	public List<JDSku> querySkuInfo(Map<String, Object> skuParames) {
+		return jdSkuDaoBean.querySkuInfo(skuParames);
+	}
+
+	
+
+	@Override
+	public int findSkuCount(Map<String, Object> skuParames) {
+		// TODO Auto-generated method stub
+		return jdSkuDaoBean.findSkuCount(skuParames);
+	}
+
+	@Override
+	public List<JDSku> findSkuBywareId(Map<String, Object> skuParames) {
+		// TODO Auto-generated method stub
+		return jdSkuDaoBean.querySkuInfoByWareId(skuParames);
+	}
+
+}

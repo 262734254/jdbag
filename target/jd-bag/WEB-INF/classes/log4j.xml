@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%d{ISO8601} %-5p] - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="debugfile" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/www/logs/jd_bag/jd_debug_${log.port}.log"/>
+		<param name="MaxBackupIndex" value="300"/>
+		<param name="Encoding" value="UTF-8"/>
+		<param name="MaxFileSize" value="20MB"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %p [%c] - [%m]%n"/>
+		</layout>
+	</appender>	
+	
+	<appender name="infofile" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/www/logs/jd_bag/jd_info_${log.port}.log"/>
+		<param name="Encoding" value="UTF-8"/>
+		<param name="MaxBackupIndex" value="300"/>
+		<param name="MaxFileSize" value="20MB"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %p [%c] - [%m]%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="info"/>
+			<param name="LevelMax" value="info"/>
+			<param name="acceptOnMatch" value="true"/>
+		</filter>
+	</appender>
+	
+	<appender name="errorfile" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/www/logs/jd_bag/jd_error_${log.port}.log"/>
+		<param name="MaxBackupIndex" value="300"/>
+		<param name="Encoding" value="UTF-8"/>
+		<param name="MaxFileSize" value="20MB"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %p [%c] - [%m]%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="error"/>
+			<param name="LevelMax" value="error"/>
+			<param name="acceptOnMatch" value="true"/>
+		</filter>	
+	</appender>	
+
+	<logger name="com.xiu" additivity="false">
+		<level value="debug"/>
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="debugfile"/>
+		<appender-ref ref="errorfile"/>
+		<appender-ref ref="infofile"/>
+
+	</logger>
+	
+	 <logger name="com.ibatis" additivity="false">
+		<level value="debug"/>
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="debugfile"/>
+		<appender-ref ref="errorfile"/>
+		<appender-ref ref="infofile"/>
+
+	</logger>
+	<logger name="java.sql" additivity="false">
+		<level value="debug"/>
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="debugfile"/>
+		<appender-ref ref="errorfile"/>
+		<appender-ref ref="infofile"/>
+	</logger>
+
+	<root>
+		<level value="info" />
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="errorfile"/>
+		<appender-ref ref="infofile"/>
+	</root>
+
+</log4j:configuration>

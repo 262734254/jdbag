@@ -1,0 +1,30 @@
+package com.xiu.jd.dao.ware.impl;
+
+
+import org.springframework.stereotype.Repository;
+
+import com.xiu.jd.bean.ware.JdPromo;
+import com.xiu.jd.bean.ware.JdPromoSku;
+import com.xiu.jd.dao.BaseDaoImpl;
+import com.xiu.jd.dao.ware.JdPromoDao;
+
+
+
+@Repository("JdPromoDaoBean")
+public class JdPromoDaoBean extends BaseDaoImpl<JdPromo>implements JdPromoDao<JdPromo> {
+
+	
+	@Override
+	public void insertPromo(JdPromo jdPromo) {
+		// TODO Auto-generated method stub
+		Object obj = getSqlMapClientTemplate().insert("JdPromoDaoBean.insertJdPromo",jdPromo);
+		
+	}
+
+	@Override
+	public void insertPromoSku(JdPromoSku jdPromoSku) {
+		Object obj = getSqlMapClientTemplate().insert("JdPromoDaoBean.insertJdPromoSku",jdPromoSku);
+		
+	}
+
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<settings cacheModelsEnabled="false" enhancementEnabled="true"
+		lazyLoadingEnabled="false" maxRequests="512" maxSessions="256"
+		maxTransactions="128" useStatementNamespaces="true" />
+	
+
+    <sqlMap resource="config/ibatis/sql-map-jd-ware.xml" />
+    <sqlMap resource="config/ibatis/sql-map-jd-sku.xml" />
+
+    <sqlMap resource="config/ibatis/sql-map-jd-sku-syn.xml" />
+	<sqlMap resource="config/ibatis/sql-map-jd-order.xml" />
+    <sqlMap resource="config/ibatis/sql-map-jd-batchnum.xml" />
+    <sqlMap resource="config/ibatis/sql-map-jd-log.xml" />
+    <sqlMap resource="config/ibatis/sql-map-jd-wareandsku.xml"/>
+	<sqlMap resource="config/ibatis/sql-map-jd-category.xml" />
+	<sqlMap resource="config/ibatis/sql-map-jd-seller-category.xml" />
+	<sqlMap resource="config/ibatis/sql-map-jd-attribute.xml" />
+	<sqlMap resource="config/ibatis/sql-map-jd-user.xml" />
+	<sqlMap resource="config/ibatis/sql-map-jd-orderItems.xml" />
+	<sqlMap resource="config/ibatis/sql-map-jd-attributevalue.xml" />
+	<sqlMap resource="config/ibatis/sql-map-xop-category.xml" />
+	<sqlMap resource="config/ibatis/sql-map-jd-skuColorAndSize.xml" />
+	<sqlMap resource="config/ibatis/sql-map-jd-change-goods_price.xml" />
+	<sqlMap resource="config/ibatis/sql-map-jd-change-goods_stock.xml" />
+	<sqlMap resource="config/ibatis/sql-map-jd-change-goods_onsale.xml" />
+	
+	<sqlMap resource="config/ibatis/sql-map-black-product.xml" />
+	
+</sqlMapConfig>

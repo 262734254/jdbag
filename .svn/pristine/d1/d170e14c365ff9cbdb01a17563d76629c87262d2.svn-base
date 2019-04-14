@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans default-autowire="byName">
+
+	<bean id="defaultUserManagerHessianServices"
+		class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${defaultUserManagerHessianServicesUrl}" />
+		<property name="overloadEnabled" value="true" />
+		<property name="serviceInterface">
+			<value>com.xiu.usermanager.provider.UserManagerService</value>
+		</property>
+	</bean>
+</beans>

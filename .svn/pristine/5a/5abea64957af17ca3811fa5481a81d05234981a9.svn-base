@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+						http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd"
+	>
+
+<!-- <bean id="jdDataSources" class="com.jolbox.bonecp.BoneCPDataSource"	destroy-method="close">
+		
+		<property name="driverClass" value="${jdbc.driver.class}" />
+		
+		<property name="jdbcUrl" value="${jdbc.m.url}" />
+	
+		<property name="username" value="${jdbc.m.username}" />
+		
+		<property name="password" value="${jdbc.m.password}" />
+		
+		<property name="idleConnectionTestPeriodInMinutes" value="${jdbc.m.idleConnectionTestPeriodInMinutes}" />
+		
+		<property name="idleMaxAgeInMinutes" value="${jdbc.m.idleMaxAgeInMinutes}" />
+		
+		<property name="maxConnectionsPerPartition" value="${jdbc.m.maxConnectionsPerPartition}" />
+	
+		<property name="minConnectionsPerPartition" value="${jdbc.m.minConnectionsPerPartition}" />
+	
+		<property name="partitionCount" value="${jdbc.m.partitionCount}"/>
+		
+		<property name="acquireIncrement" value="${jdbc.m.acquireIncrement}" />
+		
+		<property name="statementsCacheSize" value="${jdbc.m.statementsCacheSize}" />
+	
+		<property name="releaseHelperThreads" value="${jdbc.m.releaseHelperThreads}" />
+	</bean>   
+-->
+   <!-- 使用jndi -->
+    <bean id="jdDataSources" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/jdbc/xiu_jd_bag" />
+		<property name="resourceRef" value="true"></property>
+	</bean>  
+	
+	
+	<bean id="jdSqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+			<value>classpath:config/ibatis/sql-map-config.xml</value>
+		</property>
+		<property name="dataSource" ref="jdDataSources" />
+	</bean>
+	
+	<bean id="jdSqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient">
+			<ref bean="jdSqlMapClient"/>
+		</property>
+	</bean>
+	
+	<bean id="jdTxManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="jdDataSources" />
+	</bean>
+	
+	<tx:advice id="jdTxAdvice" transaction-manager="jdTxManager">
+		<tx:attributes>
+			<tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception"/>
+	   		<tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>
+	   		<tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception"/>
+	   		
+	   		<tx:method name="remove*" propagation="REQUIRED" rollback-for="Exception"/>
+	   		<tx:method name="query*" read-only="true"/>
+	   		<tx:method name="find*" read-only="true"/>
+	   		<tx:method name="get*" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+    
+	<aop:config>
+		<aop:pointcut id="jdServiceMethod" expression="execution(* com.xiu.jd.service.*.*(..))" />
+		<aop:advisor advice-ref="jdTxAdvice" pointcut-ref="jdServiceMethod" />
+	</aop:config>
+</beans>

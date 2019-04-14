@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<constant name="struts.i18n.encoding"  value="utf-8"></constant>
+
+    <package name="login" extends="adminIntercepter" >
+		<action name="systemadmin" class="com.xiu.jd.web.action.LoginAction" method="systemAdmin">
+			<result name="success" >/admin/view/xopLogin.jsp</result>
+		</action>
+		<action name="init" class="com.xiu.jd.web.action.InitAction" method="init"></action>
+    </package>
+    <package name="displayLogin" extends="struts-default">
+		<action name="doLogin" class="com.xiu.jd.web.action.LoginAction" method="doLogin">
+			<result name="success" >/admin/view/xopLogin.jsp</result>
+			<result name="input" >/admin/view/login.jsp</result>
+		</action>
+		<action name="checkLogin" class="com.xiu.jd.web.action.LoginAction" method="checkLogin">
+			<result name="input" >/admin/view/login.jsp</result>
+		</action>
+		
+		
+		<action name="admin_top">
+			<result name="success">/admin/view/admin_top.jsp</result>
+		</action>
+		
+		<action name="admin_left">
+			<result name="success">/admin/view/admin_left.jsp</result>
+		</action>
+		
+		<action name="admin_center">
+			<result name="success">/admin/view/admin_center.jsp</result>
+		</action>
+		
+		<action name="admin_main">
+			<result name="success">/admin/view/admin_main.jsp</result>
+		</action>
+		
+		<action name="admin_bottom">
+			<result name="success">/admin/view/admin_bottom.jsp</result>
+		</action>
+		<action name="admin_left_top">
+			<result name="success">/admin/view/admin_left_top.jsp</result>
+		</action>
+		<action name="admin_left_bot">
+			<result name="success">/admin/view/admin_left_bot.jsp</result>
+		</action>
+		
+		
+		
+    </package>
+</struts>

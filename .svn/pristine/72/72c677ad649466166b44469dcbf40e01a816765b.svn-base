@@ -1,0 +1,35 @@
+<div style="padding:15px 0;width:98%; line-height:22px; overflow:hidden;" >
+          <h5>商品属性</h5>
+          <div style="overflow:hidden;clear:both;width:97%;padding:0 10px;color:#636363;" >
+          	<ul style="width:100%;background:#f5f5f5;float:left;padding:10px 0;"  >
+				#foreach($attribute in $product.attributeList)
+				  <li style="float:left;width:47%;padding-left:20px;height:25px;line-height:25px;overflow:hidden;white-space:nowrap;-o-text-overflow:ellipsis;text-overflow:ellipsis;" title="$!{attribute.attrName}">
+				  <strong style="font-weight:bold;" >$!{attribute.attrName}：</strong>$!{attribute.valDesc}
+				  </li>
+				 #end
+            </ul>
+          </div>
+
+          #if($product.sizeContrast!='')
+          <h5 id="sizeIcon">尺码对照</h5>
+          <div style="overflow:hidden;clear:both;width:97%;padding:0 10px;color:#636363;"  >
+            <p style=" text-align:left;color:#636363;" >
+            <img style="text-align:center" src="$!{product.sizeContrast}" onerror="sizePicErr(this);" width="706"></p>
+          </div>
+          #end
+
+          #if($product.editKeyword!='')
+          <h5>商品描述</h5>
+          <div style="overflow:hidden;clear:both;width:97%;padding:0 10px;color:#636363;" >
+          	$!{product.editKeyword}
+          </div>
+          #end
+           
+		  #if($product.description!='')
+          <h5>商品详情</h5>
+          <div style="overflow:hidden;clear:both;width:97%;padding:0 10px;color:#636363;"  >
+            $!{product.description}
+          </div>
+          #end
+              
+ </div>
